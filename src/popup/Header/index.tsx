@@ -1,25 +1,18 @@
 import * as React from 'react'
 import './styles.scss'
+import SettingsIcon from '@material-ui/icons/Settings'
 
-interface AppProps {}
+interface HeaderProps {}
 
-interface AppState {}
+const Header: React.FC<HeaderProps> = () => (
+  <div className='header__main'>
+    <div className='header__title'>
+      <span>Controlla</span>
+    </div>
+    <div className='settings__button'>
+      <SettingsIcon />
+    </div>
+  </div>
+)
 
-export default class Header extends React.Component<AppProps, AppState> {
-  constructor(props: AppProps, state: AppState) {
-    super(props, state)
-  }
-
-  render() {
-    return (
-      <div className='header__main'>
-        <div className='header__title'>
-          <span>Controlla</span>
-        </div>
-        <div className='settings__button'>
-          <i className='fas fa-cog'></i>
-        </div>
-      </div>
-    )
-  }
-}
+export default Header

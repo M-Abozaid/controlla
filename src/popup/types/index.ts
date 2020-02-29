@@ -1,14 +1,14 @@
 /* Quota */
 
-export interface QuoteTime {
+export interface QuotaTime {
   startTime: string
   endTime: string
-  quote: number
+  quota: number
 }
 
 export interface QuotaRule {
   daysOfweek: number[]
-  timeOfDay: QuoteTime[]
+  timeOfDay: QuotaTime[]
 }
 
 export interface RuleObject {

@@ -1,11 +1,11 @@
 $primary-color: rgb(78, 78, 78);
 
 * {
+  margin: 0; // all El gets margin 5 by default :D
   box-sizing: border-box;
 }
 
 body {
-  margin: 0px;
   font-family: Arial, Helvetica, sans-serif;
 }
 

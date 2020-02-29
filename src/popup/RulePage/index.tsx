@@ -1,5 +1,6 @@
 import * as React from 'react'
 import './styles.scss'
+import TabsPanel from '../TabsPanel'
 
 import data from '../data'
 import { getRuleTitle } from '../utils'
@@ -17,6 +18,7 @@ export default class RulePage extends React.Component<AppProps, AppState> {
     return (
       <div className='rule-page__main'>
         <h3 className='rule-page__title'>{getRuleTitle(data[0])}</h3>
+        <TabsPanel />
       </div>
     )
   }

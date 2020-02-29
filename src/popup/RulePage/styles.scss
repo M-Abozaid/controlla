@@ -1,8 +1,13 @@
 .rule-page__main {
-  background-color: rgba(243, 243, 243, 0.596);
+  margin: 5px;
 }
 
 .rule-page__title {
+  width: 98%;
   padding: 10px;
+  margin: 0 auto;
   text-align: center;
+  border-radius: 10px;
+  border: 1px solid rgba(134, 134, 134, 0.616);
+  background-color: rgba(226, 225, 225, 0.616);
 }
