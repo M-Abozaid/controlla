@@ -1,19 +1,18 @@
 /* Quota */
 
-export interface QuotaTime {
-  startTime: string
-  endTime: string
-  quota: number
+export enum MatcherType {
+  'YT_CATEGORY',
+  'URL',
+  'YT_CHANNEL',
+  'YT_TITLE',
 }
-
-export interface QuotaRule {
+export interface Rule {
+  id?: string,
+  matcher:{
+      type: MatcherType,
+      value: string | RegExp
+  },
+  startTime: string,
+  endTime: string,
   daysOfWeek: number[]
-  quotaTime: number
-  timeOfDay: QuotaTime
-}
-
-export interface RuleObject {
-  url?: RegExp
-  categoryId?: string
-  quotaRules: QuotaRule[]
 }
