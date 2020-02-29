@@ -20,6 +20,7 @@
   &:visited {
     cursor: pointer;
     display: inline-block;
+    color: #1387b4;
   }
 
   transition: all 0.3s;
@@ -30,6 +31,6 @@
 
   &:active {
     transform: translateY(0.3rem);
-    color: #10a1b4c2;
+    color: #1387b4;
   }
 }
