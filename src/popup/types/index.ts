@@ -7,8 +7,9 @@ export interface QuotaTime {
 }
 
 export interface QuotaRule {
-  daysOfweek: number[]
-  timeOfDay: QuotaTime[]
+  daysOfWeek: number[]
+  quotaTime: number
+  timeOfDay: QuotaTime
 }
 
 export interface RuleObject {

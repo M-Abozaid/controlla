@@ -1,12 +1,12 @@
 # Changelog
 
--added Bootstrap CDN
-
-## npm
-
-- npm install react-bootstrap bootstrap
+- changed favicon
 
 ## src/popup
 
-- changed TabsPanel to use react-bootstrap
-- changed RulesPage to be MainPage
+- select quota rule from rule object
+
+- show quota rules in the rules tab
+- show progress par in rule component
+
+- changed timeOfDay from an array to only one object
