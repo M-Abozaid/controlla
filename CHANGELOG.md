@@ -2,4 +2,4 @@
 
 ## src/popup
 
-- added repres. of quota time to the rule component
+- added repres. of time of the day to the rule component
