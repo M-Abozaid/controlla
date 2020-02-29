@@ -2,6 +2,10 @@
   padding: 5px;
   margin: 5px 0;
   border: rgba(143, 141, 140, 0.397) 0.5px solid;
+
+  > *:not(:last-child) {
+    padding-bottom: 5px;
+  }
 }
 
 .rule__progress {
@@ -28,12 +32,39 @@
 
 .rule__time-day {
   text-align: center;
+  position: relative;
 
   :not(:first-child) {
-    font-size: 75%;
+    font-size: 80%;
   }
 
   :not(:last-child) {
     padding-right: 10px;
+  }
+
+  svg {
+    font-size: 180%;
+    font-weight: 800;
+
+    top: 0;
+    left: 0;
+    position: absolute;
+  }
+}
+
+.rule__days-week {
+  text-align: center;
+  position: relative;
+
+  svg {
+    top: 5px;
+    left: 0;
+    position: absolute;
+  }
+
+  &--active {
+    span {
+      background-color: #90caf925;
+    }
   }
 }

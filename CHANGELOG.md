@@ -2,4 +2,5 @@
 
 ## src/popup
 
-- added repres. of time of the day to the rule component
+- added repres. of days of the week to the rule comp.
+- added some styling to rule comp.
