@@ -6,6 +6,11 @@ export enum MatcherType {
   'YT_CHANNEL',
   'YT_TITLE',
 }
+
+export interface Matcher {
+  type: MatcherType,
+  value: string | RegExp
+}
 export interface Rule {
   id?: string,
   matcher:{
@@ -14,5 +19,6 @@ export interface Rule {
   },
   startTime: string,
   endTime: string,
-  daysOfWeek: number[]
+  daysOfWeek: number[],
+  quota: number
 }
