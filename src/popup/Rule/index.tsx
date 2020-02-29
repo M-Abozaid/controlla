@@ -14,11 +14,15 @@ const Rule: React.FC<RuleProps> = ({ quotaTime, timeOfDay, daysOfWeek }) => {
 
   return (
     <div className='rule__main'>
-      <ProgressBar
-        now={quotaPercentage}
-        label={`${quotaPercentage} %`}
-        animated
-      />
+      <div>
+        <ProgressBar
+          className='progress__bar'
+          now={quotaPercentage}
+          label={`${quotaPercentage} %`}
+          animated
+        />
+        <span className='progress__bar--time'>{quotaTime}</span>
+      </div>
     </div>
   )
 }

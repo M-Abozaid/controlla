@@ -3,3 +3,23 @@
   margin: 5px 0;
   border: rgba(143, 141, 140, 0.397) 0.5px solid;
 }
+
+.progress__bar {
+  width: 90%;
+  height: 110%;
+  display: inline-block; // to inline the time
+
+  &--time {
+    top: -3px; // to bring it up a little
+    position: relative; // to rule__main
+
+    padding: 4px;
+    font-size: 70%;
+    color: white;
+    font-weight: bold;
+
+    margin-left: 10px;
+    border-radius: 50%;
+    background-color: #007bff;
+  }
+}
