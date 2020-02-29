@@ -1,6 +1,7 @@
-import { QuotaUsage } from './types/index';
+import { QuotaUsage } from '../popup/types/index';
 
-import { Rule, MatcherType } from './types';
+import { Rule, MatcherType } from '../popup/types';
+
 const rules: Rule[] = [
   {
     id: 'someuuid',
@@ -21,4 +22,5 @@ const quotaUsage: QuotaUsage[] = [
     amount: 3
   }
 ]
+
 export { rules, quotaUsage }
