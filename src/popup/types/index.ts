@@ -17,8 +17,8 @@ export interface Rule {
       type: MatcherType,
       value: string | RegExp
   },
+  quota: number,
   startTime: string,
   endTime: string,
   daysOfWeek: number[],
-  quota: number
 }

@@ -24,6 +24,14 @@ export class Storage{
         return 0
     }
 
+    incrementUsage(ruleId: string){
 
+    }
+
+    resetUsage(ruleId:string){
+
+    }
+
+    
 
 }
