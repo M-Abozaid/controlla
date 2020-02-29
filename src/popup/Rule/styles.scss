@@ -1,0 +1,70 @@
+.rule__main {
+  padding: 5px;
+  margin: 5px 0;
+  border: rgba(143, 141, 140, 0.397) 0.5px solid;
+
+  > *:not(:last-child) {
+    padding-bottom: 5px;
+  }
+}
+
+.rule__progress {
+  &-bar {
+    width: 90%;
+    height: 110%;
+    display: inline-block;
+  }
+
+  &-time {
+    top: -3px;
+    position: relative;
+
+    padding: 4px;
+    font-size: 70%;
+    color: white;
+    font-weight: bold;
+
+    margin-left: 10px;
+    border-radius: 50%;
+    background-color: #007bff;
+  }
+}
+
+.rule__time-day {
+  text-align: center;
+  position: relative;
+
+  :not(:first-child) {
+    font-size: 80%;
+  }
+
+  :not(:last-child) {
+    padding-right: 10px;
+  }
+
+  svg {
+    font-size: 180%;
+    font-weight: 800;
+
+    top: 0;
+    left: 0;
+    position: absolute;
+  }
+}
+
+.rule__days-week {
+  text-align: center;
+  position: relative;
+
+  svg {
+    top: 5px;
+    left: 0;
+    position: absolute;
+  }
+
+  &--active {
+    span {
+      background-color: #90caf925;
+    }
+  }
+}
