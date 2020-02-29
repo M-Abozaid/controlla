@@ -14,11 +14,16 @@ export interface Matcher {
 export interface Rule {
   id?: string,
   matcher: {
-      type: MatcherType,
-      value: string | RegExp
+    type: MatcherType,
+    value: string | RegExp
   },
   startTime: string,
   endTime: string,
   daysOfWeek: number[],
   quota: any,
+}
+
+export interface QuotaUsage {
+  id?: string,
+  amount: number,
 }

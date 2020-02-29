@@ -1,6 +1,7 @@
+import { QuotaUsage } from './types/index';
 
 import { Rule, MatcherType } from './types';
-const data: Rule[] = [
+const rules: Rule[] = [
   {
     id: 'someuuid',
     matcher: {
@@ -14,4 +15,10 @@ const data: Rule[] = [
   }
 ]
 
-export default data
+const quotaUsage: QuotaUsage[] = [
+  {
+    id: 'someuuid',
+    amount: 3
+  }
+]
+export { rules, quotaUsage }

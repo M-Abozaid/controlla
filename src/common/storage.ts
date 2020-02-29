@@ -1,6 +1,7 @@
+import { QuotaUsage } from './../popup/types/index';
 import { Rule } from './../popup/types';
 import { MatcherType } from 'popup/types/index';
-import data from 'popup/data';
+import { rules, quotaUsage } from '../popup/data';
 export class Storage {
 
     constructor() {
@@ -23,22 +24,23 @@ export class Storage {
 
     }
 
-    getUsage(ruleId: string): number {
-        return 0
+    getQuotaUsage(ruleId: string): number {
+
+        return quotaUsage[0].amount
     }
 
-    incrementUsage(ruleId: string) {
+    incrementQuotaUsage(ruleId: string) {
 
     }
 
-    resetUsage(ruleId: string) {
+    resetQuotaUsage(ruleId: string) {
 
     }
 
 
 
     getMatchingRules(url: string): Rule[] {
-        return data
+        return rules
     }
 
 }
