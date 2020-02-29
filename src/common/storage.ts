@@ -1,41 +1,39 @@
-import { Rule } from './../popup/types/index';
+import { Rule } from './../popup/types';
 import { MatcherType } from 'popup/types/index';
 import data from 'popup/data';
-export class Storage{
+export class Storage {
 
-    constructor(){
+    constructor() {
 
     }
 
-    getRuleById(id:string){
+    getRuleById(id: string) {
         return {}
     }
 
-    getMatcherRules(matcher:MatcherType){
+
+    deleteRuleById(id: string) {
 
     }
-    deleteRuleById(id: string){
-
-    }
-    addRule(rule: Rule){
+    addRule(rule: Rule) {
 
     }
 
-    getUsage(ruleId: string): number{
+    getUsage(ruleId: string): number {
         return 0
     }
 
-    incrementUsage(ruleId: string){
+    incrementUsage(ruleId: string) {
 
     }
 
-    resetUsage(ruleId:string){
+    resetUsage(ruleId: string) {
 
     }
 
 
 
-    getMatchingRules(url: string):Rule[]{
+    getMatchingRules(url: string): Rule[] {
         return data[0]
     }
 
