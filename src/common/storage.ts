@@ -1,5 +1,6 @@
 import { Rule } from './../popup/types/index';
 import { MatcherType } from 'popup/types/index';
+import data from 'popup/data';
 export class Storage{
 
     constructor(){
@@ -32,6 +33,10 @@ export class Storage{
 
     }
 
-    
+
+
+    getMatchingRules(url: string):Rule[]{
+        return data[0]
+    }
 
 }
