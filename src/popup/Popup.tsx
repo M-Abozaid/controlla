@@ -1,6 +1,7 @@
 import * as React from 'react'
 import './Popup.scss'
 import Header from './Header'
+import RulePage from './RulePage'
 
 interface AppProps {}
 
@@ -19,6 +20,7 @@ export default class Popup extends React.Component<AppProps, AppState> {
     return (
       <div className='popupContainer'>
         <Header />
+        <RulePage />
       </div>
     )
   }
