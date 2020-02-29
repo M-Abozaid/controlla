@@ -1,15 +1,16 @@
 
+import { Rule, MatcherType } from './types';
 const data: Rule[] = [
   {
     id: 'someuuid',
-    matcher:{
+    matcher: {
       type: MatcherType.URL,
       value: /^chess\.com/
     },
-    daysOfWeek: [1,2,3],
+    daysOfWeek: [1, 2, 3],
     startTime: '00:00',
-    endTime: '23:59', 
-    quota: 27,
+    endTime: '23:59',
+    quota: 27
   }
 ]
 
