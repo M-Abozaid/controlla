@@ -7,12 +7,16 @@ export class Storage {
 
     }
 
-    getRuleById(id: string) {
+    getRuleById(ruleId: string) {
         return {}
     }
 
 
-    deleteRuleById(id: string) {
+    updateRuleById(ruleId: string) {
+
+    }
+
+    deleteRuleById(ruleId: string) {
 
     }
     addRule(rule: Rule) {
