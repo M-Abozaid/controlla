@@ -1,0 +1,35 @@
+.header__main {
+  padding: 10px;
+  font-size: 1.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #27b0e6;
+  border-bottom: 1px solid rgba(168, 167, 167, 0.753);
+}
+
+.header__title {
+  font-weight: bold;
+}
+
+.settings__button {
+  &,
+  &:link,
+  &:visited {
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  transition: all 0.3s;
+
+  &:hover {
+    color: #65e0f0;
+  }
+
+  &:active {
+    transform: translateY(0.2rem);
+    color: #10a1b4c2;
+  }
+}

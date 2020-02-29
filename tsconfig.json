@@ -1,14 +1,18 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "rootDir": "src",
-        "outDir": "dist/js",
-        "sourceMap": true,
-        "jsx": "react",
-        "lib": ["es2015", "dom"],
-        "experimentalDecorators": true,
-        "allowSyntheticDefaultImports": true
-    }
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "es2015",
+      "DOM.Iterable"
+    ],
+    "jsx": "react",
+    "target": "es5",
+    "module": "esnext",
+    "sourceMap": true,
+    "rootDir": "src",
+    "outDir": "dist/js",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true
+  }
 }
