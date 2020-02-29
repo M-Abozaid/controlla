@@ -33,7 +33,7 @@ export class Storage {
 
 
 
-    getMatchingRules(url: string): Rule[] {
+    getMatchingRules(url: string): Rule {
         return data[0]
     }
 
