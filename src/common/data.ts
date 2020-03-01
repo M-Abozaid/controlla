@@ -12,14 +12,16 @@ const rules: Rule[] = [
     daysOfWeek: [1, 2, 3],
     startTime: '00:00',
     endTime: '23:59',
-    quota: 27
+    activeQuota: 27,
+    visibilityQuota: 10,
   }
 ]
 
 const quotaUsage: QuotaUsage[] = [
   {
     id: 'someuuid',
-    amount: 3
+    activeUsage: 5,
+    visibilityUsage: 5,
   }
 ]
 

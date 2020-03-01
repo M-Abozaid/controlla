@@ -1,3 +1,4 @@
+import { QuotaUsage } from './index';
 /* Quota */
 
 export enum MatcherType {
@@ -20,10 +21,12 @@ export interface Rule {
   startTime: string,
   endTime: string,
   daysOfWeek: number[],
-  quota: any,
+  activeQuota: any,
+  visibilityQuota?: number,
 }
 
 export interface QuotaUsage {
   id?: string,
-  amount: number,
+  activeUsage: number,
+  visibilityUsage: number
 }

@@ -10,14 +10,15 @@ export class Storage {
     constructor() {
         this.rulesDB = new PounchDB('rules')
         this.quotaUsageDB = new PounchDB('quotaUsage')
-
     }
 
-    getRuleById(ruleId: string) {
-        return {}
+    getRuleById(ruleId: string): Rule {
+        return rules[0]
     }
 
-
+    getRules(): Rule[] {
+        return rules
+    }
     updateRuleById(ruleId: string, rule) {
 
     }
