@@ -33,6 +33,7 @@
     "@material-ui/icons": "^4.9.1",
     "bootstrap": "^4.4.1",
     "chrome-promise": "^3.0.5",
+    "pouchdb": "^7.2.1",
     "react": "^16.13.0",
     "react-bootstrap": "^1.0.0-beta.17",
     "react-dom": "^16.13.0",
