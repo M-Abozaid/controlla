@@ -2,11 +2,8 @@ import React, { useState } from 'react'
 import { Tabs, Tab } from 'react-bootstrap'
 import Rule from '../Rule'
 
-import { selectQuotaRules } from '../utils'
-import data from '../data'
-
 const TabsPanel = () => {
-  const [key, setKey] = useState('rules')
+  const [key, setKey] = useState('stats')
 
   return (
     <Tabs
@@ -14,7 +11,7 @@ const TabsPanel = () => {
       activeKey={key}
       onSelect={(k: React.SetStateAction<string>) => setKey(k)}
     >
-      <Tab eventKey='rules' title='Rules &#9997;'>
+      {/* <Tab eventKey='rules' title='Rules &#9997;'>
         <div>
           {selectQuotaRules(data[0]).map(quotaRule => (
             <Rule
@@ -24,7 +21,7 @@ const TabsPanel = () => {
             />
           ))}
         </div>
-      </Tab>
+      </Tab> */}
 
       <Tab eventKey='stats' title='Stats &#9783;'>
         <div>Stats</div>
