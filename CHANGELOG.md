@@ -2,5 +2,7 @@
 
 ## src/popup
 
-- added repres. of days of the week to the rule comp.
-- added some styling to rule comp.
+- changed the popup to take data from common/data
+- changed popup and Main page to be functional components
+- changed main page to RuleHeader
+- deleted MainPage

@@ -1,7 +1,7 @@
 $primary-color: rgb(78, 78, 78);
 
 * {
-  margin: 0; // all El gets margin 5 by default :D
+  margin: 0;
   box-sizing: border-box;
 }
 
@@ -17,4 +17,12 @@ body {
   color: $primary-color;
 
   border: 1px solid rgb(117, 116, 116);
+}
+
+.tabs-panel {
+  padding: 5px 0;
+
+  a {
+    width: 50%;
+  }
 }

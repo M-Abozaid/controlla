@@ -1,22 +1,23 @@
 import * as React from 'react'
 import './styles.scss'
-import { QuotaTime } from '../types'
 import { ProgressBar } from 'react-bootstrap'
 import TimerIcon from '@material-ui/icons/Timer'
 import { ButtonGroup, Button } from '@material-ui/core'
 import DateRangeIcon from '@material-ui/icons/DateRange'
 
-interface RuleProps {
-  quotaTime: number
-  timeOfDay: QuotaTime
-  daysOfWeek: number[]
-}
+// interface RuleProps {
+//   quotaTime: number
+//   timeOfDay: QuotaTime
+//   daysOfWeek: number[]
+// }
 
-const Rule: React.FC<RuleProps> = ({ quotaTime, timeOfDay, daysOfWeek }) => {
+const Rule = ({ ruleTitle, quotaTime, timeOfDay, daysOfWeek }) => {
   const quotaPercentage = (timeOfDay.quota / quotaTime) * 100
 
   return (
     <div className='rule__main'>
+      <h4 className='rule__title'>{ruleTitle}</h4>
+
       <div>
         <ProgressBar
           className='rule__progress-bar'

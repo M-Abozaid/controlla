@@ -1,27 +1,15 @@
 import * as React from 'react'
 import './Popup.scss'
 import Header from './Header'
-import MainPage from './MainPage'
+import TabsPanel from './TabsPanel'
 
-interface AppProps {}
+const Popup = () => (
+  <div className='popupContainer'>
+    <Header />
+    <div className='tabs-panel'>
+      <TabsPanel />
+    </div>
+  </div>
+)
 
-interface AppState {}
-
-export default class Popup extends React.Component<AppProps, AppState> {
-  constructor(props: AppProps, state: AppState) {
-    super(props, state)
-  }
-
-  componentDidMount() {
-    chrome.runtime.sendMessage({ popupMounted: true })
-  }
-
-  render() {
-    return (
-      <div className='popupContainer'>
-        <Header />
-        <MainPage />
-      </div>
-    )
-  }
-}
+export default Popup
