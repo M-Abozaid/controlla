@@ -11,12 +11,19 @@ import DateRangeIcon from '@material-ui/icons/DateRange'
 //   daysOfWeek: number[]
 // }
 
-const Rule = ({ ruleTitle, quotaTime, timeOfDay, daysOfWeek }) => {
-  const quotaPercentage = (timeOfDay.quota / quotaTime) * 100
+const Rule = ({
+  ruleTitle,
+  activeQuota,
+  visibilityQuota,
+  startTime,
+  endTime,
+  daysOfWeek,
+}) => {
+  const quotaPercentage = (20 / activeQuota) * 100
 
   return (
     <div className='rule__main'>
-      <h4 className='rule__title'>{ruleTitle}</h4>
+      <h4 className='rule__title'>{`${ruleTitle}`}</h4>
 
       <div>
         <ProgressBar
@@ -25,14 +32,14 @@ const Rule = ({ ruleTitle, quotaTime, timeOfDay, daysOfWeek }) => {
           label={`${quotaPercentage} %`}
           animated
         />
-        <span className='rule__progress-time'>{quotaTime}</span>
+        <span className='rule__progress-time'>{activeQuota}</span>
       </div>
 
       <div className='rule__time-day'>
         <TimerIcon />
-        <span>Start: {timeOfDay.startTime}</span>
-        <span>End: {timeOfDay.endTime}</span>
-        <span>Quota: {timeOfDay.quota} m</span>
+        <span>Start: {startTime}</span>
+        <span>End: {endTime}</span>
+        <span>Quota: {activeQuota} m</span>
       </div>
 
       <div className='rule__days-week'>
@@ -42,13 +49,15 @@ const Rule = ({ ruleTitle, quotaTime, timeOfDay, daysOfWeek }) => {
           aria-label='small outlined button group'
           color='primary'
         >
-          {[0, 1, 2, 3, 4, 5, 6].map(number => {
+          {[0, 1, 2, 3, 4, 5, 6].map((number, idx) => {
             if (daysOfWeek.includes(number)) {
               return (
-                <Button className='rule__days-week--active'>{number}</Button>
+                <Button key={idx} className='rule__days-week--active'>
+                  {number}
+                </Button>
               )
             } else {
-              return <Button>{number}</Button>
+              return <Button key={idx}>{number}</Button>
             }
           })}
         </ButtonGroup>
