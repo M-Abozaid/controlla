@@ -23,7 +23,9 @@ const Rule: React.FC<RuleProps> = ({
   endTime,
   daysOfWeek,
 }) => {
-  const quotaPercentage = Math.round((20 / activeQuota) * 100)
+  const quotaUsage = 20
+  const restQuota = activeQuota - quotaUsage
+  const quotaPercentage = Math.round((quotaUsage / activeQuota) * 100)
 
   return (
     <div className='rule__main'>
@@ -35,7 +37,7 @@ const Rule: React.FC<RuleProps> = ({
           now={quotaPercentage}
           label={`${quotaPercentage} %`}
         />
-        <span className='rule__progress-time'>{activeQuota}</span>
+        <span className='rule__progress-time'>{restQuota} m</span>
       </div>
 
       <div className='rule__time-day'>
@@ -49,8 +51,8 @@ const Rule: React.FC<RuleProps> = ({
         <DateRangeIcon />
         <ButtonGroup
           size='small'
-          aria-label='small outlined button group'
           color='primary'
+          aria-label='small outlined button group'
         >
           {[0, 1, 2, 3, 4, 5, 6].map((number, idx) => {
             if (daysOfWeek.includes(number)) {
