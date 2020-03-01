@@ -1,4 +1,3 @@
-import { QuotaUsage } from './index';
 /* Quota */
 
 export enum MatcherType {

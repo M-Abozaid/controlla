@@ -29,14 +29,14 @@ export class Keeper {
 
             effectiveRules.forEach(async effectiveRule => {
                 const { activeUsage, visibilityUsage } = await this.storage.getUsage(effectiveRule.id);
-                if (tabRemoved) return;
+                if (tabRemoved || tabHidden) return;
                 if (activeUsage > effectiveRule.activeQuota) {
-                    this.removeTab(tab);
+                    await this.removeTab(tab);
                     tabRemoved = true
                 }
-                if (activeUsage > effectiveRule.activeQuota) {
-                    this.removeTab(tab);
-                    tabRemoved = true
+                if (visibilityUsage > effectiveRule.visibilityQuota) {
+                    await this.hideTab(tab);
+                    tabHidden = true
                 }
             })
 
@@ -57,13 +57,16 @@ export class Keeper {
     }
 
 
-
-
-
-
-
-
-
+    async hideTab(tab) {
+        const [newTab] = await chromep.tabs.query({
+            url: 'chrome://newtab/',
+            windowId: tab.windowId,
+        });
+        if (newTab) {
+            return chromep.tabs.update(newTab.id, { active: true });
+        }
+        return chromep.tabs.create({ windowId: tab.windowId });
+    }
 
 
 
