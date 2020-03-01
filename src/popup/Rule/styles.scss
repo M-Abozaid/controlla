@@ -2,10 +2,6 @@
   margin: 5px;
   padding: 5px;
   border: rgba(143, 141, 140, 0.397) 0.5px solid;
-
-  > * {
-    padding-bottom: 5px;
-  }
 }
 
 .rule__title {
@@ -57,7 +53,7 @@
     font-size: 220%;
     font-weight: 800;
 
-    top: 0;
+    top: -5px;
     left: 0;
     position: absolute;
   }

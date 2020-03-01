@@ -2,4 +2,5 @@
 
 ## src/popup
 
-- minor changes to the styling in Rule Comp.
+- mapDayNumber and changes to the Rule comp.
+- minor changes to the styling of AddButton and Rule
