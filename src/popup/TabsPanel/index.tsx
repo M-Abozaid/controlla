@@ -4,7 +4,7 @@ import Rule from '../Rule'
 import { rules } from '../../common/data'
 
 const TabsPanel = () => {
-  const [key, setKey] = useState('stats')
+  const [key, setKey] = useState('rules')
 
   return (
     <Tabs

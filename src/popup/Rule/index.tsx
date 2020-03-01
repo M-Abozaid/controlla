@@ -4,6 +4,7 @@ import { ProgressBar } from 'react-bootstrap'
 import TimerIcon from '@material-ui/icons/Timer'
 import { ButtonGroup, Button } from '@material-ui/core'
 import DateRangeIcon from '@material-ui/icons/DateRange'
+import { getRuleTitle } from '../Services'
 
 // interface RuleProps {
 //   quotaTime: number
@@ -19,11 +20,11 @@ const Rule = ({
   endTime,
   daysOfWeek,
 }) => {
-  const quotaPercentage = (20 / activeQuota) * 100
+  const quotaPercentage = Math.round((20 / activeQuota) * 100)
 
   return (
     <div className='rule__main'>
-      <h4 className='rule__title'>{`${ruleTitle}`}</h4>
+      <h4 className='rule__title'>{getRuleTitle(ruleTitle)}</h4>
 
       <div>
         <ProgressBar

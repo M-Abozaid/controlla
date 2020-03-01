@@ -6,7 +6,8 @@
   align-items: center;
   justify-content: space-between;
 
-  color: #27b0e6;
+  color: #007bff;
+  background-color: rgba(218, 208, 189, 0.137);
   border-bottom: 1px solid rgba(168, 167, 167, 0.753);
 }
 
@@ -20,7 +21,6 @@
   &:visited {
     cursor: pointer;
     display: inline-block;
-    color: #1387b4;
   }
 
   transition: all 0.3s;
@@ -31,6 +31,10 @@
 
   &:active {
     transform: translateY(0.3rem);
-    color: #1387b4;
+    color: #007bff;
+  }
+
+  svg {
+    font-size: 120%;
   }
 }
