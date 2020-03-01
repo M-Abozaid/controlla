@@ -2,12 +2,16 @@
   padding: 10px;
   font-size: 1.5rem;
 
+  top: 0;
+  width: 100%;
+  position: fixed;
+  background-color: #333;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  color: #007bff;
-  background-color: rgba(218, 208, 189, 0.137);
+  color: #65e0f0;
   border-bottom: 1px solid rgba(168, 167, 167, 0.753);
 }
 
@@ -26,7 +30,7 @@
   transition: all 0.3s;
 
   &:hover {
-    color: #65e0f0;
+    color: #65f088;
   }
 
   &:active {

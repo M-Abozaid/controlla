@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
+import './styles.scss'
 import { Tabs, Tab } from 'react-bootstrap'
 import Rule from '../Rule'
 import { rules } from '../../common/data'
+import AddButton from '../AddButton'
 
 const TabsPanel = () => {
   const [key, setKey] = useState('rules')
 
   return (
     <Tabs
+      className='tabs-panel__main'
       id='contolled-tabs'
       activeKey={key}
       onSelect={(k: React.SetStateAction<string>) => setKey(k)}
@@ -26,6 +29,7 @@ const TabsPanel = () => {
             />
           ))}
         </div>
+        <AddButton />
       </Tab>
 
       <Tab eventKey='stats' title='Stats &#9783;'>

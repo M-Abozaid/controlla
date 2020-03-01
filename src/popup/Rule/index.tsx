@@ -34,7 +34,6 @@ const Rule: React.FC<RuleProps> = ({
           className='rule__progress-bar'
           now={quotaPercentage}
           label={`${quotaPercentage} %`}
-          animated
         />
         <span className='rule__progress-time'>{activeQuota}</span>
       </div>
