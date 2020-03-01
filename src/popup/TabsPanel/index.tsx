@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Tabs, Tab } from 'react-bootstrap'
 import Rule from '../Rule'
+import { rules } from '../../common/data'
 
 const TabsPanel = () => {
-  const [key, setKey] = useState('stats')
+  const [key, setKey] = useState('rules')
 
   return (
     <Tabs
@@ -11,17 +12,21 @@ const TabsPanel = () => {
       activeKey={key}
       onSelect={(k: React.SetStateAction<string>) => setKey(k)}
     >
-      {/* <Tab eventKey='rules' title='Rules &#9997;'>
+      <Tab eventKey='rules' title='Rules &#9997;'>
         <div>
-          {selectQuotaRules(data[0]).map(quotaRule => (
+          {rules.map((quotaRule, idx) => (
             <Rule
-              quotaTime={quotaRule.quotaTime}
-              timeOfDay={quotaRule.timeOfDay}
+              key={idx}
+              ruleTitle={quotaRule.matcher.value}
+              activeQuota={quotaRule.activeQuota}
+              visibilityQuota={quotaRule.visibilityQuota}
+              startTime={quotaRule.startTime}
+              endTime={quotaRule.endTime}
               daysOfWeek={quotaRule.daysOfWeek}
             />
           ))}
         </div>
-      </Tab> */}
+      </Tab>
 
       <Tab eventKey='stats' title='Stats &#9783;'>
         <div>Stats</div>

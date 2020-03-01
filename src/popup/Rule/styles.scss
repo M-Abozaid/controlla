@@ -1,6 +1,6 @@
 .rule__main {
   padding: 5px;
-  margin: 5px 0;
+  margin: 5px;
   border: rgba(143, 141, 140, 0.397) 0.5px solid;
 
   > *:not(:last-child) {
@@ -10,12 +10,11 @@
 
 .rule__title {
   width: 100%;
-  padding: 10px;
-  margin: 0 auto;
+  padding: 5px;
   text-align: center;
   border-radius: 10px;
   border: 1px solid rgba(134, 134, 134, 0.616);
-  background-color: rgba(226, 225, 225, 0.616);
+  background-color: rgba(226, 225, 225, 0.452);
 }
 
 .rule__progress {
@@ -65,6 +64,7 @@
 .rule__days-week {
   text-align: center;
   position: relative;
+  margin-bottom: 5px;
 
   svg {
     top: 5px;
