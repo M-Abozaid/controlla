@@ -6,13 +6,16 @@ import { ButtonGroup, Button } from '@material-ui/core'
 import DateRangeIcon from '@material-ui/icons/DateRange'
 import { getRuleTitle } from '../Services'
 
-// interface RuleProps {
-//   quotaTime: number
-//   timeOfDay: QuotaTime
-//   daysOfWeek: number[]
-// }
+interface RuleProps {
+  ruleTitle: RegExp | string
+  activeQuota: number
+  visibilityQuota: number
+  startTime: string
+  endTime: string
+  daysOfWeek: number[]
+}
 
-const Rule = ({
+const Rule: React.FC<RuleProps> = ({
   ruleTitle,
   activeQuota,
   visibilityQuota,

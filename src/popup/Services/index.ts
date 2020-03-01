@@ -12,6 +12,6 @@ export async function getActiveTab(): Promise<chrome.tabs.Tab> {
 @input: rule title as a regex
 @output: the title of the rule as a string 
 */
-export const getRuleTitle = (ruleTitle: RegExp) => {
+export const getRuleTitle = (ruleTitle: RegExp | string) => {
   return `${ruleTitle}`.match(/[^\\\/\^\$]/gi)
 }
