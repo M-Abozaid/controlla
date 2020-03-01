@@ -1,6 +1,5 @@
-import { QuotaUsage } from './../popup/types/index';
+import { QuotaUsage, } from './../popup/types';
 import { Rule } from './../popup/types';
-import { MatcherType } from 'popup/types/index';
 import { rules, quotaUsage } from './data';
 import PounchDB from 'pouchdb';
 export class Storage {
