@@ -22,7 +22,7 @@ export class Keeper {
         activeTabs.forEach(async tab => {
             let tabRemoved = false;
             let tabHidden = false;
-            const rules = this.storage.getMatchingRules(tab.url)
+            const rules = await this.storage.getMatchingRules(tab.url)
 
             const effectiveRules = rules.filter(r => this.isRuleMatchingDaysOfWeek(r) && this.isRuleMatchingTimeOfDay(r))
 
@@ -44,11 +44,20 @@ export class Keeper {
     }
 
     isRuleMatchingTimeOfDay(rule: Rule): boolean {
-        return false
+        const currentMinutes = moment
+            .duration()
+            .add(moment().hours(), 'hours')
+            .add(moment().minutes(), 'minutes')
+            .asMinutes();
+
+        return (
+            moment.duration(rule.startTime).asMinutes() <= currentMinutes &&
+            moment.duration(rule.endTime).asMinutes() > currentMinutes
+        );
     }
 
     isRuleMatchingDaysOfWeek(rule: Rule): boolean {
-        return false
+        return rule.daysOfWeek.includes(moment().weekday())
     }
 
 
@@ -70,18 +79,10 @@ export class Keeper {
 
 
 
-    // get active tabs
-    // for each tab
-    // get matching rules
-    // filter rules that match time of day
-    // filter rules taht match time of week
-    // get usage for each rule
-    // compare usage to qouta
-    // 
-
-
-
-
+    isYTVideoAllowed({ categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet): Promise<boolean> {
+        // get rules for vidoe category channel and title 
+        return Promise.resolve(false);
+    }
 
 
 

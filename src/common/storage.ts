@@ -2,14 +2,21 @@ import { QuotaUsage, } from './../popup/types';
 import { Rule } from './../popup/types';
 import { rules, quotaUsage } from './data';
 import PounchDB from 'pouchdb';
+import pounchDBFind from 'pouchdb-find';
+
+PounchDB.plugin(pounchDBFind)
+
 export class Storage {
 
     rulesDB
     quotaUsageDB
+    visitsDB
 
     constructor() {
+
         this.rulesDB = new PounchDB('rules')
         this.quotaUsageDB = new PounchDB('quotaUsage')
+        this.visitsDB = new PounchDB('visits')
     }
 
     getRuleById(ruleId: string): Rule {
@@ -65,7 +72,9 @@ export class Storage {
 
 
 
-    getMatchingRules(url: string): Rule[] {
+    async getMatchingRules(url: string): Promise<Rule[]> {
+        const allRules = await this.rulesDB.find()
+
         return rules
     }
 
