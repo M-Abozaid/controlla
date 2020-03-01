@@ -3,7 +3,8 @@
     "lib": [
       "dom",
       "es2015",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "es2017"
     ],
     "jsx": "react",
     "target": "es5",

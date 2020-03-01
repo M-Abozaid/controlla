@@ -2,6 +2,8 @@
 import 'jquery'
 import getYTVideos from 'common/getYTVideos';
 
+declare var jQuery
+
 const keywordSearch = []
 let goodVideos = [];
 const badVideos = [];
@@ -15,18 +17,6 @@ if (typeof document.hidden !== 'undefined') {
     // hidden = 'hidden';
     visibilityChange = 'visibilitychange';
     // state = 'visibilityState';
-} else if (typeof document.mozHidden !== 'undefined') {
-    // hidden = 'mozHidden';
-    visibilityChange = 'mozvisibilitychange';
-    // state = 'mozVisibilityState';
-} else if (typeof document.msHidden !== 'undefined') {
-    // hidden = 'msHidden';
-    visibilityChange = 'msvisibilitychange';
-    // state = 'msVisibilityState';
-} else if (typeof document.webkitHidden !== 'undefined') {
-    // hidden = 'webkitHidden';
-    visibilityChange = 'webkitvisibilitychange';
-    // state = 'webkitVisibilityState';
 }
 
 // Add a listener that constantly changes the title
@@ -67,17 +57,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
 });
 
-$(window).focus(function () {
+jQuery(window).focus(function () {
     // do something
     chrome.runtime.sendMessage({ focus: true }, function (response) { });
 });
 
-$(window).blur(function () {
+jQuery(window).blur(function () {
     // do something
     chrome.runtime.sendMessage({ focus: false }, function (response) { });
 });
 
-$(document).ready(() => {
+jQuery(document).ready(() => {
     console.log('document loaded ');
 
     document.body.addEventListener('click', function () {
