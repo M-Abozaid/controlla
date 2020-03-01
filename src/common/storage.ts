@@ -30,11 +30,31 @@ export class Storage {
 
     }
 
-    getQuotaUsage(ruleId: string): number {
+    /**
+     * 
+     * @param ruleId 
+     * 
+     * returns the active usage for a given rule
+     */
+    getActiveUsage(ruleId: string): number {
 
-        return quotaUsage[0].amount
+        return quotaUsage[0].activeUsage
     }
 
+    /**
+     * 
+     * @param ruleId string
+     * 
+     * returns the visibility usage for a given rule 
+     */
+    getVisibilityUsage(ruleId: string): number {
+
+        return quotaUsage[0].activeUsage
+    }
+
+    getUsage(ruleId: string): QuotaUsage {
+        return quotaUsage[0]
+    }
     incrementQuotaUsage(ruleId: string) {
 
     }
