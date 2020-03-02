@@ -1,40 +1,48 @@
+import { RuleObj } from './../popup/types/index';
 import { QuotaUsage, } from './../popup/types';
-import { Rule } from './../popup/types';
+import Rule from '../common/rule'
 import { rules, quotaUsage } from './data';
 import PounchDB from 'pouchdb';
 import pounchDBFind from 'pouchdb-find';
 
 PounchDB.plugin(pounchDBFind)
 
-export class Storage {
+class Storage {
 
-    rulesDB
-    quotaUsageDB
-    visitsDB
+    rulesDB = new PounchDB('rules')
+    quotaUsageDB = new PounchDB('quotaUsage')
+    visitsDB = new PounchDB('visits')
 
     constructor() {
 
-        this.rulesDB = new PounchDB('rules')
-        this.quotaUsageDB = new PounchDB('quotaUsage')
-        this.visitsDB = new PounchDB('visits')
     }
 
-    getRuleById(ruleId: string): Rule {
-        return rules[0]
+    async getRuleById(ruleId: string): Promise<Rule> {
+        const ruleDoc: RuleObj = await this.rulesDB.get(ruleId)
+        return new Rule(ruleDoc._id, ruleDoc)
+    }
+    async getRuleObjById(ruleId: string): Promise<RuleObj> {
+        const ruleDoc: RuleObj = await this.rulesDB.get(ruleId)
+        return ruleDoc
     }
 
-    getRules(): Rule[] {
-        return rules
+    async getRules(): Promise<Rule[]> {
+
+        const dbResponse = await this.rulesDB.find({selector:{}})
+        const rulesDocs: RuleObj[]  = dbResponse.rows.filter(d=>d.language!=='query')
+        return rulesDocs.map(r=> new Rule(r._id, r))
     }
-    updateRuleById(ruleId: string, rule) {
+
+    updateRuleById(ruleId: string, ruleObj:RuleObj) {
+            return this.updateDoc(this.rulesDB, ruleId, ruleObj) 
 
     }
 
     deleteRuleById(ruleId: string) {
-
+        return this.rulesDB.remove(ruleId)
     }
-    addRule(rule: Rule) {
-
+    createRule(rule: RuleObj, update?: boolean):Promise<any> {
+        return this.rulesDB.put(rule)
     }
 
     /**
@@ -59,8 +67,12 @@ export class Storage {
         return quotaUsage[0].activeUsage
     }
 
-    getUsage(ruleId: string): QuotaUsage {
-        return quotaUsage[0]
+    async getUsage(ruleId: string): Promise<QuotaUsage> {
+        const  dbResponse = await this.quotaUsageDB.find({selector:{ruleId}}) 
+        return dbResponse[0]
+    }
+    createUsage(usage: QuotaUsage, update?: boolean):Promise<any> {
+        return this.quotaUsageDB.put(usage)
     }
     incrementQuotaUsage(ruleId: string) {
 
@@ -72,10 +84,42 @@ export class Storage {
 
 
 
-    async getMatchingRules(url: string): Promise<Rule[]> {
-        const allRules = await this.rulesDB.find()
+    getYTRules():Rule[]{
+        return rules.map(r=> new Rule(r._id, r))
+    }
 
-        return rules
+    closeOpenVisit(){
+        
+    }
+    getOpenVisit(tabId){
+
+    }
+    createVisit(){
+
+    }
+
+
+    
+    async updateDoc(db, _id:string, fieldsToUpdate: object): Promise<any>{
+        const doc = await db.get(_id);
+        if(!doc){
+            console.error('trying to update none existing doc')
+            return
+        }
+
+        return db.put({
+            ...doc,
+            ...fieldsToUpdate
+        })
+
+    }
+
+    async init(){
+        await this.rulesDB.createIndex({index:{fields:['matcher.type']}})
+        await this.quotaUsageDB.createIndex({index:{fields:['ruleId']}})
+        await this.visitsDB.createIndex({index:{fields:['tabId', 'leftTime']}})
     }
 
 }
+
+export default new Storage()

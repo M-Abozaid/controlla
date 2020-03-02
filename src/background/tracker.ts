@@ -1,26 +1,22 @@
 import getYTVideos from 'common/getYTVideos';
-import { Keeper } from './keeper';
+import  keeper from './keeper';
 import { Visit } from './../popup/types/index';
 import chromep from 'chrome-promise';
+import storage from 'common/storage';
 
 class Tracker {
-    storage = new Storage()
-    keeper = new Keeper()
-    constructor() {
-    }
-
 
     run() {
 
-        chrome.tabs.onRemoved.addListener(tabId => {
-            this.storage.closeOpenVisit(tabId)
+        chrome.tabs.onRemoved.addListener(async tabId => {
+            await storage.closeOpenVisit(tabId)
         });
 
         chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
             // const openVisit = visits.find(v => {
             //   return v.tabId === tabId && v.leftTime === undefined;
             // });
-            const openVisit = this.storage.getOpenVisit(tabId)
+            const openVisit = storage.getOpenVisit(tabId)
             // console.log('status ', changeInfo, openVisit);
             // a new visit // refreshes are not taken into account
             if (changeInfo.status === 'loading' && changeInfo.url && changeInfo.url.indexOf('http') === 0) {
@@ -44,12 +40,12 @@ class Tracker {
                 }
                 // add new visit
                 //   visits.push(newVisit);
-                await this.storage.createVisit()
+                await storage.createVisit(newVisit)
                 // incrementAndCheck(true);
-
+                keeper.isYTVideoAllowed(newVisit.ytDetails.snippet)
                 if (openVisit) {
 
-                    this.storage.closeOpenVisit(tabId)
+                    await storage.closeOpenVisit(tabId)
                 } else {
                     console.log('how could that even happen unless in the beginning ');
                 }
@@ -99,7 +95,7 @@ class Tracker {
             // const openVisit = visits.find(v => {
             //     return v.tabId === sender.tab.id && v.leftTime === undefined;
             // });
-            const openVisit = this.storage.getOpenVisit(sender.tab.id)
+            const openVisit = storage.getOpenVisit(sender.tab.id)
 
             // console.log('open visit in received message ' ,  openVisit)
             if (openVisit && request.hidden !== undefined) {
@@ -128,7 +124,7 @@ class Tracker {
             }
 
             if (request.msg === 'checkVideo') {
-                this.keeper.isYTVideoAllowed(request.snippet).then(allowVid => {
+                keeper.isYTVideoAllowed(request.snippet).then(allowVid => {
                     console.log('vidoe allowed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ', allowVid);
                     sendResponse({
                         allowVid,

@@ -11,8 +11,8 @@ export interface Matcher {
   type: MatcherType,
   value: string | RegExp
 }
-export interface Rule {
-  id?: string,
+export interface RuleObj {
+  _id?: string,
   matcher: {
     type: MatcherType,
     value: string | RegExp
@@ -25,7 +25,8 @@ export interface Rule {
 }
 
 export interface QuotaUsage {
-  id?: string,
+  _id?: string,
+  ruleId: string,
   activeUsage: number,
   visibilityUsage: number
 }
@@ -60,3 +61,4 @@ export interface Visit {
   ytDetails?: gapi.client.youtube.Video,
   ytVideoId?: string,
 }
+
