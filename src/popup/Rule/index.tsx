@@ -1,10 +1,11 @@
 import * as React from 'react'
 import './styles.scss'
+import { getRuleTitle, mapDayNumber } from '../Services'
+
 import { ProgressBar } from 'react-bootstrap'
 import TimerIcon from '@material-ui/icons/Timer'
 import { ButtonGroup, Button } from '@material-ui/core'
 import DateRangeIcon from '@material-ui/icons/DateRange'
-import { getRuleTitle } from '../Services'
 
 interface RuleProps {
   ruleTitle: RegExp | string
@@ -23,7 +24,11 @@ const Rule: React.FC<RuleProps> = ({
   endTime,
   daysOfWeek,
 }) => {
-  const quotaPercentage = Math.round((20 / activeQuota) * 100)
+  const quotaUsage = 20
+  const restQuota = activeQuota - quotaUsage
+  const quotaPercentage = Math.round((quotaUsage / activeQuota) * 100)
+
+  const daysNumber = [0, 1, 2, 3, 4, 5, 6]
 
   return (
     <div className='rule__main'>
@@ -35,7 +40,7 @@ const Rule: React.FC<RuleProps> = ({
           now={quotaPercentage}
           label={`${quotaPercentage} %`}
         />
-        <span className='rule__progress-time'>{activeQuota}</span>
+        <span className='rule__progress-time'>{restQuota} m</span>
       </div>
 
       <div className='rule__time-day'>
@@ -49,20 +54,19 @@ const Rule: React.FC<RuleProps> = ({
         <DateRangeIcon />
         <ButtonGroup
           size='small'
-          aria-label='small outlined button group'
           color='primary'
+          aria-label='small outlined button group'
         >
-          {[0, 1, 2, 3, 4, 5, 6].map((number, idx) => {
-            if (daysOfWeek.includes(number)) {
-              return (
-                <Button key={idx} className='rule__days-week--active'>
-                  {number}
-                </Button>
-              )
-            } else {
-              return <Button key={idx}>{number}</Button>
-            }
-          })}
+          {daysNumber.map((number, idx) => (
+            <Button
+              key={idx}
+              className={
+                daysOfWeek.includes(number) ? 'rule__days-week--active' : ''
+              }
+            >
+              {mapDayNumber(number)}
+            </Button>
+          ))}
         </ButtonGroup>
       </div>
     </div>
