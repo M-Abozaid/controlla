@@ -1,10 +1,11 @@
+
 import { QuotaUsage } from '../popup/types/index'
 
-import { Rule, MatcherType } from '../popup/types'
+import { RuleObj, MatcherType } from '../popup/types'
 
-const rules: Rule[] = [
+const rules: RuleObj[] = [
   {
-    id: 'someuuid',
+    _id: 'someuuid',
     matcher: {
       type: MatcherType.URL,
       value: /^chess\.com/,
@@ -16,7 +17,7 @@ const rules: Rule[] = [
     visibilityQuota: 10,
   },
   {
-    id: 'someuuid',
+    _id: 'someuuid',
     matcher: {
       type: MatcherType.URL,
       value: /^twitter\.com/,
@@ -28,7 +29,7 @@ const rules: Rule[] = [
     visibilityQuota: 10,
   },
   {
-    id: 'someuuid',
+    _id: 'someuuid',
     matcher: {
       type: MatcherType.URL,
       value: /^facebook\.com/,
@@ -43,7 +44,8 @@ const rules: Rule[] = [
 
 const quotaUsage: QuotaUsage[] = [
   {
-    id: 'someuuid',
+    ruleId:'someuuid',
+    _id: 'someuuid',
     activeUsage: 5,
     visibilityUsage: 5,
   },
