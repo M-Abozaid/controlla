@@ -41,9 +41,8 @@ class RuleMatcher {
 
     if (matcher.type !== MatcherType.URL) return false
 
-    console.log('match url ', matcher , url)
     if (matcher.value instanceof RegExp) {
-      console.log('match>>>>>> ', matcher.value.test(url))
+      
       return matcher.value.test(url)
     }
 

@@ -22,7 +22,7 @@ export class Keeper {
     
         const effectiveRules = rules.filter(r => r.isEffectiveNow())
         
-        console.log('effectiveRules', effectiveRules)
+        
         let matchingRules = [];
 
         // if this is a youtube tab
@@ -40,7 +40,6 @@ export class Keeper {
         }
 
 
-        console.log('matching rules ', matchingRules)
         
         // update Quota 
         await this.incrementQuota(matchingRules || effectiveRules)
