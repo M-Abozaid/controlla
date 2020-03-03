@@ -38,13 +38,10 @@ class RuleMatcher {
   }
 
   matchURL(matcher: Matcher, url) {
-    console.log('match url ', matcher)
 
     if (matcher.type !== MatcherType.URL) return false
 
-    console.log('match url ', matcher)
     if (matcher.value instanceof RegExp) {
-      console.log('regex t')
       return matcher.value.test(url)
     }
 
@@ -56,17 +53,14 @@ class RuleMatcher {
     tab: chrome.tabs.Tab,
     snippet?: gapi.client.youtube.VideoSnippet
   ): boolean {
-    console.log('matching ',  matcher)
     switch (matcher.type) {
       case MatcherType.URL:
-        console.log('matcvhing url ', matcher)
         return this.matchURL(matcher, tab.url)
       case MatcherType.YT_CATEGORY:
       case MatcherType.YT_TITLE:
       case MatcherType.YT_CHANNEL:
         return this.matchVideoSnippet(matcher, snippet)
       default:
-        console.log('defalut ', matcher.type, MatcherType.URL)
         break
     }
   }
