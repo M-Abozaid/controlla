@@ -1,8 +1,8 @@
-import { QuotaUsage, Visit } from './../popup/types/index';
+import { QuotaUsage, Visit } from '../types/index';
 import Rule from '../common/rule'
-import storage from './../common/storage';
+import storage from '../common/storage';
 import chromep from 'chrome-promise';
-import ruleMatcher from 'common/ruleMatcher';
+import ruleMatcher from '../common/ruleMatcher';
 
 export class Keeper {
 

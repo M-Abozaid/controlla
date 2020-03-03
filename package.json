@@ -32,6 +32,8 @@
   "dependencies": {
     "@material-ui/core": "^4.9.5",
     "@material-ui/icons": "^4.9.1",
+    "@types/pouchdb": "^6.4.0",
+    "@types/pouchdb-find": "^6.3.5",
     "bootstrap": "^4.4.1",
     "chrome-promise": "^3.0.5",
     "jquery": "^3.4.1",

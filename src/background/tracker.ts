@@ -1,13 +1,14 @@
-import getYTVideos from 'common/getYTVideos';
+import getYTVideos from '../common/getYTVideos';
 import  keeper from './keeper';
-import { Visit } from './../popup/types/index';
+import { Visit } from 'types';
 import chromep from 'chrome-promise';
-import storage from 'common/storage';
+import storage from '../common/storage';
 
 class Tracker {
 
     run() {
 
+        console.log('tracker is listing ')
         chrome.tabs.onRemoved.addListener(async tabId => {
             await storage.closeOpenVisit(tabId)
         });
@@ -17,6 +18,7 @@ class Tracker {
             //   return v.tabId === tabId && v.leftTime === undefined;
             // });
             const openVisit = storage.getOpenVisit(tabId)
+            console.log('openvisit ', openVisit)
             // console.log('status ', changeInfo, openVisit);
             // a new visit // refreshes are not taken into account
             if (changeInfo.status === 'loading' && changeInfo.url && changeInfo.url.indexOf('http') === 0) {
@@ -42,7 +44,7 @@ class Tracker {
                 //   visits.push(newVisit);
                 await storage.createVisit(newVisit)
                 // incrementAndCheck(true);
-                keeper.isYTVideoAllowed(newVisit.ytDetails.snippet)
+                // keeper.isYTVideoAllowed(newVisit.ytDetails.snippet)
                 if (openVisit) {
 
                     await storage.closeOpenVisit(tabId)
@@ -97,8 +99,9 @@ class Tracker {
             // });
             const openVisit = storage.getOpenVisit(sender.tab.id)
 
+
             // console.log('open visit in received message ' ,  openVisit)
-            if (openVisit && request.hidden !== undefined) {
+            if (openVisit && (request.hidden !== undefined)) {
                 openVisit.visibility.push({
                     time: new Date(),
                     hidden: request.hidden,
