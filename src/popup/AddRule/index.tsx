@@ -14,9 +14,9 @@ import {
 } from 'react-bootstrap'
 import { mapDayNumber } from '../Services'
 
-interface AddButton {}
+interface AddRule {}
 
-const AddButton = () => {
+const AddRule = () => {
   // show modal
   const [showModal, setShowModal] = useState(false)
   const toggleShowModal = () => setShowModal(!showModal)
@@ -88,13 +88,22 @@ const AddButton = () => {
             onSubmit={e => {
               e.preventDefault()
               let daysCount = 0
+
+              const startTimeParsed = parseInt(startTime.substring(0, 2))
+              const endTimeParsed = parseInt(endTime.substring(0, 2))
+
               Object.keys(daysOfWeek).map(
                 day => !daysOfWeek[day] && daysCount++
               )
+
               if (daysCount === 7) {
                 !showOverlay && setShowOverlay(true)
                 setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
+              } else if (startTimeParsed > endTimeParsed) {
+                !showOverlay && setShowOverlay(true)
+                setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
               } else {
+                console.log(timeInputs)
                 setSubmittingFrom(true)
                 setTimeout(() => {
                   setShowModal(false)
@@ -188,7 +197,8 @@ const AddButton = () => {
             >
               {props => (
                 <Tooltip id='overlay' {...props}>
-                  You have to choose at least one day
+                  You have to choose at least one day or End time must be after
+                  Start Time
                 </Tooltip>
               )}
             </Overlay>
@@ -201,4 +211,4 @@ const AddButton = () => {
   )
 }
 
-export default AddButton
+export default AddRule
