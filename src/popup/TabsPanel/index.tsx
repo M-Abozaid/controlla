@@ -3,7 +3,7 @@ import './styles.scss'
 import { Tabs, Tab } from 'react-bootstrap'
 import Rule from '../Rule'
 import { rules } from '../../common/data'
-import AddButton from '../AddButton'
+import AddRule from '../AddRule'
 import Storage from '../../common/storage'
 
 // Storage.getRules().then(rules => console.log('storage rules', rules))
@@ -32,7 +32,7 @@ const TabsPanel = () => {
             />
           ))}
         </div>
-        <AddButton />
+        <AddRule />
       </Tab>
 
       <Tab eventKey='stats' title='Stats &#9783;'>
