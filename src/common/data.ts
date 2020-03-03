@@ -45,6 +45,7 @@ const quotaUsage: QuotaUsage[] = [
     _id: 'someuuid',
     activeUsage: 5,
     visibilityUsage: 5,
+    day:1
   },
 ]
 

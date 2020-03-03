@@ -4,20 +4,29 @@ import storage from '../common/storage';
 import chromep from 'chrome-promise';
 import ruleMatcher from '../common/ruleMatcher';
 
+const ytVideoURLRegex = /youtube.com\/watch\?v=/;
 export class Keeper {
 
-    ytVideoURLRegex = /youtube.com\/watch\?v=/;
+    incrementQuota(rules:Rule[]){
+        return Promise.all(rules.map(rule=>{
 
-    async controlTab(tab: chrome.tabs.Tab) {
+            return storage.incrementOrAddUsage(rule._id)
+        }))
+    }
+
+
+    controlTab = async (tab: chrome.tabs.Tab)=> {
 
         const rules = await storage.getRules()
-        
+        console.log('control tab ' , rules)
+
         const effectiveRules = rules.filter(r => r.isEffectiveNow())
         
-        let matchingRules;
+        console.log('effectiveRules', effectiveRules)
+        let matchingRules = [];
 
         // if this is a youtube tab
-        if (this.ytVideoURLRegex.test(tab.url)) {
+        if (ytVideoURLRegex.test(tab.url)) {
             
             const {ytDetails}:Visit  = await storage.getOpenVisit(tab.id);
             if(!ytDetails) {
@@ -27,6 +36,11 @@ export class Keeper {
             matchingRules = effectiveRules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab, ytDetails.snippet))
         }
 
+
+        console.log('matching rules ', matchingRules)
+        
+        // update Quota 
+        await this.incrementQuota(matchingRules || effectiveRules)
 
         const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules || effectiveRules)
 
@@ -110,6 +124,7 @@ export class Keeper {
         return disallowed;
         
     }
+
 
 }
 
