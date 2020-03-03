@@ -1,63 +1,55 @@
-import storage from './storage';
-import { RuleObj, QuotaUsage } from './../popup/types/index';
-import moment from 'moment';
+import storage from './storage'
+import { RuleObj, QuotaUsage } from '../types/index'
+import moment from 'moment'
 
+class Rule {
+  ruleObj: RuleObj
+  _id: string
 
-class Rule{
+  constructor(_id?: string, ruleObj?: RuleObj) {
+    this.ruleObj = ruleObj
+    this._id = _id
+  }
 
-    ruleObj: RuleObj
-    _id:string
-    
-    constructor(ruleObj?:RuleObj){
-        this.ruleObj = ruleObj
-        this._id = this.ruleObj._id
-    
-    }
-  
-    async getObj(){
-        if(!this.ruleObj){
-            this.ruleObj = await storage.getRuleObjById(this._id)
-        }
-
-        return this.ruleObj
-    }
-  
-    isEffectiveNow(): boolean{
-      return this.isEffectiveThisTimeOfDay() &&  this.isEffectiveThisDaysOfWeek()
+  async getObj() {
+    if (!this.ruleObj) {
+      this.ruleObj = await storage.getRuleObjById(this._id)
     }
 
-    isEffectiveThisTimeOfDay(): boolean {
-        const currentMinutes = moment
-            .duration()
-            .add(moment().hours(), 'hours')
-            .add(moment().minutes(), 'minutes')
-            .asMinutes();
+    return this.ruleObj
+  }
 
-        return (
-            moment.duration(this.ruleObj.startTime).asMinutes() <= currentMinutes &&
-            moment.duration(this.ruleObj.endTime).asMinutes() > currentMinutes
-        );
-    }
+  isEffectiveNow(): boolean {
+    return this.isEffectiveThisTimeOfDay() && this.isEffectiveThisDaysOfWeek()
+  }
 
-    isEffectiveThisDaysOfWeek(): boolean {
-        return this.ruleObj.daysOfWeek.includes(moment().weekday())
-    }
+  isEffectiveThisTimeOfDay(): boolean {
+    const currentMinutes = moment
+      .duration()
+      .add(moment().hours(), 'hours')
+      .add(moment().minutes(), 'minutes')
+      .asMinutes()
 
-    update(fieldsToUpdate: Partial<RuleObj>): Promise<any>{
-        return storage.updateRuleById(this._id, {...this.ruleObj, ...fieldsToUpdate})
-    }
+    return (
+      moment.duration(this.ruleObj.startTime).asMinutes() <= currentMinutes &&
+      moment.duration(this.ruleObj.endTime).asMinutes() > currentMinutes
+    )
+  }
 
-    getUsage():Promise<QuotaUsage>{
-        return storage.getUsage(this._id)
-    }
+  isEffectiveThisDaysOfWeek(): boolean {
+    return this.ruleObj.daysOfWeek.includes(moment().weekday())
+  }
 
+  update(fieldsToUpdate: Partial<RuleObj>): Promise<any> {
+    return storage.updateRuleById(this._id, {
+      ...this.ruleObj,
+      ...fieldsToUpdate,
+    })
+  }
 
-    save():Promise<any>{
-    
-        return await storage.createOrUpdateRule(this.)
-    }
-
-    
+  getUsage(): Promise<QuotaUsage> {
+    return storage.getUsage(this._id)
+  }
 }
 
 export default Rule

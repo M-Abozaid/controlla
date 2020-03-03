@@ -1,7 +1,4 @@
-
-import { QuotaUsage } from '../popup/types/index'
-
-import { RuleObj, MatcherType } from '../popup/types'
+import { RuleObj, MatcherType, QuotaUsage } from '../types'
 
 const rules: RuleObj[] = [
   {
@@ -44,7 +41,7 @@ const rules: RuleObj[] = [
 
 const quotaUsage: QuotaUsage[] = [
   {
-    ruleId:'someuuid',
+    ruleId: 'someuuid',
     _id: 'someuuid',
     activeUsage: 5,
     visibilityUsage: 5,

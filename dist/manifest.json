@@ -16,5 +16,7 @@
     "icons": {
         "128": "icon128.png"
     },
-    "permissions": []
+    "permissions": [
+        "tabs" // to make the url available in queried tabs
+    ]
 }

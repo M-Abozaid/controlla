@@ -1,10 +1,14 @@
 import chromep from 'chrome-promise'
 
 export async function getActiveTab(): Promise<chrome.tabs.Tab> {
-  const activeTab = await chromep.tabs.query({
-    currentWindow: true,
-    active: true,
-  })
+  const activeTab = await chromep.tabs
+    .query({
+      currentWindow: true,
+      active: true,
+    })
+    .then(tabs => tabs)
+    .catch(err => console.log(err))
+
   return activeTab[0]
 }
 

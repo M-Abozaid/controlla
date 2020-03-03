@@ -4,6 +4,9 @@ import { Tabs, Tab } from 'react-bootstrap'
 import Rule from '../Rule'
 import { rules } from '../../common/data'
 import AddButton from '../AddButton'
+import Storage from '../../common/storage'
+
+// Storage.getRules().then(rules => console.log('storage rules', rules))
 
 const TabsPanel = () => {
   const [key, setKey] = useState('rules')
