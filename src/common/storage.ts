@@ -30,7 +30,7 @@ class Storage {
 
         const dbResponse = await this.rulesDB.find({selector:{}})
         const rulesDocs: RuleObj[]  = dbResponse.rows.filter(d=>d.language!=='query')
-        return rulesDocs.map(r=> new Rule(r._id, r))
+        return rulesDocs.map(r=> new Rule(r))
     }
 
     updateRuleById(ruleId: string, ruleObj:RuleObj) {
@@ -113,6 +113,22 @@ class Storage {
         })
 
     }
+
+    async getMatchingRules(tab){
+
+        const rules = await this.getRules()
+        if (this.ytVideoURLRegex.test(tab.url)) {
+               
+               const {ytDetails}:Visit  = await this.getOpenVisit(tab.id);
+               if(!ytDetails) {
+                   console.log('video details don\'t exist ')
+                   return
+               }
+               matchingRules = effectiveRules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab, ytDetails.snippet))
+           }
+    }
+
+
 
     async init(){
         await this.rulesDB.createIndex({index:{fields:['matcher.type']}})

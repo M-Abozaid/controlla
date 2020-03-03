@@ -8,9 +8,9 @@ class Rule{
     ruleObj: RuleObj
     _id:string
     
-    constructor( _id?:string, ruleObj?:RuleObj){
+    constructor(ruleObj?:RuleObj){
         this.ruleObj = ruleObj
-        this._id = _id
+        this._id = this.ruleObj._id
     
     }
   
@@ -50,6 +50,14 @@ class Rule{
     getUsage():Promise<QuotaUsage>{
         return storage.getUsage(this._id)
     }
+
+
+    save():Promise<any>{
+    
+        return await storage.createOrUpdateRule(this.)
+    }
+
+    
 }
 
 export default Rule
