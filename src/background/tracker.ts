@@ -8,7 +8,6 @@ class Tracker {
 
     run() {
 
-        console.log('tracker is listing ')
         chrome.tabs.onRemoved.addListener(async tabId => {
             await storage.closeOpenVisit(tabId)
         });
@@ -18,8 +17,6 @@ class Tracker {
             //   return v.tabId === tabId && v.leftTime === undefined;
             // });
             const openVisit = storage.getOpenVisit(tabId)
-            console.log('openvisit ', openVisit)
-            // console.log('status ', changeInfo, openVisit);
             // a new visit // refreshes are not taken into account
             if (changeInfo.status === 'loading' && changeInfo.url && changeInfo.url.indexOf('http') === 0) {
                 const newVisit: Visit = {
@@ -49,7 +46,6 @@ class Tracker {
 
                     await storage.closeOpenVisit(tabId)
                 } else {
-                    console.log('how could that even happen unless in the beginning ');
                 }
             } else if (openVisit) {
 
@@ -76,7 +72,6 @@ class Tracker {
                             hidden: 'hidden',
                         },
                         response => {
-                            // console.log('response >>', response)
 
                             if (response && openVisit.url === response.href) {
                                 if (response.hidden !== undefined) {
@@ -100,7 +95,6 @@ class Tracker {
             const openVisit = storage.getOpenVisit(sender.tab.id)
 
 
-            // console.log('open visit in received message ' ,  openVisit)
             if (openVisit && (request.hidden !== undefined)) {
                 openVisit.visibility.push({
                     time: new Date(),
@@ -128,7 +122,6 @@ class Tracker {
 
             if (request.msg === 'checkVideo') {
                 keeper.isYTVideoAllowed(request.snippet).then(allowVid => {
-                    console.log('vidoe allowed >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ', allowVid);
                     sendResponse({
                         allowVid,
                     });

@@ -31,7 +31,6 @@ class Storage {
     const rulesDocs: RuleObj[] = dbResponse.docs.filter(
       d => d.daysOfWeek 
     )
-    console.log('got rules docs ', rulesDocs)
     return rulesDocs.map(r => new Rule(r))
   }
 
@@ -105,7 +104,6 @@ class Storage {
       }
     const doc = await db.get(_id)
     if (!doc) {
-      console.log('trying to update none existing doc')
       newDoc = await db.post(fieldsToUpdate)
       return db.get(newDoc._id || newDoc.id)
     }
@@ -121,7 +119,6 @@ class Storage {
 
     const rules = await this.getRules()
     
-    console.log('rules ', rules)
     if (this.ytVideoURLRegex.test(tab.url)) {
         const openVisit:Visit = await this.getOpenVisit(tab.id)
         return rules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab, openVisit.ytDetails.snippet)) 

@@ -6,7 +6,6 @@ import storage from '../common/storage'
 import { MatcherType } from '../types'
 (async ()=>{
 
-  console.log('init>>>>>>>')
   await storage.init()
   const activeTab = await getActiveTab()
   const rules = await storage.getMatchingRules(activeTab)
@@ -23,7 +22,6 @@ import { MatcherType } from '../types'
       activeQuota: 30,
       visibilityQuota: 10,
   })
-  console.log('new rule ', newRule.isEffectiveNow())
  
   
   
@@ -36,9 +34,7 @@ import { MatcherType } from '../types'
     activeQuota: 30,
    })
 
-   console.log('ruls upatedd ', result)
 
-  console.log('got rules>>>>>>>>>>>>>> ', rules)
 
 })()
 chrome.tabs.query({ active: true, currentWindow: true }, tab => {
