@@ -64,18 +64,15 @@ class Storage {
     return quotaUsage[0].activeUsage
   }
 
-  async getUsage(ruleId: string): Promise<QuotaUsage> {
-    const dbResponse = await this.quotaUsageDB.find({ selector: { ruleId } })
-    return dbResponse[0]
-  }
+
+  
 
   createUsage(usage: QuotaUsage, update?: boolean): Promise<any> {
     return this.quotaUsageDB.put(usage)
   }
 
-  incrementQuotaUsage(ruleId: string) {}
-
-  resetQuotaUsage(ruleId: string) {}
+  
+  
 
   getYTRules(): Rule[] {
     return rules.map(r => new Rule(r))
@@ -180,7 +177,7 @@ class Storage {
     }
     return usage
   }
-  
+
   async init() {
     await this.rulesDB.createIndex({ index: { fields: ['matcher.type'] } })
     await this.quotaUsageDB.createIndex({ index: { fields: ['ruleId'] } })

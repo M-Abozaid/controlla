@@ -1,6 +1,6 @@
-//@ts-nocheck
+
 import 'jquery'
-import getYTVideos from 'common/getYTVideos';
+import getYTVideos from '../common/getYTVideos';
 
 declare var jQuery
 
