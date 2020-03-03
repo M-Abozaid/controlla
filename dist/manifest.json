@@ -17,6 +17,10 @@
         "128": "icon128.png"
     },
     "permissions": [
+<<<<<<< HEAD
+        "tabs"
+    ]
+=======
         "declarativeContent",
         "storage",
         "background",
@@ -38,4 +42,5 @@
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval';    connect-src *; object-src 'self'",
     "manifest_version": 2
+>>>>>>> b4df423ffbf1fba0f02eb5b2a192afb5289a4579
 }

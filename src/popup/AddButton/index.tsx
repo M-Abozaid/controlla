@@ -1,16 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import './styles.scss'
 
 import MButton from '@material-ui/core/Button'
 import GavelIcon from '@material-ui/icons/Gavel'
-import { Modal, Button, Form, Spinner, ButtonGroup } from 'react-bootstrap'
+import {
+  Modal,
+  Button,
+  Form,
+  Spinner,
+  ButtonGroup,
+  Overlay,
+  Tooltip,
+} from 'react-bootstrap'
+import { mapDayNumber } from '../Services'
 
 interface AddButton {}
 
 const AddButton = () => {
   // show modal
-  const [show, setShow] = useState(false)
-  const toggleShow = () => setShow(!show)
+  const [showModal, setShowModal] = useState(false)
+  const toggleShowModal = () => setShowModal(!showModal)
 
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
@@ -38,6 +47,10 @@ const AddButton = () => {
   }
   const [daysOfWeek, setDaysOfWeek] = useState(initialDaysOfWeek)
 
+  // form validation
+  const addButtonTarget = useRef(null)
+  const [showOverlay, setShowOverlay] = useState(false)
+
   return (
     <>
       {/* AddRule Button */}
@@ -48,7 +61,7 @@ const AddButton = () => {
           variant='contained'
           color='primary'
           startIcon={<GavelIcon />}
-          onClick={toggleShow}
+          onClick={toggleShowModal}
         >
           Add Rule
         </MButton>
@@ -58,9 +71,9 @@ const AddButton = () => {
 
       <Modal
         size='lg'
-        show={show}
+        show={showModal}
         centered
-        onHide={toggleShow}
+        onHide={toggleShowModal}
         aria-labelledby='contained-modal-title-vcenter'
       >
         <Modal.Header className='modal__header' closeButton>
@@ -74,19 +87,30 @@ const AddButton = () => {
             className='add-rule__form'
             onSubmit={e => {
               e.preventDefault()
-              setTimeout(() => {
-                setShow(false)
-                setSubmittingFrom(false)
-                setTimeInputs(initialTimeInputs)
-                setDaysOfWeek(initialDaysOfWeek)
-              }, 1000)
+              let daysCount = 0
+              Object.keys(daysOfWeek).map(
+                day => !daysOfWeek[day] && daysCount++
+              )
+              if (daysCount === 7) {
+                !showOverlay && setShowOverlay(true)
+                setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
+              } else {
+                setSubmittingFrom(true)
+                setTimeout(() => {
+                  setShowModal(false)
+                  setSubmittingFrom(false)
+                  setTimeInputs(initialTimeInputs)
+                  setDaysOfWeek(initialDaysOfWeek)
+                }, 1000)
+              }
             }}
           >
             {/* Time inputs */}
 
             <div className='time__input-group'>
               <Form.Control
-                type='text'
+                type='time'
+                required
                 placeholder='Start'
                 name='startTime'
                 value={startTime}
@@ -94,7 +118,8 @@ const AddButton = () => {
               />
 
               <Form.Control
-                type='text'
+                type='time'
+                required
                 placeholder='End'
                 name='endTime'
                 value={endTime}
@@ -102,7 +127,9 @@ const AddButton = () => {
               />
 
               <Form.Control
-                type='text'
+                required
+                min='1'
+                type='number'
                 placeholder='Quota'
                 name='quotaTime'
                 value={quotaTime}
@@ -127,7 +154,7 @@ const AddButton = () => {
                     })
                   }
                 >
-                  {number}
+                  {mapDayNumber(parseInt(number))}
                 </Button>
               ))}
             </ButtonGroup>
@@ -139,7 +166,7 @@ const AddButton = () => {
               variant='danger'
               type='submit'
               block
-              onClick={() => !submittingFrom && setSubmittingFrom(true)}
+              ref={addButtonTarget}
             >
               {submittingFrom ? (
                 <Spinner
@@ -153,6 +180,18 @@ const AddButton = () => {
                 <span>Submit</span>
               )}
             </Button>
+
+            <Overlay
+              target={addButtonTarget.current}
+              show={showOverlay}
+              placement='top'
+            >
+              {props => (
+                <Tooltip id='overlay' {...props}>
+                  You have to choose at least one day
+                </Tooltip>
+              )}
+            </Overlay>
 
             {/*  */}
           </Form>
