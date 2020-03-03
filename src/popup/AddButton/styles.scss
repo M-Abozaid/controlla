@@ -28,6 +28,14 @@
   }
 }
 
+.add-rule__main {
+  transition: all 0.3s ease-in;
+
+  .add-rule__button:active {
+    transform: translateY(3px);
+  }
+}
+
 .time__input-group {
   display: flex;
   margin-bottom: 12px;
@@ -35,7 +43,11 @@
   justify-content: space-between;
 
   input {
-    width: 31%;
+    width: 33%;
+
+    &:last-child {
+      width: 30%;
+    }
   }
 }
 

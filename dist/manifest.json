@@ -17,6 +17,6 @@
         "128": "icon128.png"
     },
     "permissions": [
-        "tabs" // to make the url available in queried tabs
+        "tabs"
     ]
 }
