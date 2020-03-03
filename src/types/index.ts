@@ -1,8 +1,8 @@
 export enum MatcherType {
-  'YT_CATEGORY',
-  'URL',
-  'YT_CHANNEL',
-  'YT_TITLE',
+  'YT_CATEGORY'='YT_CATEGORY',
+  'URL'='URL',
+  'YT_CHANNEL'='YT_CHANNEL',
+  'YT_TITLE'='YT_TITLE',
 }
 
 export interface Matcher {

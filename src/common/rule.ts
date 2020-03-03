@@ -6,9 +6,9 @@ class Rule {
   ruleObj: RuleObj
   _id: string
 
-  constructor(_id?: string, ruleObj?: RuleObj) {
+  constructor(ruleObj?: RuleObj) {
     this.ruleObj = ruleObj
-    this._id = _id
+    this._id = this.ruleObj._id
   }
 
   async getObj() {
@@ -40,11 +40,13 @@ class Rule {
     return this.ruleObj.daysOfWeek.includes(moment().weekday())
   }
 
-  update(fieldsToUpdate: Partial<RuleObj>): Promise<any> {
-    return storage.updateRuleById(this._id, {
+  async update(fieldsToUpdate: Partial<RuleObj>): Promise<any> {
+    const newObj = await storage.updateRuleById(this._id, {
       ...this.ruleObj,
       ...fieldsToUpdate,
     })
+    this.ruleObj = newObj;
+    return this.ruleObj
   }
 
   getUsage(): Promise<QuotaUsage> {
