@@ -11,6 +11,7 @@ export interface Matcher {
 }
 export interface RuleObj {
   _id?: string
+  _rev?: string
   matcher: {
     type: MatcherType
     value: string | RegExp
@@ -24,6 +25,7 @@ export interface RuleObj {
 
 export interface QuotaUsage {
   _id?: string
+  _rev?: string
   ruleId: string
   activeUsage: number
   visibilityUsage: number
@@ -32,7 +34,7 @@ export interface QuotaUsage {
 interface Visibility {
   time: string | Date
   hidden?: boolean
-  focus: boolean
+  focus?: boolean
 }
 
 interface OneEvent {
@@ -48,6 +50,7 @@ export interface Visit {
   url: string
   tabId: number
   _id?: string
+  _rev?: string
   visitTime: string | Date
   title: string
   audible: boolean
