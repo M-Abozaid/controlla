@@ -16,6 +16,30 @@
   padding-left: 15px;
 }
 
+.add-rule__form {
+  transition: all 0.3s ease-in;
+
+  .submit__button {
+    box-shadow: 0 5px 10px rgba(143, 138, 138, 0.87);
+
+    &:active {
+      transform: translateY(3px);
+    }
+  }
+}
+
+.time__input-group {
+  display: flex;
+  margin-bottom: 12px;
+  flex-direction: row;
+  justify-content: space-between;
+
+  input {
+    width: 31%;
+  }
+}
+
 .week__button-group {
   width: 100%;
+  margin-bottom: 12px;
 }
