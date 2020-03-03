@@ -34,10 +34,10 @@ import { MatcherType } from '../types'
     activeQuota: 30,
    })
 
-
+   chrome.tabs.query({ active: true, currentWindow: true }, tab => {
+    ReactDOM.render(<Popup />, document.getElementById('popup'))
+  })
 
 })()
-chrome.tabs.query({ active: true, currentWindow: true }, tab => {
-  ReactDOM.render(<Popup />, document.getElementById('popup'))
-})
+
 
