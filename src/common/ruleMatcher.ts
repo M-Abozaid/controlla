@@ -37,11 +37,13 @@ class RuleMatcher {
     return channel.includes(matcher.value)
   }
 
-  matchURL(matcher: Matcher, url) {
+  matchURL(matcher: Matcher, {url}:chrome.tabs.Tab) {
 
     if (matcher.type !== MatcherType.URL) return false
 
+    console.log('match url ', matcher , url)
     if (matcher.value instanceof RegExp) {
+      console.log('match>>>>>> ', matcher.value.test(url))
       return matcher.value.test(url)
     }
 
@@ -55,7 +57,7 @@ class RuleMatcher {
   ): boolean {
     switch (matcher.type) {
       case MatcherType.URL:
-        return this.matchURL(matcher, tab.url)
+        return this.matchURL(matcher, tab)
       case MatcherType.YT_CATEGORY:
       case MatcherType.YT_TITLE:
       case MatcherType.YT_CHANNEL:

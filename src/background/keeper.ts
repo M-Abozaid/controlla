@@ -18,8 +18,8 @@ export class Keeper {
     controlTab = async (tab: chrome.tabs.Tab)=> {
 
         const rules = await storage.getRules()
-        console.log('control tab ' , rules)
-
+      
+    
         const effectiveRules = rules.filter(r => r.isEffectiveNow())
         
         console.log('effectiveRules', effectiveRules)
@@ -34,6 +34,9 @@ export class Keeper {
                 return
             }
             matchingRules = effectiveRules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab, ytDetails.snippet))
+        }else{
+            matchingRules = effectiveRules.filter(rule=> ruleMatcher.matchURL(rule.ruleObj.matcher, tab, ))
+
         }
 
 
@@ -60,7 +63,7 @@ export class Keeper {
        
         await Promise.all(rules.map(async rule => {
             if (tabRemoved) return;
-            const usage = await storage.getUsage(rule._id);
+            const usage = await storage.getQuotaUsage(rule._id);
             if (tabRemoved) return;
             if (this.compareActiveQuota(usage, rule)) {
                 result[0] = true
