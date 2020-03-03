@@ -10,15 +10,17 @@ declare var window;
 PounchDB.plugin(pounchDBFind)
 
 class Storage {
-  rulesDB = new PounchDB('rules')
-  quotaUsageDB = new PounchDB('quotaUsage')
-  visitsDB = new PounchDB('visits')
+  rulesDB = new PounchDB<RuleObj>('rules')
+  quotaUsageDB = new PounchDB<QuotaUsage>('quotaUsage')
+  visitsDB = new PounchDB<Visit>('visits')
+  
   ytVideoURLRegex = /youtube.com\/watch\?v=/;
   constructor() {}
 
   async getRuleById(ruleId: string): Promise<Rule> {
     const ruleDoc: RuleObj = await this.rulesDB.get(ruleId)
     return new Rule(ruleDoc)
+
   }
 
   async getRuleObjById(ruleId: string): Promise<RuleObj> {
@@ -38,8 +40,8 @@ class Storage {
     return this.updateOrCreateDoc(this.rulesDB,  ruleObj, ruleId)
   }
 
-  deleteRuleById(ruleId: string) {
-    return this.rulesDB.remove(ruleId)
+  removeRule(ruleObj) {
+    return this.rulesDB.remove(ruleObj)
   }
   async createRule(rule: RuleObj, ): Promise<Rule> {
     const newRule = await this.rulesDB.post(rule)
@@ -83,13 +85,14 @@ class Storage {
       return this.updateOrCreateDoc(this.visitsDB, {leftTime: new Date() }, visit._id)
   }
 
-  getOpenVisit(tabId) {
-      return  this.visitsDB.find({
+  async getOpenVisit(tabId) {
+      const dbResponse = await  this.visitsDB.find({
             selector:{
                 tabId: tabId,
                 leftTime:{$exists:false}
             }
         })
+        return dbResponse.docs[0]
   }
   createVisit(visit:Visit) {
 
@@ -120,8 +123,9 @@ class Storage {
     const rules = await this.getRules()
     
     if (this.ytVideoURLRegex.test(tab.url)) {
-        const openVisit:Visit = await this.getOpenVisit(tab.id)
-        return rules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab, openVisit.ytDetails.snippet)) 
+        const visit = await this.getOpenVisit(tab.id)
+    
+        return rules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab, visit.ytDetails.snippet)) 
     }
     return rules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab)) 
     

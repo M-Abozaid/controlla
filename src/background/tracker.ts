@@ -16,7 +16,7 @@ class Tracker {
             // const openVisit = visits.find(v => {
             //   return v.tabId === tabId && v.leftTime === undefined;
             // });
-            const openVisit = storage.getOpenVisit(tabId)
+            const openVisit = await storage.getOpenVisit(tabId)
             // a new visit // refreshes are not taken into account
             if (changeInfo.status === 'loading' && changeInfo.url && changeInfo.url.indexOf('http') === 0) {
                 const newVisit: Visit = {
@@ -88,11 +88,11 @@ class Tracker {
 
             }
         });
-        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        chrome.runtime.onMessage.addListener(async(request, sender, sendResponse) => {
             // const openVisit = visits.find(v => {
             //     return v.tabId === sender.tab.id && v.leftTime === undefined;
             // });
-            const openVisit = storage.getOpenVisit(sender.tab.id)
+            const openVisit = await storage.getOpenVisit(sender.tab.id)
 
 
             if (openVisit && (request.hidden !== undefined)) {

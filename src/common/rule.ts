@@ -52,6 +52,10 @@ class Rule {
   getUsage(): Promise<QuotaUsage> {
     return storage.getUsage(this._id)
   }
+
+  remove(){
+      storage.removeRule(this.ruleObj)
+  }
 }
 
 export default Rule
