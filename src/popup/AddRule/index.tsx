@@ -58,22 +58,32 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
 
+  // time input control
   const timeRangeInitial = {
     start: '00:00',
     end: '23:59',
   }
   const [timeRange, setTimeRange] = useState({ ...timeRangeInitial })
-
-  // time input control
-  const initialTimeInputs = {
-    startTime: '',
-    endTime: '',
-    quotaTime: '',
+  const timeRangeChange = time => {
+    setTimeRange(time)
+    setTimeInputs({ start: timeRange.start, end: timeRange.end, quotaTime })
   }
-  const [timeInputs, setTimeInputs] = useState(initialTimeInputs)
-  const { startTime, endTime, quotaTime } = timeInputs
-  const handleTimeInputChange = e =>
+
+  // const initialTimeInputs = {
+  //   start: '',
+  //   end: '',
+  //   quotaTime: '',
+  // }
+  const [timeInputs, setTimeInputs] = useState({
+    ...timeRangeInitial,
+    quotaTime: '1',
+  })
+  const { start, end, quotaTime } = timeInputs
+  const handleTimeInputChange = e => {
     setTimeInputs({ ...timeInputs, [e.target.name]: e.target.value })
+    if (e.target.name !== 'quotaTime')
+      setTimeRange({ ...timeRange, [e.target.name]: e.target.value })
+  }
 
   // regex url
   const [regexUrl, setRegexUrl] = useState('')
@@ -120,8 +130,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               e.preventDefault()
               let daysCount = 0
 
-              const startTimeParsed = parseInt(startTime.substring(0, 2))
-              const endTimeParsed = parseInt(endTime.substring(0, 2))
+              const startTimeParsed = parseInt(start.substring(0, 2))
+              const endTimeParsed = parseInt(end.substring(0, 2))
 
               Object.keys(daysOfWeek).map(
                 day => !daysOfWeek[day] && daysCount++
@@ -148,8 +158,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                     value: convRegexUrl,
                   },
                   daysOfWeek: convDaysOfWeek,
-                  startTime: startTime,
-                  endTime: endTime,
+                  startTime: start,
+                  endTime: end,
                   activeQuota: parseInt(quotaTime),
                   visibilityQuota: Infinity,
                 })
@@ -157,7 +167,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                 onRuleAdded()
                 onHide()
                 setSubmittingFrom(false)
-                setTimeInputs(initialTimeInputs)
+                setTimeInputs({ ...timeRangeInitial, quotaTime: '1' })
                 setDaysOfWeek(initialDaysOfWeek)
               }
             }}
@@ -177,27 +187,12 @@ const AddRule = ({ onRuleAdded, onHide }) => {
             {/* Time inputs */}
 
             <div className='time__input-group'>
-              <div>
-                start {timeRange.start} end {timeRange.end}
-                <TimeRangeSlider
-                  disabled={false}
-                  format={24}
-                  maxValue={'23:59'}
-                  minValue={'00:00'}
-                  name={'time_range'}
-                  onChangeStart={console.log}
-                  onChangeComplete={console.log}
-                  onChange={setTimeRange}
-                  step={5}
-                  value={timeRange}
-                />
-              </div>
               <Form.Control
                 type='time'
                 required
                 placeholder='Start'
-                name='startTime'
-                value={startTime}
+                name='start'
+                value={start}
                 onChange={e => handleTimeInputChange(e)}
               />
 
@@ -205,8 +200,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                 type='time'
                 required
                 placeholder='End'
-                name='endTime'
-                value={endTime}
+                name='end'
+                value={end}
                 onChange={e => handleTimeInputChange(e)}
               />
 
@@ -218,6 +213,22 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                 name='quotaTime'
                 value={quotaTime}
                 onChange={e => handleTimeInputChange(e)}
+              />
+            </div>
+
+            <div className='time-range__slider'>
+              start {timeRange.start} end {timeRange.end}
+              <TimeRangeSlider
+                disabled={false}
+                format={24}
+                maxValue={'23:59'}
+                minValue={'00:00'}
+                name={'time_range'}
+                onChangeStart={console.log}
+                onChangeComplete={console.log}
+                onChange={timeRangeChange}
+                step={5}
+                value={timeRange}
               />
             </div>
 
