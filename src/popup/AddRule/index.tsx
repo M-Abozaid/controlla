@@ -36,18 +36,20 @@ function extractHostname(url) {
   return hostname
 }
 
+function escapeRegExp(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+}
+
 interface AddRule {}
 
 const AddRule = () => {
-  let activeTabUrl
-
   useEffect(() => {
     async function getActiveTabAsync() {
       const activeTab = await getActiveTab()
-      activeTabUrl = activeTab.url
-      console.log('active tab url have set', activeTabUrl)
-      console.log('extracted hosted name', extractHostname(activeTabUrl))
-      setRegexUrl(activeTabUrl)
+      const activeTabUrl = extractHostname(activeTab.url)
+      const HostRegexEscaped = escapeRegExp(activeTabUrl)
+      console.log('host regex escaped', HostRegexEscaped)
+      setRegexUrl(HostRegexEscaped)
     }
 
     getActiveTabAsync()
