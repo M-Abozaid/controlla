@@ -11,7 +11,7 @@ import storage from '../common/storage';
     const keeper = new Keeper()
     
     await storage.init()
-    setInterval(()=>keeper.run, 6000)
+    setInterval(keeper.run, 6000)
 })()
 
 

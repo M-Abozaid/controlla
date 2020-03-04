@@ -17,6 +17,7 @@ export class Keeper {
 
     controlTab = async (tab: chrome.tabs.Tab)=> {
 
+        console.log('tab ', tab)
         const rules = await storage.getRules()
       
     
@@ -40,7 +41,6 @@ export class Keeper {
         }
 
 
-        
         // update Quota 
         await this.incrementQuota(matchingRules || effectiveRules)
 
@@ -78,7 +78,7 @@ export class Keeper {
     }
 
 
-    async run() {
+    run = async ()=> {
         const activeTabs = await chromep.tabs.query({ active: true })
         activeTabs.forEach(this.controlTab)
     }
