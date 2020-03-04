@@ -98,7 +98,27 @@ const AddRule = ({ onRuleAdded, onHide }) => {
     5: false,
     6: false,
   }
+  const allDaysOfWeekOn = {
+    0: true,
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+    5: true,
+    6: true,
+  }
   const [daysOfWeek, setDaysOfWeek] = useState(initialDaysOfWeek)
+
+  const [allWeekOn, setAllWeekOn] = useState(false)
+  const handleAllWeek = () => {
+    if (allWeekOn) {
+      setDaysOfWeek(initialDaysOfWeek)
+      setAllWeekOn(false)
+    } else {
+      setDaysOfWeek(allDaysOfWeekOn)
+      setAllWeekOn(true)
+    }
+  }
 
   // form validation
   const addButtonTarget = useRef(null)
@@ -106,8 +126,6 @@ const AddRule = ({ onRuleAdded, onHide }) => {
 
   return (
     <>
-      {/* AddRule Button */}
-
       {/* Modal */}
 
       <Modal
@@ -252,6 +270,13 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                   {mapDayNumber(parseInt(number))}
                 </Button>
               ))}
+              <Button
+                style={{ marginLeft: '5px' }}
+                variant={allWeekOn ? 'outline-secondary' : 'primary'}
+                onClick={handleAllWeek}
+              >
+                {allWeekOn ? '-' : '+'}
+              </Button>
             </ButtonGroup>
 
             {/* Submit Button */}
