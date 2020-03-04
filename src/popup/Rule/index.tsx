@@ -2,11 +2,11 @@ import * as React from 'react'
 import './styles.scss'
 import { getRuleTitle, mapDayNumber } from '../Services'
 
-import { ProgressBar } from 'react-bootstrap'
+import { ProgressBar, ButtonGroup, Button } from 'react-bootstrap'
 import TimerIcon from '@material-ui/icons/Timer'
-import { ButtonGroup, Button } from '@material-ui/core'
 import DateRangeIcon from '@material-ui/icons/DateRange'
 import Rule from '../../common/rule'
+
 interface RuleProps {
   rule: Rule
 }
@@ -24,6 +24,10 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
       <h4 className='rule__title'>
         {getRuleTitle(rule.ruleObj.matcher.value)}
       </h4>
+
+      <div onClick={() => {}} className='remove__rule'>
+        &#10007;
+      </div>
 
       <div>
         <ProgressBar
@@ -44,16 +48,14 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
       <div className='rule__days-week'>
         <DateRangeIcon />
         <ButtonGroup
-          size='small'
-          color='primary'
-          aria-label='small outlined button group'
+          className='rule__days-week--group'
+          aria-label='days-of-week-gruop'
         >
           {daysNumber.map((number, idx) => (
             <Button
               key={idx}
-              className={
-                daysOfWeek.includes(number) ? 'rule__days-week--active' : ''
-              }
+              size='sm'
+              variant={daysOfWeek.includes(number) ? 'primary' : 'light'}
             >
               {mapDayNumber(number)}
             </Button>

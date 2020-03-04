@@ -2,6 +2,8 @@
   margin: 5px;
   padding: 5px;
   border: rgba(143, 141, 140, 0.397) 0.5px solid;
+
+  position: relative;
 }
 
 .rule__title {
@@ -14,6 +16,24 @@
   border-radius: 10px;
   border: 1px solid rgba(134, 134, 134, 0.616);
   background-color: rgba(226, 225, 225, 0.308);
+}
+
+.remove__rule {
+  top: 6px;
+  right: 5px;
+  color: rgba(255, 0, 0, 0.482);
+  cursor: pointer;
+  position: absolute;
+
+  &:hover {
+    color: red;
+  }
+
+  transition: all 0.5;
+
+  &:active {
+    transform: translateY(3px);
+  }
 }
 
 .rule__progress {
@@ -62,6 +82,11 @@
 .rule__days-week {
   text-align: center;
   position: relative;
+
+  &--group {
+    height: 90%;
+    width: 75%;
+  }
 
   svg {
     top: 5px;
