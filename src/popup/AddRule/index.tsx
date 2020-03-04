@@ -47,6 +47,7 @@ const AddRule = () => {
       activeTabUrl = activeTab.url
       console.log('active tab url have set', activeTabUrl)
       console.log('extracted hosted name', extractHostname(activeTabUrl))
+      setRegexUrl(activeTabUrl)
     }
 
     getActiveTabAsync()
@@ -71,8 +72,7 @@ const AddRule = () => {
     setTimeInputs({ ...timeInputs, [e.target.name]: e.target.value })
 
   // regex url
-  const hostname = extractHostname(activeTabUrl)
-  const [regexUrl, setRegexUrl] = useState('hostname')
+  const [regexUrl, setRegexUrl] = useState('')
 
   // days of the week
   const initialDaysOfWeek = {
