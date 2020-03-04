@@ -120,7 +120,7 @@ class Storage {
     return db.get(updatedDoc._id || updatedDoc.id)
   }
 
-  async getMatchingRules(tab):Promise<Rule[]>{
+  async getMatchingRules(tab: chrome.tabs.Tab):Promise<Rule[]>{
 
     const rules = await this.getRules()
     
