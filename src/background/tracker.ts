@@ -1,5 +1,5 @@
 import getYTVideos from '../common/getYTVideos';
-import  keeper from './keeper';
+import keeper from './keeper';
 import { Visit } from 'types';
 import chromep from 'chrome-promise';
 import storage from '../common/storage';
@@ -9,7 +9,8 @@ class Tracker {
     run() {
 
         chrome.tabs.onRemoved.addListener(async tabId => {
-            await storage.closeOpenVisit(tabId)
+            const openVisit = await storage.getOpenVisit(tabId)
+            await storage.closeOpenVisit(openVisit)
         });
 
         chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
@@ -37,6 +38,22 @@ class Tracker {
                     [newVisit.ytDetails] = ytDetails.items;
                     newVisit.ytVideoId = vidId;
                 }
+
+                // add new visit
+                // visits.push(newVisit);
+                // incrementAndCheck(true);
+
+                // if (openVisit) {
+                //   // close open visits
+                //   // console.log('close open visits ', openVisit)
+
+                //   openVisit.leftTime = new Date();
+                //   save(openVisit);
+                // } else {
+                //   console.log('how could that even happen unless in the beginning ');
+                // }
+
+
                 // add new visit
                 //   visits.push(newVisit);
                 await storage.createVisit(newVisit)
@@ -44,8 +61,10 @@ class Tracker {
                 // keeper.isYTVideoAllowed(newVisit.ytDetails.snippet)
                 if (openVisit) {
 
-                    await storage.closeOpenVisit(tabId)
+                    console.log('close open visit ', openVisit)
+                    await storage.closeOpenVisit(openVisit)
                 } else {
+                    console.log('how could that even happen unless in the beginning ');
                 }
             } else if (openVisit) {
 
@@ -88,7 +107,7 @@ class Tracker {
 
             }
         });
-        chrome.runtime.onMessage.addListener(async(request, sender, sendResponse) => {
+        chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             // const openVisit = visits.find(v => {
             //     return v.tabId === sender.tab.id && v.leftTime === undefined;
             // });

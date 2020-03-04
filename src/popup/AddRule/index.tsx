@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './styles.scss'
-
-import MButton from '@material-ui/core/Button'
-import GavelIcon from '@material-ui/icons/Gavel'
+import TimeRangeSlider from 'react-time-range-slider'
 import {
   Modal,
   Button,
@@ -40,9 +38,12 @@ function escapeRegExp(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
 }
 
-interface AddRule {}
+interface AddRule {
+  onRuleAdded: Function
+  onHide: Function
+}
 
-const AddRule = () => {
+const AddRule = ({ onRuleAdded, onHide }) => {
   useEffect(() => {
     async function getActiveTabAsync() {
       const activeTab = await getActiveTab()
@@ -54,12 +55,14 @@ const AddRule = () => {
     getActiveTabAsync()
   }, [])
 
-  // show modal
-  const [showModal, setShowModal] = useState(false)
-  const toggleShowModal = () => setShowModal(!showModal)
-
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
+
+  const timeRangeInitial = {
+    start: '00:00',
+    end: '23:59',
+  }
+  const [timeRange, setTimeRange] = useState({ ...timeRangeInitial })
 
   // time input control
   const initialTimeInputs = {
@@ -95,25 +98,13 @@ const AddRule = () => {
     <>
       {/* AddRule Button */}
 
-      <div className='add-rule__main'>
-        <MButton
-          className='add-rule__button'
-          variant='contained'
-          color='primary'
-          startIcon={<GavelIcon />}
-          onClick={toggleShowModal}
-        >
-          Add Rule
-        </MButton>
-      </div>
-
       {/* Modal */}
 
       <Modal
         size='lg'
-        show={showModal}
+        show
         centered
-        onHide={toggleShowModal}
+        onHide={onHide}
         aria-labelledby='contained-modal-title-vcenter'
       >
         <Modal.Header className='modal__header' closeButton>
@@ -160,10 +151,11 @@ const AddRule = () => {
                   startTime: startTime,
                   endTime: endTime,
                   activeQuota: parseInt(quotaTime),
-                  visibilityQuota: 10,
+                  visibilityQuota: Infinity,
                 })
 
-                setShowModal(false)
+                onRuleAdded()
+                onHide()
                 setSubmittingFrom(false)
                 setTimeInputs(initialTimeInputs)
                 setDaysOfWeek(initialDaysOfWeek)
@@ -185,6 +177,21 @@ const AddRule = () => {
             {/* Time inputs */}
 
             <div className='time__input-group'>
+              <div>
+                start {timeRange.start} end {timeRange.end}
+                <TimeRangeSlider
+                  disabled={false}
+                  format={24}
+                  maxValue={'23:59'}
+                  minValue={'00:00'}
+                  name={'time_range'}
+                  onChangeStart={console.log}
+                  onChangeComplete={console.log}
+                  onChange={setTimeRange}
+                  step={5}
+                  value={timeRange}
+                />
+              </div>
               <Form.Control
                 type='time'
                 required
