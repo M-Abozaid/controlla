@@ -11,11 +11,7 @@ import storage from '../common/storage';
     const keeper = new Keeper()
     
     await storage.init()
-    setInterval(()=>{
-        console.log('tracker running')
-        keeper.run()
-
-    }, 6000)
+    setInterval(()=>keeper.run, 6000)
 })()
 
 
