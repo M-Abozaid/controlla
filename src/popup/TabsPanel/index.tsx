@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './styles.scss'
 import { Tabs, Tab } from 'react-bootstrap'
 import Rule from '../Rule'
 import { rules } from '../../common/data'
 import AddRule from '../AddRule'
-import Storage from '../../common/storage'
 
-// Storage.getRules().then(rules => console.log('storage rules', rules))
+import storage from '../../common/storage'
+import { getActiveTab } from '../Services'
 
 const TabsPanel = () => {
+  useEffect(() => {
+    async function getRules() {
+      const activeTab = await getActiveTab()
+      console.log('activeTab', activeTab, activeTab.url)
+      const rules = await storage.getMatchingRules(activeTab.url)
+      console.log('matching rules', rules)
+    }
+
+    getRules()
+  }, [])
+
   const [key, setKey] = useState('rules')
 
   return (

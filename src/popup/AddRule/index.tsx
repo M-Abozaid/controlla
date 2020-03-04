@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import './styles.scss'
 
 import MButton from '@material-ui/core/Button'
@@ -12,11 +12,46 @@ import {
   Overlay,
   Tooltip,
 } from 'react-bootstrap'
-import { mapDayNumber } from '../Services'
+import { mapDayNumber, getActiveTab } from '../Services'
+
+import storage from '../../common/storage'
+import { MatcherType } from '../../types'
+
+// get host name url
+function extractHostname(url) {
+  var hostname
+  //find & remove protocol (http, ftp, etc.) and get hostname
+
+  if (url.indexOf('//') > -1) {
+    hostname = url.split('/')[2]
+  } else {
+    hostname = url.split('/')[0]
+  }
+
+  //find & remove port number
+  hostname = hostname.split(':')[0]
+  //find & remove "?"
+  hostname = hostname.split('?')[0]
+
+  return hostname
+}
 
 interface AddRule {}
 
 const AddRule = () => {
+  let activeTabUrl
+
+  useEffect(() => {
+    async function getActiveTabAsync() {
+      const activeTab = await getActiveTab()
+      activeTabUrl = activeTab.url
+      console.log('active tab url have set', activeTabUrl)
+      console.log('extracted hosted name', extractHostname(activeTabUrl))
+    }
+
+    getActiveTabAsync()
+  }, [])
+
   // show modal
   const [showModal, setShowModal] = useState(false)
   const toggleShowModal = () => setShowModal(!showModal)
@@ -34,6 +69,10 @@ const AddRule = () => {
   const { startTime, endTime, quotaTime } = timeInputs
   const handleTimeInputChange = e =>
     setTimeInputs({ ...timeInputs, [e.target.name]: e.target.value })
+
+  // regex url
+  const hostname = extractHostname(activeTabUrl)
+  const [regexUrl, setRegexUrl] = useState('hostname')
 
   // days of the week
   const initialDaysOfWeek = {
@@ -85,7 +124,7 @@ const AddRule = () => {
 
           <Form
             className='add-rule__form'
-            onSubmit={e => {
+            onSubmit={async e => {
               e.preventDefault()
               let daysCount = 0
 
@@ -105,15 +144,50 @@ const AddRule = () => {
               } else {
                 console.log(timeInputs)
                 setSubmittingFrom(true)
-                setTimeout(() => {
-                  setShowModal(false)
-                  setSubmittingFrom(false)
-                  setTimeInputs(initialTimeInputs)
-                  setDaysOfWeek(initialDaysOfWeek)
-                }, 1000)
+
+                const convDaysOfWeek = Object.keys(daysOfWeek).map(day => {
+                  if (daysOfWeek[day]) return parseInt(day)
+                })
+
+                const convRegexUrl = new RegExp(regexUrl)
+
+                await storage.createRule({
+                  matcher: {
+                    type: MatcherType.URL,
+                    value: convRegexUrl,
+                  },
+                  daysOfWeek: convDaysOfWeek,
+                  startTime: startTime,
+                  endTime: endTime,
+                  activeQuota: parseInt(quotaTime),
+                  visibilityQuota: 10,
+                })
+
+                setShowModal(false)
+                setSubmittingFrom(false)
+                setTimeInputs(initialTimeInputs)
+                setDaysOfWeek(initialDaysOfWeek)
+
+                // setTimeout(() => {
+                //   setShowModal(false)
+                //   setSubmittingFrom(false)
+                //   setTimeInputs(initialTimeInputs)
+                //   setDaysOfWeek(initialDaysOfWeek)
+                // }, 1000)
               }
             }}
           >
+            {/* regex url */}
+
+            <Form.Control
+              type='text'
+              required
+              placeholder='Regex'
+              name='urlRegex'
+              value={regexUrl}
+              onChange={e => setRegexUrl(e.target.value)}
+            />
+
             {/* Time inputs */}
 
             <div className='time__input-group'>
