@@ -1,6 +1,15 @@
-.tabs-panel__main {
-  flex-grow: 1;
-  width: 100%;
+.tabs-panel {
+  &__main {
+    flex-grow: 1;
+    width: 100%;
+    text-align: center;
 
-  margin-top: 55px;
+    margin-top: 55px;
+  }
+
+  &__spinner {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+  }
 }
