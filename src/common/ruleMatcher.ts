@@ -6,7 +6,7 @@ class RuleMatcher {
     { categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet
   ): boolean {
     return (
-      this.matchVideoCategory(matcher, title) ||
+      this.matchVideoTitle(matcher, title) ||
       this.matchChannel(matcher, channelTitle) ||
       this.matchVideoCategory(matcher, categoryId)
     )
@@ -37,11 +37,12 @@ class RuleMatcher {
     return channel.includes(matcher.value)
   }
 
-  matchURL(matcher: Matcher, url) {
+  matchURL(matcher: Matcher, {url}:chrome.tabs.Tab) {
 
     if (matcher.type !== MatcherType.URL) return false
 
     if (matcher.value instanceof RegExp) {
+      
       return matcher.value.test(url)
     }
 
@@ -55,7 +56,7 @@ class RuleMatcher {
   ): boolean {
     switch (matcher.type) {
       case MatcherType.URL:
-        return this.matchURL(matcher, tab.url)
+        return this.matchURL(matcher, tab)
       case MatcherType.YT_CATEGORY:
       case MatcherType.YT_TITLE:
       case MatcherType.YT_CHANNEL:

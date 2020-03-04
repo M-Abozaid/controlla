@@ -1,0 +1,1 @@
+export const CHECK_EVERY = 5000;

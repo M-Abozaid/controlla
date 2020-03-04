@@ -64,18 +64,15 @@ class Storage {
     return quotaUsage[0].activeUsage
   }
 
-  async getUsage(ruleId: string): Promise<QuotaUsage> {
-    const dbResponse = await this.quotaUsageDB.find({ selector: { ruleId } })
-    return dbResponse[0]
-  }
+
+  
 
   createUsage(usage: QuotaUsage, update?: boolean): Promise<any> {
     return this.quotaUsageDB.put(usage)
   }
 
-  incrementQuotaUsage(ruleId: string) {}
-
-  resetQuotaUsage(ruleId: string) {}
+  
+  
 
   getYTRules(): Rule[] {
     return rules.map(r => new Rule(r))
@@ -130,6 +127,57 @@ class Storage {
     return rules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab)) 
     
   }
+
+  async incrementOrAddUsage(ruleId:string):Promise<QuotaUsage>{
+    const result = await this.quotaUsageDB.find({selector:{ruleId, day:new Date().getDate()}})
+
+    const usage = result.docs[0]
+    if(!usage){
+        // create usage
+        const newUsage = {
+            ruleId,
+            day:new Date().getDate(),
+            activeUsage:0,
+            visibilityUsage:0,
+        }
+        const response = await this.quotaUsageDB.post(newUsage)
+        return this.quotaUsageDB.get(response.id)
+    }
+    if(usage.day !== new Date().getDate()){
+        // update usage 
+        usage.day = new Date().getDate();
+        usage.activeUsage = usage.activeUsage + 0.1
+        usage.visibilityUsage = usage.visibilityUsage + 0.1
+        await this.quotaUsageDB.put(usage)
+        return usage
+    }
+
+    usage.activeUsage = usage.activeUsage + 0.1
+    usage.visibilityUsage = usage.visibilityUsage + 0.1
+    await this.quotaUsageDB.put(usage)
+    return usage
+  }
+
+
+
+  async getQuotaUsage(ruleId){
+    const result = await this.quotaUsageDB.find({selector:{ruleId, day:new Date().getDate()}})
+
+    const usage = result.docs[0]
+    if(!usage){
+        // create usage
+        const newUsage = {
+            ruleId,
+            day:new Date().getDate(),
+            activeUsage:0,
+            visibilityUsage:0,
+        }
+        const response = await this.quotaUsageDB.post(newUsage)
+        return this.quotaUsageDB.get(response.id)
+    }
+    return usage
+  }
+
   async init() {
     await this.rulesDB.createIndex({ index: { fields: ['matcher.type'] } })
     await this.quotaUsageDB.createIndex({ index: { fields: ['ruleId'] } })

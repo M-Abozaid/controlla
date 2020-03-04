@@ -28,7 +28,8 @@ export interface QuotaUsage {
   _rev?: string
   ruleId: string
   activeUsage: number
-  visibilityUsage: number
+  visibilityUsage: number,
+  day: number
 }
 
 interface Visibility {

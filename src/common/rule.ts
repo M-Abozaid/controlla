@@ -50,11 +50,15 @@ class Rule {
   }
 
   getUsage(): Promise<QuotaUsage> {
-    return storage.getUsage(this._id)
+    return storage.getQuotaUsage(this._id)
   }
 
   remove(){
-      storage.removeRule(this.ruleObj)
+      return storage.removeRule(this.ruleObj)
+  }
+
+  save(){
+      return storage
   }
 }
 

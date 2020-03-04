@@ -4,20 +4,29 @@ import storage from '../common/storage';
 import chromep from 'chrome-promise';
 import ruleMatcher from '../common/ruleMatcher';
 
+const ytVideoURLRegex = /youtube.com\/watch\?v=/;
 export class Keeper {
 
-    ytVideoURLRegex = /youtube.com\/watch\?v=/;
+    incrementQuota(rules:Rule[]){
+        return Promise.all(rules.map(rule=>{
 
-    async controlTab(tab: chrome.tabs.Tab) {
+            return storage.incrementOrAddUsage(rule._id)
+        }))
+    }
+
+
+    controlTab = async (tab: chrome.tabs.Tab)=> {
 
         const rules = await storage.getRules()
-        
+      
+    
         const effectiveRules = rules.filter(r => r.isEffectiveNow())
         
-        let matchingRules;
+        
+        let matchingRules = [];
 
         // if this is a youtube tab
-        if (this.ytVideoURLRegex.test(tab.url)) {
+        if (ytVideoURLRegex.test(tab.url)) {
             
             const {ytDetails}:Visit  = await storage.getOpenVisit(tab.id);
             if(!ytDetails) {
@@ -25,8 +34,15 @@ export class Keeper {
                 return
             }
             matchingRules = effectiveRules.filter(rule=> ruleMatcher.matchTab(rule.ruleObj.matcher, tab, ytDetails.snippet))
+        }else{
+            matchingRules = effectiveRules.filter(rule=> ruleMatcher.matchURL(rule.ruleObj.matcher, tab, ))
+
         }
 
+
+        
+        // update Quota 
+        await this.incrementQuota(matchingRules || effectiveRules)
 
         const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules || effectiveRules)
 
@@ -46,7 +62,7 @@ export class Keeper {
        
         await Promise.all(rules.map(async rule => {
             if (tabRemoved) return;
-            const usage = await storage.getUsage(rule._id);
+            const usage = await storage.getQuotaUsage(rule._id);
             if (tabRemoved) return;
             if (this.compareActiveQuota(usage, rule)) {
                 result[0] = true
@@ -110,6 +126,7 @@ export class Keeper {
         return disallowed;
         
     }
+
 
 }
 
