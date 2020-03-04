@@ -1,5 +1,4 @@
-
-import 'jquery'
+import * as jQuery from 'jquery'
 import getYTVideos from '../common/getYTVideos';
 
 declare var jQuery
