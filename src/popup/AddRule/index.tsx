@@ -48,7 +48,6 @@ const AddRule = () => {
       const activeTab = await getActiveTab()
       const activeTabUrl = extractHostname(activeTab.url)
       const HostRegexEscaped = escapeRegExp(activeTabUrl)
-      console.log('host regex escaped', HostRegexEscaped)
       setRegexUrl(HostRegexEscaped)
     }
 
@@ -144,7 +143,6 @@ const AddRule = () => {
                 !showOverlay && setShowOverlay(true)
                 setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
               } else {
-                console.log(timeInputs)
                 setSubmittingFrom(true)
 
                 const convDaysOfWeek = Object.keys(daysOfWeek).map(day => {
@@ -169,19 +167,13 @@ const AddRule = () => {
                 setSubmittingFrom(false)
                 setTimeInputs(initialTimeInputs)
                 setDaysOfWeek(initialDaysOfWeek)
-
-                // setTimeout(() => {
-                //   setShowModal(false)
-                //   setSubmittingFrom(false)
-                //   setTimeInputs(initialTimeInputs)
-                //   setDaysOfWeek(initialDaysOfWeek)
-                // }, 1000)
               }
             }}
           >
             {/* regex url */}
 
             <Form.Control
+              className='regex__input'
               type='text'
               required
               placeholder='Regex'

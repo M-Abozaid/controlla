@@ -11,6 +11,11 @@ PounchDB.plugin(pounchDBFind)
 
 class Storage {
   rulesDB = new PounchDB<RuleObj>('rules')
+  rulesDB.find({selector:{}}).then(console.log)
+
+
+
+
   quotaUsageDB = new PounchDB<QuotaUsage>('quotaUsage')
   visitsDB = new PounchDB<Visit>('visits')
   

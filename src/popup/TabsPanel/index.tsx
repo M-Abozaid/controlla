@@ -12,22 +12,24 @@ const TabsPanel = () => {
   useEffect(() => {
     async function getRules() {
       const activeTab = await getActiveTab()
-      console.log('activeTab', activeTab, activeTab.url)
       const rules = await storage.getMatchingRules(activeTab.url)
-      console.log('matching rules', rules)
+      console.log('active tab and rules from tabsPanel', activeTab, rules)
+      setMatchedRules(rules)
     }
 
     getRules()
   }, [])
 
-  const [key, setKey] = useState('rules')
+  const [tabKey, setTabKey] = useState('rules')
+
+  const [matchedRules, setMatchedRules] = useState([])
 
   return (
     <Tabs
       className='tabs-panel__main'
       id='contolled-tabs'
-      activeKey={key}
-      onSelect={(k: React.SetStateAction<string>) => setKey(k)}
+      activeKey={tabKey}
+      onSelect={(k: React.SetStateAction<string>) => setTabKey(k)}
     >
       <Tab eventKey='rules' title='Rules &#9997;'>
         <div>
