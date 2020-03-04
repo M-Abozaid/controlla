@@ -6,7 +6,7 @@ class RuleMatcher {
     { categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet
   ): boolean {
     return (
-      this.matchVideoCategory(matcher, title) ||
+      this.matchVideoTitle(matcher, title) ||
       this.matchChannel(matcher, channelTitle) ||
       this.matchVideoCategory(matcher, categoryId)
     )
