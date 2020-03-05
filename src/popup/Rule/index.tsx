@@ -5,6 +5,9 @@ import { getRuleTitle, mapDayNumber } from '../Services'
 import { ProgressBar, ButtonGroup, Button } from 'react-bootstrap'
 import TimerIcon from '@material-ui/icons/Timer'
 import DateRangeIcon from '@material-ui/icons/DateRange'
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord'
+import { Tooltip, Zoom, Drawer, Switch } from '@material-ui/core'
+
 import Rule from '../../common/rule'
 
 interface RuleProps {
@@ -24,13 +27,39 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
   }
   return (
     <div className='rule__main'>
+      <div className='rule__header'>
+        <div
+          className={`rule__effective__badge  ${
+            rule.isEffectiveNow() ? 'active' : ''
+          }`}
+        >
+          <Tooltip
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 200 }}
+            title={
+              rule.isEffectiveNow() ? 'Rule is active' : 'Rule is inactive'
+            }
+            arrow
+          >
+            <FiberManualRecordIcon />
+          </Tooltip>
+        </div>
+
+        <div className='rule__type'>{rule.ruleObj.matcher.type}</div>
+        <Tooltip
+          TransitionComponent={Zoom}
+          TransitionProps={{ timeout: 200 }}
+          title='Remove rule'
+          arrow
+        >
+          <div onClick={removeRule} className='remove__rule'>
+            &#10007;
+          </div>
+        </Tooltip>
+      </div>
       <h4 className='rule__title'>
         {getRuleTitle(rule.ruleObj.matcher.value)}
       </h4>
-
-      <div onClick={removeRule} className='remove__rule'>
-        &#10007;
-      </div>
 
       <div>
         <ProgressBar
