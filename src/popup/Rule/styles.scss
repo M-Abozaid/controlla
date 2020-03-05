@@ -18,24 +18,6 @@
   background-color: rgba(226, 225, 225, 0.308);
 }
 
-.remove__rule {
-  top: 6px;
-  right: 5px;
-  color: rgba(255, 0, 0, 0.482);
-  cursor: pointer;
-  position: absolute;
-
-  &:hover {
-    color: red;
-  }
-
-  transition: all 0.5;
-
-  &:active {
-    transform: translateY(3px);
-  }
-}
-
 .rule__progress {
   &-bar {
     width: 85%;
@@ -97,6 +79,57 @@
   &--active {
     span {
       background-color: #84c6fc42;
+    }
+  }
+}
+
+.rule__header {
+  width: 100%;
+  font-size: 16px;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+
+  .rule__effective__badge {
+    display: flex;
+    align-items: center;
+    margin-right: 9px;
+    color: grey;
+    svg {
+      font-size: 15px;
+    }
+    &.active {
+      color: red !important;
+    }
+  }
+  .rule__tools {
+    margin-left: auto;
+    svg {
+      font-size: 18px;
+    }
+
+    display: flex;
+    .rule__edit {
+      margin-left: auto;
+      margin-right: 10px;
+      cursor: pointer;
+      &:hover {
+        color: red;
+      }
+    }
+    .remove__rule {
+      margin-left: auto;
+      cursor: pointer;
+
+      &:hover {
+        color: red;
+      }
+
+      transition: all 0.5;
+
+      &:active {
+        transform: translateY(3px);
+      }
     }
   }
 }
