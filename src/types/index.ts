@@ -1,14 +1,15 @@
 export enum MatcherType {
-  'YT_CATEGORY'='YT_CATEGORY',
-  'URL'='URL',
-  'YT_CHANNEL'='YT_CHANNEL',
-  'YT_TITLE'='YT_TITLE',
+  'URL' = 'URL',
+  'YT_CATEGORY' = 'YT_CATEGORY',
+  'YT_CHANNEL' = 'YT_CHANNEL',
+  'YT_TITLE' = 'YT_TITLE',
 }
 
 export interface Matcher {
   type: MatcherType
   value: string | RegExp
 }
+
 export interface RuleObj {
   _id?: string
   _rev?: string
@@ -28,7 +29,7 @@ export interface QuotaUsage {
   _rev?: string
   ruleId: string
   activeUsage: number
-  visibilityUsage: number,
+  visibilityUsage: number
   day: number
 }
 

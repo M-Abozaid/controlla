@@ -4,6 +4,8 @@ import storage from '../../common/storage'
 import { MatcherType } from '../../types'
 import TimeRangeSlider from 'react-time-range-slider'
 
+import SelectMatcher from './Select'
+
 import {
   Modal,
   Button,
@@ -158,6 +160,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
             className='add-rule__form'
             onSubmit={async e => await handleFormSubmitting(e)}
           >
+            <SelectMatcher />
+
             <Form.Control
               className='regex__input'
               type='text'

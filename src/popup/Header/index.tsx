@@ -5,8 +5,6 @@ import AddRule from '../AddRule'
 import { Settings, Add } from '@material-ui/icons'
 import { Tooltip, Zoom, Drawer, Switch } from '@material-ui/core'
 
-// the drawer is a source of perfomance issues :D
-
 const Header = () => {
   const [showAddRuleModal, toggleAddRuleModal] = useState(false)
 
