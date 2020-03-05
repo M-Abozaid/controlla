@@ -6,8 +6,8 @@ import { ProgressBar, ButtonGroup, Button } from 'react-bootstrap'
 import TimerIcon from '@material-ui/icons/Timer'
 import DateRangeIcon from '@material-ui/icons/DateRange'
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord'
-import { Tooltip, Zoom, Drawer, Switch } from '@material-ui/core'
-
+import { Tooltip, Zoom } from '@material-ui/core'
+import EditIcon from '@material-ui/icons/Edit'
 import Rule from '../../common/rule'
 
 interface RuleProps {
@@ -46,16 +46,29 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
         </div>
 
         <div className='rule__type'>{rule.ruleObj.matcher.type}</div>
-        <Tooltip
-          TransitionComponent={Zoom}
-          TransitionProps={{ timeout: 200 }}
-          title='Remove rule'
-          arrow
-        >
-          <div onClick={removeRule} className='remove__rule'>
-            &#10007;
-          </div>
-        </Tooltip>
+        <div className='rule__tools'>
+          <Tooltip
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 200 }}
+            title='Edit Rule'
+            arrow
+          >
+            <div className='rule__edit'>
+              <EditIcon />
+            </div>
+          </Tooltip>
+
+          <Tooltip
+            TransitionComponent={Zoom}
+            TransitionProps={{ timeout: 200 }}
+            title='Remove rule'
+            arrow
+          >
+            <div onClick={removeRule} className='remove__rule'>
+              &#10007;
+            </div>
+          </Tooltip>
+        </div>
       </div>
       <h4 className='rule__title'>
         {getRuleTitle(rule.ruleObj.matcher.value)}

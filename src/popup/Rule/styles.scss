@@ -84,6 +84,7 @@
 }
 
 .rule__header {
+  width: 100%;
   font-size: 16px;
   margin-bottom: 4px;
   display: flex;
@@ -101,19 +102,32 @@
       color: red !important;
     }
   }
-  .remove__rule {
+  .rule__tools {
     margin-left: auto;
-    color: rgba(255, 0, 0, 0.482);
-    cursor: pointer;
-
-    &:hover {
-      color: red;
+    svg {
+      font-size: 18px;
     }
 
-    transition: all 0.5;
+    display: flex;
+    .rule__edit {
+      margin-left: auto;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .remove__rule {
+      margin-left: auto;
+      color: rgba(255, 0, 0, 0.482);
+      cursor: pointer;
 
-    &:active {
-      transform: translateY(3px);
+      &:hover {
+        color: red;
+      }
+
+      transition: all 0.5;
+
+      &:active {
+        transform: translateY(3px);
+      }
     }
   }
 }
