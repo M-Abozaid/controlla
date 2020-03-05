@@ -8,6 +8,7 @@ import DateRangeIcon from '@material-ui/icons/DateRange'
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord'
 import { Tooltip, Zoom } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit'
+import Close from '@material-ui/icons/Close'
 import Rule from '../../common/rule'
 
 interface RuleProps {
@@ -65,7 +66,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
             arrow
           >
             <div onClick={removeRule} className='remove__rule'>
-              &#10007;
+              <Close></Close>
             </div>
           </Tooltip>
         </div>

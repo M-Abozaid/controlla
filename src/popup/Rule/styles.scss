@@ -113,10 +113,12 @@
       margin-left: auto;
       margin-right: 10px;
       cursor: pointer;
+      &:hover {
+        color: red;
+      }
     }
     .remove__rule {
       margin-left: auto;
-      color: rgba(255, 0, 0, 0.482);
       cursor: pointer;
 
       &:hover {
