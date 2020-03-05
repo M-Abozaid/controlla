@@ -165,7 +165,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               placeholder='Regex'
               name='urlRegex'
               value={regexUrl}
-              onChange={e => setRegexUrl(e.target.value)}
+              onChange={(e: any) => setRegexUrl(e.target.value)}
             />
 
             <div className='start-end__time'>
@@ -228,6 +228,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                   {mapDayNumber(parseInt(number))}
                 </Button>
               ))}
+
               <Button
                 style={{ marginLeft: '5px' }}
                 variant={allWeekOn ? 'outline-secondary' : 'primary'}

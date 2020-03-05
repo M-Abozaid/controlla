@@ -2,6 +2,5 @@
 
 ## src/popup
 
-- removed input time in add rule form and only used slider
-- changed font family
-- removed two functions from addRule to sevices
+- add another page for options
+- add the option to chnage the header color

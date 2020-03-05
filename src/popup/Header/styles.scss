@@ -6,7 +6,7 @@
   top: 0;
   width: 100%;
   position: fixed;
-  background-color: #007bff; // #24292e
+  background-color: #007bff; // 24292e 007bff
 
   display: flex;
   align-items: center;
@@ -21,10 +21,13 @@
 
 .header__button {
   color: #fff;
+  cursor: pointer;
+  margin: auto 8px;
   transition: all 0.3s;
+  display: inline-block;
 
   &:hover {
-    color: #65f088;
+    color: #1afb52; // 65f088
   }
 
   &:active {
@@ -34,14 +37,4 @@
   svg {
     font-size: 120%;
   }
-  &,
-  &:link,
-  &:visited {
-    cursor: pointer;
-    display: inline-block;
-  }
-  margin: auto 8px;
-}
-
-.settings__button {
 }
