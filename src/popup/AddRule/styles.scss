@@ -36,23 +36,25 @@
   }
 }
 
-.time__input-group {
+.start-end__time {
   display: flex;
-  margin-bottom: 12px;
-  flex-direction: row;
   justify-content: space-between;
-
-  input {
-    width: 35%;
-
-    &:last-child {
-      width: 27%;
-    }
-  }
 }
 
 .time-range__slider {
+  width: 96%;
+  margin: 0 auto;
   margin-bottom: 12px;
+}
+
+.quota__time-gruop {
+  display: flex;
+  margin-bottom: 12px;
+  justify-content: space-between;
+
+  input {
+    width: 48%;
+  }
 }
 
 .week__button-group {

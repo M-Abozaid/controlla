@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './styles.scss'
+import storage from '../../common/storage'
+import { MatcherType } from '../../types'
 import TimeRangeSlider from 'react-time-range-slider'
+
 import {
   Modal,
   Button,
@@ -10,34 +13,14 @@ import {
   Overlay,
   Tooltip,
 } from 'react-bootstrap'
-import { mapDayNumber, getActiveTab } from '../Services'
+import {
+  mapDayNumber,
+  getActiveTab,
+  extractHostname,
+  escapeRegExp,
+} from '../Services'
 
-import storage from '../../common/storage'
-import { MatcherType } from '../../types'
-
-// get host name url
-function extractHostname(url) {
-  var hostname
-  //find & remove protocol (http, ftp, etc.) and get hostname
-
-  if (url.indexOf('//') > -1) {
-    hostname = url.split('/')[2]
-  } else {
-    hostname = url.split('/')[0]
-  }
-
-  //find & remove port number
-  hostname = hostname.split(':')[0]
-  //find & remove "?"
-  hostname = hostname.split('?')[0]
-
-  return hostname
-}
-
-function escapeRegExp(text) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
-}
-
+//
 interface AddRule {
   onRuleAdded: Function
   onHide: Function
@@ -58,35 +41,22 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
 
+  // regex url
+  const [regexUrl, setRegexUrl] = useState('')
+
   // time input control
   const timeRangeInitial = {
     start: '00:00',
     end: '23:59',
   }
   const [timeRange, setTimeRange] = useState({ ...timeRangeInitial })
-  const timeRangeChange = time => {
-    setTimeRange(time)
-    setTimeInputs({ start: timeRange.start, end: timeRange.end, quotaTime })
-  }
+  const { start, end } = timeRange
 
-  // const initialTimeInputs = {
-  //   start: '',
-  //   end: '',
-  //   quotaTime: '',
-  // }
-  const [timeInputs, setTimeInputs] = useState({
-    ...timeRangeInitial,
-    quotaTime: '1',
-  })
-  const { start, end, quotaTime } = timeInputs
-  const handleTimeInputChange = e => {
-    setTimeInputs({ ...timeInputs, [e.target.name]: e.target.value })
-    if (e.target.name !== 'quotaTime')
-      setTimeRange({ ...timeRange, [e.target.name]: e.target.value })
-  }
-
-  // regex url
-  const [regexUrl, setRegexUrl] = useState('')
+  const quotaTimeInitial = { activeQuota: '', visibilityQuota: '' }
+  const [quotaTime, setQuotaTime] = useState(quotaTimeInitial)
+  const { activeQuota, visibilityQuota } = quotaTime
+  const handleQuotaChange = e =>
+    setQuotaTime({ ...quotaTime, [e.target.name]: e.target.value })
 
   // days of the week
   const initialDaysOfWeek = {
@@ -124,10 +94,54 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   const addButtonTarget = useRef(null)
   const [showOverlay, setShowOverlay] = useState(false)
 
+  // form submitting
+  const handleFormSubmitting = async e => {
+    e.preventDefault()
+    let daysCount = 0
+
+    const startTimeParsed = parseInt(start.substring(0, 2))
+    const endTimeParsed = parseInt(end.substring(0, 2))
+
+    Object.keys(daysOfWeek).map(day => !daysOfWeek[day] && daysCount++)
+
+    if (daysCount === 7) {
+      !showOverlay && setShowOverlay(true)
+      setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
+    } else if (startTimeParsed > endTimeParsed) {
+      !showOverlay && setShowOverlay(true)
+      setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
+    } else {
+      setSubmittingFrom(true)
+
+      const convDaysOfWeek = Object.keys(daysOfWeek).map(day => {
+        if (daysOfWeek[day]) return parseInt(day)
+      })
+
+      const convRegexUrl = new RegExp(regexUrl)
+
+      await storage.createRule({
+        matcher: {
+          type: MatcherType.URL,
+          value: convRegexUrl,
+        },
+        daysOfWeek: convDaysOfWeek,
+        startTime: start,
+        endTime: end,
+        activeQuota: parseInt(activeQuota),
+        visibilityQuota: parseInt(visibilityQuota),
+      })
+
+      onHide()
+      onRuleAdded()
+      setSubmittingFrom(false)
+      setQuotaTime(quotaTimeInitial)
+      setDaysOfWeek(initialDaysOfWeek)
+      setTimeRange({ ...timeRangeInitial })
+    }
+  }
+
   return (
     <>
-      {/* Modal */}
-
       <Modal
         size='lg'
         show
@@ -140,58 +154,10 @@ const AddRule = ({ onRuleAdded, onHide }) => {
         </Modal.Header>
 
         <Modal.Body>
-          {/* Input From */}
-
           <Form
             className='add-rule__form'
-            onSubmit={async e => {
-              e.preventDefault()
-              let daysCount = 0
-
-              const startTimeParsed = parseInt(start.substring(0, 2))
-              const endTimeParsed = parseInt(end.substring(0, 2))
-
-              Object.keys(daysOfWeek).map(
-                day => !daysOfWeek[day] && daysCount++
-              )
-
-              if (daysCount === 7) {
-                !showOverlay && setShowOverlay(true)
-                setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
-              } else if (startTimeParsed > endTimeParsed) {
-                !showOverlay && setShowOverlay(true)
-                setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
-              } else {
-                setSubmittingFrom(true)
-
-                const convDaysOfWeek = Object.keys(daysOfWeek).map(day => {
-                  if (daysOfWeek[day]) return parseInt(day)
-                })
-
-                const convRegexUrl = new RegExp(regexUrl)
-
-                await storage.createRule({
-                  matcher: {
-                    type: MatcherType.URL,
-                    value: convRegexUrl,
-                  },
-                  daysOfWeek: convDaysOfWeek,
-                  startTime: start,
-                  endTime: end,
-                  activeQuota: parseInt(quotaTime),
-                  visibilityQuota: Infinity,
-                })
-
-                onRuleAdded()
-                onHide()
-                setSubmittingFrom(false)
-                setTimeInputs({ ...timeRangeInitial, quotaTime: '1' })
-                setDaysOfWeek(initialDaysOfWeek)
-              }
-            }}
+            onSubmit={async e => await handleFormSubmitting(e)}
           >
-            {/* regex url */}
-
             <Form.Control
               className='regex__input'
               type='text'
@@ -202,40 +168,12 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               onChange={e => setRegexUrl(e.target.value)}
             />
 
-            {/* Time inputs */}
-
-            <div className='time__input-group'>
-              <Form.Control
-                type='time'
-                required
-                placeholder='Start'
-                name='start'
-                value={start}
-                onChange={e => handleTimeInputChange(e)}
-              />
-
-              <Form.Control
-                type='time'
-                required
-                placeholder='End'
-                name='end'
-                value={end}
-                onChange={e => handleTimeInputChange(e)}
-              />
-
-              <Form.Control
-                required
-                min='1'
-                type='number'
-                placeholder='Quota'
-                name='quotaTime'
-                value={quotaTime}
-                onChange={e => handleTimeInputChange(e)}
-              />
+            <div className='start-end__time'>
+              <span>{timeRange.start}</span>
+              <span>{timeRange.end}</span>
             </div>
 
             <div className='time-range__slider'>
-              start {timeRange.start} end {timeRange.end}
               <TimeRangeSlider
                 disabled={false}
                 format={24}
@@ -244,13 +182,33 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                 name={'time_range'}
                 onChangeStart={console.log}
                 onChangeComplete={console.log}
-                onChange={timeRangeChange}
+                onChange={setTimeRange}
                 step={5}
                 value={timeRange}
               />
             </div>
 
-            {/* Days of the Week */}
+            <div className='quota__time-gruop'>
+              <Form.Control
+                required
+                min='1'
+                type='number'
+                placeholder='Active Quota'
+                name='activeQuota'
+                value={activeQuota}
+                onChange={e => handleQuotaChange(e)}
+              />
+
+              <Form.Control
+                required
+                min='1'
+                type='number'
+                placeholder='Visibility Quota'
+                name='visibilityQuota'
+                value={visibilityQuota}
+                onChange={e => handleQuotaChange(e)}
+              />
+            </div>
 
             <ButtonGroup
               className='week__button-group'
@@ -279,8 +237,6 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               </Button>
             </ButtonGroup>
 
-            {/* Submit Button */}
-
             <Button
               className='submit__button'
               variant='danger'
@@ -306,15 +262,10 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               show={showOverlay}
               placement='top'
             >
-              {props => (
-                <Tooltip id='overlay' {...props}>
-                  You have to choose at least one day or End time must be after
-                  Start Time
-                </Tooltip>
-              )}
+              <Tooltip id='overlay'>
+                You have to choose at least one day
+              </Tooltip>
             </Overlay>
-
-            {/*  */}
           </Form>
         </Modal.Body>
       </Modal>

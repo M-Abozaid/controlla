@@ -6,7 +6,7 @@
   top: 0;
   width: 100%;
   position: fixed;
-  background-color: #007bff;
+  background-color: #007bff; // #24292e
 
   display: flex;
   align-items: center;
@@ -19,8 +19,6 @@
   font-weight: bold;
 }
 
-.header__buttons {
-}
 .header__button {
   color: #fff;
   transition: all 0.3s;
@@ -31,7 +29,6 @@
 
   &:active {
     transform: translateY(0.3rem);
-    // color: #007bff;
   }
 
   svg {
@@ -45,8 +42,6 @@
   }
   margin: auto 8px;
 }
-.settings__button {
-}
 
-.add__button {
+.settings__button {
 }
