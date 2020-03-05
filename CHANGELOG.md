@@ -2,5 +2,6 @@
 
 ## src/popup
 
-- add another page for options
-- add the option to chnage the header color
+- add tooltip for the header buttons
+- added drawer to show the settins
+- add the option to chanage the header color

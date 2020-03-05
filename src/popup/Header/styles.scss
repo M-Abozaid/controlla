@@ -6,13 +6,21 @@
   top: 0;
   width: 100%;
   position: fixed;
-  background-color: #007bff; // 24292e 007bff
+  // background-color: #007bff; // 24292e 007bff
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   border-bottom: 1px solid rgba(168, 167, 167, 0.753);
+}
+
+.blue {
+  background-color: #007bff;
+}
+
+.black {
+  background-color: #24292e;
 }
 
 .header__title {

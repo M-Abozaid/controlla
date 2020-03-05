@@ -1,27 +1,61 @@
 import React, { useState } from 'react'
 import './styles.scss'
-import SettingsIcon from '@material-ui/icons/Settings'
-import Add from '@material-ui/icons/Add'
 import AddRule from '../AddRule'
+
+import { Settings, Add } from '@material-ui/icons'
+import { Tooltip, Zoom, Drawer, Switch } from '@material-ui/core'
+
+// the drawer is a source of perfomance issues :D
 
 const Header = () => {
   const [showAddRuleModal, toggleAddRuleModal] = useState(false)
 
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const [toggleColor, setToggleColor] = useState(true)
+
   return (
     <>
-      <div className='header__main'>
+      <div className={`header__main ${toggleColor ? 'blue' : 'black'}`}>
         <div className='header__title'>
           <span>Controlla</span>
         </div>
 
         <div>
           <div className='header__button'>
-            <Add onClick={() => toggleAddRuleModal(true)} />
+            <Tooltip
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 300 }}
+              title='Add Rule'
+              arrow
+            >
+              <Add onClick={() => toggleAddRuleModal(true)} />
+            </Tooltip>
           </div>
 
           <div className='header__button'>
-            <SettingsIcon />
+            <Tooltip
+              TransitionComponent={Zoom}
+              TransitionProps={{ timeout: 300 }}
+              title='Settings'
+              arrow
+            >
+              <Settings onClick={() => setDrawerOpen(true)} />
+            </Tooltip>
           </div>
+
+          <Drawer
+            anchor='bottom'
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+          >
+            <span>Header Color</span>
+            <Switch
+              checked={toggleColor}
+              color={toggleColor ? 'primary' : 'secondary'}
+              onChange={() => setToggleColor(!toggleColor)}
+            />
+          </Drawer>
         </div>
       </div>
 
