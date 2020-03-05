@@ -5,7 +5,7 @@ import moment from 'moment'
 class Rule {
   ruleObj: RuleObj
   _id: string
-    usage : QuotaUsage
+  usage: QuotaUsage
   constructor(ruleObj?: RuleObj) {
     this.ruleObj = ruleObj
     this._id = this.ruleObj._id
@@ -50,16 +50,16 @@ class Rule {
   }
 
   async getUsage(): Promise<QuotaUsage> {
-   this.usage = await storage.getQuotaUsage(this._id)
-   return this.usage
+    this.usage = await storage.getQuotaUsage(this._id)
+    return this.usage
   }
 
-  remove(){
-      return storage.removeRule(this.ruleObj)
+  remove() {
+    return storage.removeRule(this.ruleObj)
   }
 
-  save(){
-      return storage
+  save() {
+    return storage
   }
 }
 

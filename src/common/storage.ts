@@ -43,8 +43,10 @@ class Storage extends EventEmitter {
         return this.updateOrCreateDoc(this.rulesDB, ruleObj, ruleId)
     }
 
-    removeRule(ruleObj) {
-        return this.rulesDB.remove(ruleObj)
+    async removeRule(ruleObj) {
+        await this.rulesDB.remove(ruleObj)
+        this.emit('rule_removed', ruleObj)
+        return
     }
     async createRule(rule: RuleObj, ): Promise<Rule> {
         const newRule = await this.rulesDB.post(rule)

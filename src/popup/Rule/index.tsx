@@ -19,13 +19,16 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
 
   const daysNumber = [0, 1, 2, 3, 4, 5, 6]
 
+  const removeRule = async () => {
+    await rule.remove()
+  }
   return (
     <div className='rule__main'>
       <h4 className='rule__title'>
         {getRuleTitle(rule.ruleObj.matcher.value)}
       </h4>
 
-      <div onClick={() => {}} className='remove__rule'>
+      <div onClick={removeRule} className='remove__rule'>
         &#10007;
       </div>
 

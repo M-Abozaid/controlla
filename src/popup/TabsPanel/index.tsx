@@ -21,6 +21,7 @@ const TabsPanel = () => {
   useEffect(() => {
     getRules()
     storage.on('new_rule', getRules)
+    storage.on('rule_removed', getRules)
     const intervalId = setInterval(getRules, 6000)
     return () => clearInterval(intervalId)
   }, [])
