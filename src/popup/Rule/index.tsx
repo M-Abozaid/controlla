@@ -35,7 +35,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
           now={quotaPercentage}
           label={`${quotaPercentage} %`}
         />
-        <span className='rule__progress-time'>{parseInt(restQuota)} m</span>
+        <span className='rule__progress-time'>{Math.floor(restQuota)} m</span>
       </div>
 
       <div className='rule__time-day'>
