@@ -65,3 +65,15 @@
 .regex__input {
   margin-bottom: 12px;
 }
+
+.matcher-type {
+  &__main {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+
+  &__select {
+    width: 60%;
+  }
+}

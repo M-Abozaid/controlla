@@ -4,7 +4,8 @@ import storage from '../../common/storage'
 import { MatcherType } from '../../types'
 import TimeRangeSlider from 'react-time-range-slider'
 
-import SelectMatcher from './Select'
+import MenuItem from '@material-ui/core/MenuItem'
+import Select from '@material-ui/core/Select'
 
 import {
   Modal,
@@ -29,16 +30,23 @@ interface AddRule {
 }
 
 const AddRule = ({ onRuleAdded, onHide }) => {
+  // matcher type
+  const [matcherType, setmatcherType] = React.useState('URL')
+  const handleChange = event => {
+    setmatcherType(event.target.value)
+  }
+
   useEffect(() => {
     async function getActiveTabAsync() {
       const activeTab = await getActiveTab()
       const activeTabUrl = extractHostname(activeTab.url)
-      const HostRegexEscaped = escapeRegExp(activeTabUrl)
+      const HostRegexEscaped =
+        matcherType === 'URL' ? escapeRegExp(activeTabUrl) : activeTabUrl
       setRegexUrl(HostRegexEscaped)
     }
 
     getActiveTabAsync()
-  }, [])
+  }, [matcherType])
 
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
@@ -119,11 +127,12 @@ const AddRule = ({ onRuleAdded, onHide }) => {
         if (daysOfWeek[day]) return parseInt(day)
       })
 
-      const convRegexUrl = new RegExp(regexUrl)
+      const convRegexUrl =
+        matcherType === 'URL' ? new RegExp(regexUrl) : regexUrl
 
       await storage.createRule({
         matcher: {
-          type: MatcherType.URL,
+          type: matcherType,
           value: convRegexUrl,
         },
         daysOfWeek: convDaysOfWeek,
@@ -160,7 +169,21 @@ const AddRule = ({ onRuleAdded, onHide }) => {
             className='add-rule__form'
             onSubmit={async e => await handleFormSubmitting(e)}
           >
-            <SelectMatcher />
+            <div className='matcher-type__main'>
+              <span>Matcher Type</span>
+              <Select
+                className='matcher-type__select'
+                labelId='select-label'
+                value={matcherType}
+                onChange={handleChange}
+              >
+                {Object.keys(MatcherType).map(matcher => (
+                  <MenuItem key={matcher} value={matcher}>
+                    {matcher}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
 
             <Form.Control
               className='regex__input'

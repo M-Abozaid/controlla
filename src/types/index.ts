@@ -1,6 +1,6 @@
 export enum MatcherType {
-  'YT_CATEGORY' = 'YT_CATEGORY',
   'URL' = 'URL',
+  'YT_CATEGORY' = 'YT_CATEGORY',
   'YT_CHANNEL' = 'YT_CHANNEL',
   'YT_TITLE' = 'YT_TITLE',
 }
@@ -14,7 +14,7 @@ export interface RuleObj {
   _id?: string
   _rev?: string
   matcher: {
-    type: MatcherType
+    type: string | MatcherType
     value: string | RegExp
   }
   startTime: string
