@@ -68,7 +68,7 @@ const SelectYTCat: React.FC<SelectYTCatProps> = ({ setMatcherValue }) => {
             key={cat}
             value={YTCategories[cat]}
             onClick={(e: any) => {
-              setMatcherValue(e.target.value)
+              setMatcherValue(String(e.target.value))
               setChoosenCategory(cat)
               setAnchorEl(null)
             }}
