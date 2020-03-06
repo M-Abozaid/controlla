@@ -1,17 +1,7 @@
 import { Matcher, MatcherType } from '../types'
 
 class RuleMatcher {
-  matchVideoSnippet(
-    matcher: Matcher,
-    { categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet
-  ): boolean {
 
-    return (
-      this.matchVideoTitle(matcher, title) ||
-      this.matchChannel(matcher, channelTitle) ||
-      this.matchVideoCategory(matcher, categoryId)
-    )
-  }
 
   matchVideoTitle(matcher: Matcher, title: string): boolean {
     if (matcher.type !== MatcherType.YT_TITLE) return false
@@ -51,6 +41,18 @@ class RuleMatcher {
     return url.includes(matcher.value)
   }
 
+  matchVideoSnippet(
+    matcher: Matcher,
+    { categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet
+  ): boolean {
+
+    console.log('mach youtube visdeo ', matcher, this.matchVideoCategory(matcher, categoryId), categoryId)
+    return (
+      this.matchVideoTitle(matcher, title) ||
+      this.matchChannel(matcher, channelTitle) ||
+      this.matchVideoCategory(matcher, categoryId)
+    )
+  }
   matchTab(
     matcher,
     tab: chrome.tabs.Tab,

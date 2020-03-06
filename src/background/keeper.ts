@@ -10,7 +10,6 @@ export class Keeper {
     incrementQuota(rules: Rule[]) {
         return Promise.all(rules.map(rule => {
 
-            console.log('increment quota ', rule)
             return storage.incrementOrAddUsage(rule._id)
         }))
     }
@@ -18,7 +17,6 @@ export class Keeper {
 
     controlTab = async (tab: chrome.tabs.Tab) => {
 
-        // console.log('tab ', tab)
         const rules = await storage.getRules()
 
 
@@ -32,7 +30,6 @@ export class Keeper {
 
             const { ytDetails }: Visit = await storage.getOpenVisit(tab.id);
             if (!ytDetails) {
-                console.log('video details don\'t exist ')
                 return
             }
             matchingRules = effectiveRules.filter(rule => ruleMatcher.matchTab(rule.ruleObj.matcher, tab, ytDetails.snippet))
@@ -120,11 +117,12 @@ export class Keeper {
 
     async isYTVideoAllowed(video: gapi.client.youtube.VideoSnippet): Promise<boolean> {
 
-        const YTRules = await storage.getYTRules()
+        const YTRules = await storage.getRules()
 
-        const matchingRules = YTRules.filter(rule => rule.isEffectiveNow() && ruleMatcher.matchVideoSnippet(rule.ruleObj.matcher, video))
 
-        console.log('matching ', matchingRules)
+        const matchingRules = YTRules.filter(rule => (rule.isEffectiveNow() && ruleMatcher.matchVideoSnippet(rule.ruleObj.matcher, video)))
+
+        console.log('mathching rules ', matchingRules)
         const [disallowed] = await this.quotaCheck(matchingRules)
 
         return !disallowed;
