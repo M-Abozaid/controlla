@@ -1,3 +1,4 @@
+import { Matcher, MatcherType, YTCategories } from './../../types/index';
 import chromep from 'chrome-promise'
 
 export async function getActiveTab(): Promise<chrome.tabs.Tab> {
@@ -16,8 +17,14 @@ export async function getActiveTab(): Promise<chrome.tabs.Tab> {
 @input: rule title as a regex
 @output: the title of the rule as a string 
 */
-export const getRuleTitle = (ruleTitle: RegExp | string) =>
-  `${ruleTitle}`.match(/[^\\\/\^\$]/gi)
+export const getRuleTitle = (matcher: Matcher) => {
+
+  if (matcher.type === MatcherType.YT_CATEGORY) {
+    return YTCategories[<string>(matcher).value]
+  }
+  return `${matcher.value}`.match(/[^\\\/\^\$]/gi)
+
+}
 
 /* 
 @input: a number repres. a day
