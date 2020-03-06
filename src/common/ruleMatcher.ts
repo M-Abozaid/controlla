@@ -19,7 +19,8 @@ class RuleMatcher {
       return matcher.value.test(title)
     }
 
-    return title.includes(matcher.value)
+
+    return title.toLowerCase().includes(matcher.value.toLowerCase())
   }
 
   matchVideoCategory(matcher: Matcher, categoryId: string): boolean {
@@ -34,15 +35,15 @@ class RuleMatcher {
       return matcher.value.test(channel)
     }
 
-    return channel.includes(matcher.value)
+    return channel.toLowerCase() === matcher.value.toLowerCase()
   }
 
-  matchURL(matcher: Matcher, {url}:chrome.tabs.Tab) {
+  matchURL(matcher: Matcher, { url }: chrome.tabs.Tab) {
 
     if (matcher.type !== MatcherType.URL) return false
 
     if (matcher.value instanceof RegExp) {
-      
+
       return matcher.value.test(url)
     }
 

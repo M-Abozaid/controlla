@@ -130,7 +130,7 @@ class Storage extends EventEmitter {
             console.log('got open visit ', visit)
             return rules.filter(rule => ruleMatcher.matchTab(rule.ruleObj.matcher, tab, visit.ytDetails.snippet))
         }
-        return rules.filter(rule => ruleMatcher.matchTab(rule.ruleObj.matcher, tab))
+        return rules.filter(rule => ruleMatcher.matchURL(rule.ruleObj.matcher, tab))
 
     }
 

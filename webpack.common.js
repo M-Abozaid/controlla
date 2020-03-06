@@ -42,6 +42,9 @@ module.exports = {
     ]
   },
   resolve: {
+    alias: {
+      jquery: 'jquery/src/jquery'
+    },
     extensions: ['.ts', '.tsx', '.js']
   }
 }
