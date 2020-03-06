@@ -43,13 +43,15 @@ export class Keeper {
 
 
         // update Quota 
-        await this.incrementQuota(matchingRules.length ? matchingRules : effectiveRules)
+        await this.incrementQuota(matchingRules)
 
-        const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules.length ? matchingRules : effectiveRules)
+        const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules)
 
         if (tabExpired) {
             this.removeTab(tab)
+
         } else if (visibilityExpired) {
+
             this.hideTab(tab)
         }
 
