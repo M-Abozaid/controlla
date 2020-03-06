@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './styles.scss'
+import { MatcherType, YTCategories } from '../../types'
 import storage from '../../common/storage'
-import { MatcherType } from '../../types'
-import TimeRangeSlider from 'react-time-range-slider'
 
+import TimeRangeSlider from 'react-time-range-slider'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
+import Menu from '@material-ui/core/Menu'
 
 import {
   Modal,
@@ -30,29 +31,44 @@ interface AddRule {
 }
 
 const AddRule = ({ onRuleAdded, onHide }) => {
-  // matcher type
-  const [matcherType, setmatcherType] = React.useState('URL')
-  const handleChange = event => {
-    setmatcherType(event.target.value)
-  }
-
   useEffect(() => {
     async function getActiveTabAsync() {
       const activeTab = await getActiveTab()
       const activeTabUrl = extractHostname(activeTab.url)
-      const HostRegexEscaped =
-        matcherType === 'URL' ? escapeRegExp(activeTabUrl) : activeTabUrl
-      setRegexUrl(HostRegexEscaped)
+      setActiveTabUrl(activeTabUrl)
+      setMatcherValue(escapeRegExp(activeTabUrl))
     }
 
     getActiveTabAsync()
-  }, [matcherType])
+  }, [])
+
+  // active tab url
+  const [activeTabUrl, setActiveTabUrl] = useState('')
+  const escapedActiveTab = escapeRegExp(activeTabUrl)
+
+  // matcher type and handler
+  const [matcherType, setmatcherType] = React.useState(MatcherType.URL)
+  const handleMatcherChange = event => {
+    const newMatcher = event.target.value
+    setmatcherType(newMatcher)
+    if (newMatcher === MatcherType.URL) {
+      setShowYTCategory(false)
+      setMatcherValue(escapedActiveTab)
+    } else if (newMatcher === MatcherType.YT_CATEGORY) setShowYTCategory(true)
+    else {
+      setShowYTCategory(false)
+      setMatcherValue('')
+    }
+  }
+
+  // matcher value and show yt category
+  const [matcherValue, setMatcherValue] = useState('')
+
+  const [showYTCategory, setShowYTCategory] = useState(false)
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
-
-  // regex url
-  const [regexUrl, setRegexUrl] = useState('')
 
   // time input control
   const timeRangeInitial = {
@@ -104,7 +120,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   const addButtonTarget = useRef(null)
   const [showOverlay, setShowOverlay] = useState(false)
 
-  // form submitting
+  // form submittion
   const handleFormSubmitting = async e => {
     e.preventDefault()
     let daysCount = 0
@@ -127,13 +143,15 @@ const AddRule = ({ onRuleAdded, onHide }) => {
         if (daysOfWeek[day]) return parseInt(day)
       })
 
-      const convRegexUrl =
-        matcherType === 'URL' ? new RegExp(regexUrl) : regexUrl
+      const convMatcherValue =
+        matcherType === MatcherType.URL
+          ? new RegExp(matcherValue)
+          : matcherValue
 
       await storage.createRule({
         matcher: {
           type: matcherType,
-          value: convRegexUrl,
+          value: convMatcherValue,
         },
         daysOfWeek: convDaysOfWeek,
         startTime: start,
@@ -175,7 +193,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                 className='matcher-type__select'
                 labelId='select-label'
                 value={matcherType}
-                onChange={handleChange}
+                onChange={handleMatcherChange}
               >
                 {Object.keys(MatcherType).map(matcher => (
                   <MenuItem key={matcher} value={matcher}>
@@ -186,14 +204,42 @@ const AddRule = ({ onRuleAdded, onHide }) => {
             </div>
 
             <Form.Control
-              className='regex__input'
+              className='macher-type__input'
               type='text'
               required
-              placeholder='Regex'
+              placeholder='Matcher Value'
               name='urlRegex'
-              value={regexUrl}
-              onChange={(e: any) => setRegexUrl(e.target.value)}
+              value={matcherValue}
+              onChange={(e: any) => setMatcherValue(e.target.value)}
             />
+
+            {showYTCategory && (
+              <Menu
+                open={showYTCategory}
+                anchorEl={anchorEl}
+                keepMounted
+                onClose={() => setShowYTCategory(false)}
+                PaperProps={{
+                  style: {
+                    maxHeight: 300,
+                    width: 200,
+                  },
+                }}
+              >
+                {Object.keys(YTCategories).map(cat => (
+                  <MenuItem
+                    key={cat}
+                    value={YTCategories[cat]}
+                    onClick={(e: any) => {
+                      setMatcherValue(e.target.value)
+                      setShowYTCategory(false)
+                    }}
+                  >
+                    {cat}
+                  </MenuItem>
+                ))}
+              </Menu>
+            )}
 
             <div className='start-end__time'>
               <span>{timeRange.start}</span>
