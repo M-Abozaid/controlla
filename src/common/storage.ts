@@ -158,6 +158,7 @@ class Storage extends EventEmitter {
             return usage
         }
 
+        console.log('inremnet quota ', usage)
         usage.activeUsage = usage.activeUsage + 0.1
         usage.visibilityUsage = usage.visibilityUsage + 0.1
         await this.quotaUsageDB.put(usage)

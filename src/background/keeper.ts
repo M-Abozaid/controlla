@@ -10,6 +10,7 @@ export class Keeper {
     incrementQuota(rules: Rule[]) {
         return Promise.all(rules.map(rule => {
 
+            console.log('increment quota ', rule)
             return storage.incrementOrAddUsage(rule._id)
         }))
     }
@@ -42,9 +43,9 @@ export class Keeper {
 
 
         // update Quota 
-        await this.incrementQuota(matchingRules || effectiveRules)
+        await this.incrementQuota(matchingRules.length ? matchingRules : effectiveRules)
 
-        const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules || effectiveRules)
+        const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules.length ? matchingRules : effectiveRules)
 
         if (tabExpired) {
             this.removeTab(tab)
