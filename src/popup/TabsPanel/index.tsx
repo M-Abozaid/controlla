@@ -15,7 +15,7 @@ const TabsPanel = () => {
     console.log('matched rules from tabs', rules)
 
     setMatchedRules(rules)
-    setTimeout(() => setLoading(false), 300)
+    setLoading(false)
   }
 
   useEffect(() => {

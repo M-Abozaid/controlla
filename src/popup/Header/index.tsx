@@ -42,7 +42,7 @@ const Header = () => {
             </Tooltip>
           </div>
 
-          <Drawer
+          {/* <Drawer
             anchor='bottom'
             open={drawerOpen}
             onClose={() => setDrawerOpen(false)}
@@ -53,7 +53,7 @@ const Header = () => {
               color={toggleColor ? 'primary' : 'secondary'}
               onChange={() => setToggleColor(!toggleColor)}
             />
-          </Drawer>
+          </Drawer> */}
         </div>
       </div>
 
