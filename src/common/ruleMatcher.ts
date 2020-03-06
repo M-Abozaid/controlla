@@ -26,7 +26,7 @@ class RuleMatcher {
 
   matchVideoCategory(matcher: Matcher, categoryId: string): boolean {
     if (matcher.type !== MatcherType.YT_CATEGORY) return false
-    return matcher.value === categoryId
+    return String(matcher.value) === categoryId
   }
 
   matchChannel(matcher: Matcher, channel) {
