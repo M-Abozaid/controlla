@@ -240,7 +240,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
             <div className='quota__time-gruop'>
               <Form.Control
                 required
-                min='1'
+                min='0'
                 type='number'
                 placeholder='Active Quota'
                 name='activeQuota'
@@ -250,7 +250,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
 
               <Form.Control
                 required
-                min='1'
+                min='0'
                 type='number'
                 placeholder='Visibility Quota'
                 name='visibilityQuota'

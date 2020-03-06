@@ -1,7 +1,7 @@
 import getYTVideos from '../common/getYTVideos';
 import keeper from './keeper';
 import { Visit } from 'types';
-import chromep from 'chrome-promise';
+import saveVisit from '../common/saveVisit'
 import storage from '../common/storage';
 
 class Tracker {
@@ -11,6 +11,8 @@ class Tracker {
         chrome.tabs.onRemoved.addListener(async tabId => {
             const openVisit = await storage.getOpenVisit(tabId)
             await storage.closeOpenVisit(openVisit)
+            openVisit.leftTime = new Date();
+            saveVisit(openVisit);
         });
 
         chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
@@ -63,6 +65,8 @@ class Tracker {
 
                     console.log('close open visit ', openVisit)
                     await storage.closeOpenVisit(openVisit)
+                    openVisit.leftTime = new Date();
+                    saveVisit(openVisit);
                 } else {
                     console.log('how could that even happen unless in the beginning ');
                 }
