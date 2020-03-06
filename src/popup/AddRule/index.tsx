@@ -6,7 +6,8 @@ import storage from '../../common/storage'
 import TimeRangeSlider from 'react-time-range-slider'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
-import Menu from '@material-ui/core/Menu'
+
+import SelectYTCat from './SelectYTCat'
 
 import {
   Modal,
@@ -65,7 +66,6 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   const [matcherValue, setMatcherValue] = useState('')
 
   const [showYTCategory, setShowYTCategory] = useState(false)
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
 
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
@@ -203,42 +203,18 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               </Select>
             </div>
 
-            <Form.Control
-              className='macher-type__input'
-              type='text'
-              required
-              placeholder='Matcher Value'
-              name='urlRegex'
-              value={matcherValue}
-              onChange={(e: any) => setMatcherValue(e.target.value)}
-            />
-
-            {showYTCategory && (
-              <Menu
-                open={showYTCategory}
-                anchorEl={anchorEl}
-                keepMounted
-                onClose={() => setShowYTCategory(false)}
-                PaperProps={{
-                  style: {
-                    maxHeight: 300,
-                    width: 200,
-                  },
-                }}
-              >
-                {Object.keys(YTCategories).map(cat => (
-                  <MenuItem
-                    key={cat}
-                    value={YTCategories[cat]}
-                    onClick={(e: any) => {
-                      setMatcherValue(e.target.value)
-                      setShowYTCategory(false)
-                    }}
-                  >
-                    {cat}
-                  </MenuItem>
-                ))}
-              </Menu>
+            {showYTCategory ? (
+              <SelectYTCat setMatcherValue={setMatcherValue} />
+            ) : (
+              <Form.Control
+                className='macher-type__input'
+                type='text'
+                required
+                placeholder='Matcher Value'
+                name='urlRegex'
+                value={matcherValue}
+                onChange={(e: any) => setMatcherValue(e.target.value)}
+              />
             )}
 
             <div className='start-end__time'>
