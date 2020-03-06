@@ -10,7 +10,7 @@ import { Tooltip, Zoom } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit'
 import Close from '@material-ui/icons/Close'
 import Rule from '../../common/rule'
-
+import moment from 'moment'
 interface RuleProps {
   rule: Rule
 }
@@ -101,7 +101,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
               size='sm'
               variant={daysOfWeek.includes(number) ? 'primary' : 'light'}
             >
-              {mapDayNumber(number)}
+              {moment(parseInt(number), 'd').format('dd')}
             </Button>
           ))}
         </ButtonGroup>
