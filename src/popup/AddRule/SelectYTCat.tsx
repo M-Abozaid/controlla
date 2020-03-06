@@ -39,6 +39,7 @@ const SelectYTCat: React.FC<SelectYTCatProps> = ({ setMatcherValue }) => {
 
   const [choosenCategory, setChoosenCategory] = useState('')
 
+  const getCatOptions = () => {}
   return (
     <div className={classes.root}>
       <List component='nav' aria-label='Device settings'>
@@ -63,19 +64,21 @@ const SelectYTCat: React.FC<SelectYTCatProps> = ({ setMatcherValue }) => {
           },
         }}
       >
-        {Object.keys(YTCategories).map(cat => (
-          <MenuItem
-            key={cat}
-            value={YTCategories[cat]}
-            onClick={(e: any) => {
-              setMatcherValue(e.target.value)
-              setChoosenCategory(cat)
-              setAnchorEl(null)
-            }}
-          >
-            {cat}
-          </MenuItem>
-        ))}
+        {Object.keys(YTCategories)
+          .filter(key => !isNaN(Number(YTCategories[key])))
+          .map(cat => (
+            <MenuItem
+              key={cat}
+              value={YTCategories[cat]}
+              onClick={(e: any) => {
+                setMatcherValue(e.target.value)
+                setChoosenCategory(cat)
+                setAnchorEl(null)
+              }}
+            >
+              {cat}
+            </MenuItem>
+          ))}
       </Menu>
     </div>
   )
