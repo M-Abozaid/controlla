@@ -18,13 +18,8 @@ import {
   Overlay,
   Tooltip,
 } from 'react-bootstrap'
-import {
-  mapDayNumber,
-  getActiveTab,
-  extractHostname,
-  escapeRegExp,
-} from '../Services'
-
+import { getActiveTab, extractHostname, escapeRegExp } from '../Services'
+import moment from 'moment'
 //
 interface AddRule {
   onRuleAdded: Function
@@ -274,7 +269,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
                     })
                   }
                 >
-                  {mapDayNumber(parseInt(number))}
+                  {moment(parseInt(number), 'd').format('dd')}
                 </Button>
               ))}
 
