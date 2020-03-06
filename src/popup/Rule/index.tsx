@@ -71,9 +71,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
           </Tooltip>
         </div>
       </div>
-      <h4 className='rule__title'>
-        {getRuleTitle(rule.ruleObj.matcher.value)}
-      </h4>
+      <h4 className='rule__title'>{getRuleTitle(rule.ruleObj.matcher)}</h4>
 
       <div>
         <ProgressBar

@@ -5,6 +5,7 @@ class RuleMatcher {
     matcher: Matcher,
     { categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet
   ): boolean {
+
     return (
       this.matchVideoTitle(matcher, title) ||
       this.matchChannel(matcher, channelTitle) ||
@@ -35,7 +36,7 @@ class RuleMatcher {
       return matcher.value.test(channel)
     }
 
-    return channel.toLowerCase() === matcher.value.toLowerCase()
+    return channel.toLowerCase().trim() === matcher.value.toLowerCase().trim()
   }
 
   matchURL(matcher: Matcher, { url }: chrome.tabs.Tab) {
