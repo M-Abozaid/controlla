@@ -1,7 +1,7 @@
-import * as jQuery from 'jquery'
 import getYTVideos from '../common/getYTVideos';
 
-declare var jQuery
+const jQuery = require('jquery')
+// declare var jQuery
 
 const keywordSearch = []
 let goodVideos = [];
@@ -161,6 +161,7 @@ async function checkYoutube() {
                     chrome.runtime.sendMessage({ msg: 'checkVideo', snippet: ytVideo.snippet }, function (
                         response,
                     ) {
+                        console.log('got response ------------------', response)
                         if (response.allowVid) {
                             allowVid(el);
                         } else {

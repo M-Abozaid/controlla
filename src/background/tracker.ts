@@ -107,52 +107,56 @@ class Tracker {
 
             }
         });
-        chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // const openVisit = visits.find(v => {
             //     return v.tabId === sender.tab.id && v.leftTime === undefined;
             // });
-            const openVisit = await storage.getOpenVisit(sender.tab.id)
+
+            storage.getOpenVisit(sender.tab.id).then(openVisit => {
 
 
-            if (openVisit && (request.hidden !== undefined)) {
-                openVisit.visibility.push({
-                    time: new Date(),
-                    hidden: request.hidden,
-                });
-            }
-
-            if (openVisit && request.focus !== undefined) {
-                openVisit.visibility.push({
-                    time: new Date(),
-                    focus: request.focus,
-                });
-            }
-
-            if (openVisit && request.message === 'keypress') {
-                openVisit.keypress.push({
-                    time: new Date(),
-                });
-            }
-            if (openVisit && request.message === 'click') {
-                openVisit.click.push({
-                    time: new Date(),
-                });
-            }
-
-            if (request.msg === 'checkVideo') {
-                keeper.isYTVideoAllowed(request.snippet).then(allowVid => {
-                    sendResponse({
-                        allowVid,
+                if (openVisit && (request.hidden !== undefined)) {
+                    openVisit.visibility.push({
+                        time: new Date(),
+                        hidden: request.hidden,
                     });
+                }
+
+                if (openVisit && request.focus !== undefined) {
+                    openVisit.visibility.push({
+                        time: new Date(),
+                        focus: request.focus,
+                    });
+                }
+
+                if (openVisit && request.message === 'keypress') {
+                    openVisit.keypress.push({
+                        time: new Date(),
+                    });
+                }
+                if (openVisit && request.message === 'click') {
+                    openVisit.click.push({
+                        time: new Date(),
+                    });
+                }
+
+                if (request.msg === 'checkVideo') {
+                    keeper.isYTVideoAllowed(request.snippet).then(allowVid => {
+                        sendResponse({
+                            allowVid,
+                        });
+                    });
+
+                    return true;
+                }
+                sendResponse({
+                    farewell: 'goodbye',
                 });
 
-                return true;
-            }
-            sendResponse({
-                farewell: 'goodbye',
-            });
+            })
 
-            return false;
+
+            return true;
         });
     }
 
