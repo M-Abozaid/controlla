@@ -41,16 +41,13 @@ const SelectYTCat: React.FC<SelectYTCatProps> = ({ setMatcherValue }) => {
 
   return (
     <div className={classes.root}>
-      <List
-        component='nav'
-        aria-label='Device settings'
-        style={{ paddingLeft: '0px' }}
-      >
+      <List component='nav' aria-label='Device settings'>
         <ListItem
           button
           aria-haspopup='true'
           aria-controls='lock-menu'
           onClick={handleClickListItem}
+          style={{ paddingLeft: '0px' }}
         >
           <ListItemText
             primary={choosenCategory || 'Select Youtube category'}
