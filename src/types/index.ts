@@ -13,10 +13,7 @@ export interface Matcher {
 export interface RuleObj {
   _id?: string
   _rev?: string
-  matcher: {
-    type: string | MatcherType
-    value: string | RegExp
-  }
+  matcher: Matcher
   startTime: string
   endTime: string
   daysOfWeek: number[]
