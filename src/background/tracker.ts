@@ -1,8 +1,8 @@
-import getYTVideos from '../common/getYTVideos';
-import keeper from './keeper';
 import { Visit } from 'types';
-import saveVisit from '../common/saveVisit'
+import getYTVideos from '../common/getYTVideos';
+import saveVisit from '../common/saveVisit';
 import storage from '../common/storage';
+import keeper from './keeper';
 
 class Tracker {
 
@@ -59,8 +59,8 @@ class Tracker {
                 // add new visit
                 //   visits.push(newVisit);
                 await storage.createVisit(newVisit)
-                console.log('run keeperrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
-                keeper.run()
+                // console.log('run keeperrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+                // keeper.run()
                 // incrementAndCheck(true);
                 // keeper.isYTVideoAllowed(newVisit.ytDetails.snippet)
                 if (openVisit) {
