@@ -45,7 +45,29 @@ const quotaUsage: QuotaUsage[] = [
     _id: 'someuuid',
     activeUsage: 5,
     visibilityUsage: 5,
-    day:1
+    day: 1
+  },
+]
+
+
+const timeProfiles = [
+  {
+    name: 'All Time',
+    daysOfWeek: [0, 1, 2, 3, 4, 5],
+    startTime: '00:00',
+    endTime: '23:59',
+  },
+  {
+    name: 'Work',
+    daysOfWeek: [1, 2, 3, 4, 5],
+    startTime: '08:00',
+    endTime: '16:00',
+  },
+  {
+    name: 'Week end',
+    daysOfWeek: [0, 1],
+    startTime: '00:00',
+    endTime: '23:59',
   },
 ]
 

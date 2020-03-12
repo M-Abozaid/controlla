@@ -59,6 +59,8 @@ class Tracker {
                 // add new visit
                 //   visits.push(newVisit);
                 await storage.createVisit(newVisit)
+                console.log('run keeperrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+                keeper.run()
                 // incrementAndCheck(true);
                 // keeper.isYTVideoAllowed(newVisit.ytDetails.snippet)
                 if (openVisit) {

@@ -6,6 +6,7 @@ import RuleComponent from '../Rule'
 import storage from '../../common/storage'
 import { getActiveTab } from '../Services'
 
+
 const TabsPanel = () => {
   async function getRules() {
     const activeTab = await getActiveTab()

@@ -101,7 +101,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
               size='sm'
               variant={daysOfWeek.includes(number) ? 'primary' : 'light'}
             >
-              {moment(parseInt(number), 'd').format('dd')}
+              {moment(number, 'd').format('dd')}
             </Button>
           ))}
         </ButtonGroup>
