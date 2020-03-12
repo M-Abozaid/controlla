@@ -11,6 +11,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import Close from '@material-ui/icons/Close'
 import Rule from '../../common/rule'
 import moment from 'moment'
+
 interface RuleProps {
   rule: Rule
 }
@@ -18,14 +19,22 @@ interface RuleProps {
 const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
   const { activeUsage } = rule.usage
   const { activeQuota, startTime, endTime, daysOfWeek } = rule.ruleObj
-  const restQuota = activeQuota - activeUsage
+
   const quotaPercentage = Math.round((activeUsage / activeQuota) * 100)
+
+  const restQuota = activeQuota - activeUsage
+  const dotIndex = restQuota.toString().indexOf('.')
+  const restQuotaMin = dotIndex
+    ? restQuota.toString().slice(0, dotIndex)
+    : restQuota
+  const restQuotaSec = Number.parseInt(restQuota.toFixed(1).slice(2)) * 6
 
   const daysNumber = [0, 1, 2, 3, 4, 5, 6]
 
   const removeRule = async () => {
     await rule.remove()
   }
+
   return (
     <div className='rule__main'>
       <div className='rule__header'>
@@ -79,7 +88,9 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
           now={quotaPercentage}
           label={`${quotaPercentage} %`}
         />
-        <span className='rule__progress-time'>{Math.floor(restQuota)} m</span>
+        <span className='rule__progress-time'>
+          {`${restQuotaMin}:${restQuotaSec}`} m
+        </span>
       </div>
 
       <div className='rule__time-day'>
@@ -95,13 +106,14 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
           className='rule__days-week--group'
           aria-label='days-of-week-gruop'
         >
-          {daysNumber.map((number, idx) => (
+          {daysNumber.map((dayNum, idx) => (
             <Button
               key={idx}
               size='sm'
-              variant={daysOfWeek.includes(number) ? 'primary' : 'light'}
+              variant={daysOfWeek.includes(dayNum) ? 'primary' : 'light'}
             >
               {moment(number, 'd').format('dd')}
+
             </Button>
           ))}
         </ButtonGroup>
