@@ -1,7 +1,10 @@
+/* eslint-disable  */
 import getYTVideos from '../common/getYTVideos';
 
-const jQuery = require('jquery')
+import jQuery from 'jquery';
 // declare var jQuery
+let bodyHidden 
+
 
 const keywordSearch = []
 let goodVideos = [];
@@ -29,7 +32,7 @@ document.addEventListener(
 );
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(sender, ' sent >>>> ', request);
+    // console.log(sender, ' sent >>>> ', request);
 
     if (request.newVisit) {
         sendResponse({ msg: 'got it' });
@@ -42,11 +45,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 focus: document.hasFocus(),
                 href: location.href,
             });
-            console.log('sending res ', {
-                hidden: document.hidden,
-                focus: document.hasFocus(),
-                href: location.href,
-            });
+            // console.log('sending res ', {
+            //     hidden: document.hidden,
+            //     focus: document.hasFocus(),
+            //     href: location.href,
+            // });
         });
     } else {
         sendResponse({ msg: 'got it' });
@@ -67,15 +70,21 @@ jQuery(window).blur(function () {
 });
 
 jQuery(document).ready(() => {
-    console.log('document loaded ');
+    // console.log('document loaded ');
+ 
+    if (window.location.href.includes('youtube.com')) {
+        jQuery('body').css('display', 'none')
+        bodyHidden = true;
+    }
 
     document.body.addEventListener('click', function () {
-        console.log('click ');
+        
+        // console.log('click ');
         chrome.runtime.sendMessage({ message: 'click' }, function (response) { });
     });
 
     document.body.addEventListener('keypress', function () {
-        console.log('key press ');
+        // console.log('key press ');
         chrome.runtime.sendMessage({ message: 'keypress' }, function (response) { });
     });
 });
@@ -103,6 +112,10 @@ async function checkYoutube() {
         jQuery('ytd-miniplayer').remove();
     }
     if (window.location.href.includes('youtube.com')) {
+        if(bodyHidden){
+            jQuery('body').css('display', 'block')
+           bodyHidden = false
+       }
         const videos = jQuery(
             'ytd-compact-autoplay-renderer,ytd-rich-item-renderer,ytd-compact-video-renderer,ytd-grid-video-renderer,ytd-video-renderer,#movie_player > div.html5-endscreen.ytp-player-content.videowall-endscreen.ytp-show-tiles > div > a',
         ).toArray();
@@ -115,7 +128,7 @@ async function checkYoutube() {
                 const id = getId(el);
 
                 if (!id) {
-                    console.log('video with no id ', id, el);
+                    // console.log('video with no id ', id, el);
                     return;
                 }
                 if (el.attr('tr-allowed')) {
@@ -144,16 +157,18 @@ async function checkYoutube() {
 
             const ytVideos = await getYTVideos(ids.join(','));
 
-            console.log('got videos ', ytVideos);
+          
+            // console.log('got videos ', ytVideos);
 
-            for (let k = 0; k < chunkArr.length; k++) {
+            for (const v of chunkArr) {
+
                 try {
-                    const v = chunkArr[k];
+                    // const v = chunkArr[k];
                     const el = jQuery(v);
                     const id = getId(el);
 
                     if (!id) {
-                        console.log('no id ', el, v);
+                        // console.log('no id ', el, v);
                         continue;
                     }
                     const ytVideo = ytVideos.items.find(v => v.id === id);
@@ -161,7 +176,7 @@ async function checkYoutube() {
                     chrome.runtime.sendMessage({ msg: 'checkVideo', snippet: ytVideo.snippet }, function (
                         response,
                     ) {
-                        console.log('got response ------------------', response)
+                        // console.log('got response ------------------', response)
                         if (response.allowVid) {
                             allowVid(el);
                         } else {
@@ -176,12 +191,14 @@ async function checkYoutube() {
                     console.error('errrrrrrrrrrrrrrrrrrrrr checking ', error);
                 }
             }
+
+            
         }
     }
 }
 
 async function replaceBadVideos() {
-    console.log('replace bad vids', badVideos);
+    // console.log('replace bad vids', badVideos);
     await getGoodVideos();
 
     while (badVideos.length) {
@@ -194,7 +211,7 @@ async function replaceBadVideos() {
         ) {
             if (response.allowVid) {
                 if (el) {
-                    console.log('replace vid ', el, goodVid);
+                    // console.log('replace vid ', el, goodVid);
                     el.click(() => {
                         location.href = `https://www.youtube.com/watch?v=${goodVid.id.videoId}`;
                     });
@@ -275,7 +292,7 @@ function coverVideo(el) {
   height: 100%;
   position: absolute;
   background-color: var(--yt-spec-general-background-a);
-  z-index: 100;
+  z-index: 1000;
   top: 0; "></div>`);
 }
 

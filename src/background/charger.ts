@@ -1,15 +1,15 @@
-import storage from '../common/storage'
-import chromep from 'chrome-promise';
+// import storage from '../common/storage';
+// import chromep from 'chrome-promise';
 
-class Charger{
+// class Charger {
 
-    async run(){
+//     async run() {
 
-        const rules = await storage.getRules()
-        const activeTabs = await chromep.tabs.query({ active: true })
-        await Promise.all(activeTabs.map(t=>{
-            
-        }))
+//         const rules = await storage.getRules();
+//         const activeTabs = await chromep.tabs.query({ active: true });
+//         await Promise.all(activeTabs.map(t => {
 
-    }
-}
+//         }));
+
+//     }
+// }

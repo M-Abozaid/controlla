@@ -38,7 +38,7 @@ const Header = () => {
               title='Settings'
               arrow
             >
-              <Settings onClick={() => setDrawerOpen(true)} />
+              <Settings onClick={() => chrome.tabs.create( { url: "/settings.html"} )} />
             </Tooltip>
           </div>
 

@@ -46,7 +46,6 @@ class RuleMatcher {
     { categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet
   ): boolean {
 
-    console.log('mach youtube visdeo ', matcher, this.matchVideoCategory(matcher, categoryId), categoryId)
     return (
       this.matchVideoTitle(matcher, title) ||
       this.matchChannel(matcher, channelTitle) ||

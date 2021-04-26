@@ -1,17 +1,20 @@
-import { Keeper } from './keeper';
-import Tracker from "./tracker";
+
+import keeper from './keeper';
+import tracker from './tracker';
 import storage from '../common/storage';
 
+const TICK_LENGTH = 1000;
 
+function run() {
 
-(async()=>{
-    const tracker = new Tracker()
-    tracker.run()
+    try {
 
-    const keeper = new Keeper()
-    
-    await storage.init()
-    setInterval(keeper.run, 6000)
-})()
+        void tracker.run();
+        void storage.init();
+        setInterval(keeper.run, TICK_LENGTH);
+    } catch (error) {
+        console.error('Error in background.ts' , error)
+    }
+}
 
-
+run();

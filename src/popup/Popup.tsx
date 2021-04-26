@@ -8,7 +8,7 @@ import storage from '../common/storage'
 const Popup = () => {
   useEffect(() => {
     async function initStorage() {
-      await storage.init()
+      await storage.init('popup')
       console.log('storage initialized')
     }
     initStorage()

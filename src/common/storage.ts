@@ -1,57 +1,60 @@
 import { Visit } from '../types';
-import { RuleObj, QuotaUsage } from '../types/index'
-import Rule from './rule'
-import { rules, quotaUsage } from './data'
-import PounchDB from 'pouchdb'
-import pounchDBFind from 'pouchdb-find'
+import { RuleObj, QuotaUsage } from '../types/index';
+import Rule from './Rule';
+import { rules, quotaUsage } from './data';
+import PounchDB from 'pouchdb';
+import pounchDBFind from 'pouchdb-find';
 import ruleMatcher from './ruleMatcher';
 import { EventEmitter } from 'events';
+import moment from 'moment'
+declare let window;
+PounchDB.plugin(pounchDBFind);
 
-declare var window;
-PounchDB.plugin(pounchDBFind)
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 class Storage extends EventEmitter {
-    rulesDB = new PounchDB<RuleObj>('rules')
-    quotaUsageDB = new PounchDB<QuotaUsage>('quotaUsage')
-    visitsDB = new PounchDB<Visit>('visits')
-
+    rulesDB = new PounchDB<RuleObj>('rules');
+    quotaUsageDB = new PounchDB<QuotaUsage>('quotaUsage');
+    visitsDB = new PounchDB<Visit>('visits');
     ytVideoURLRegex = /youtube.com\/watch\?v=/;
+    public visits = []
+    private QUOTA_RENEWAL_HOUR = 17;
     constructor() {
-        super()
+        super();
+
     }
 
     async getRuleById(ruleId: string): Promise<Rule> {
-        const ruleDoc: RuleObj = await this.rulesDB.get(ruleId)
-        return new Rule(ruleDoc)
-
+        const ruleDoc: RuleObj = await this.rulesDB.get(ruleId);
+        return new Rule(ruleDoc);
     }
 
     async getRuleObjById(ruleId: string): Promise<RuleObj> {
-        const ruleDoc: RuleObj = await this.rulesDB.get(ruleId)
-        return ruleDoc
+        const ruleDoc: RuleObj = await this.rulesDB.get(ruleId);
+        return ruleDoc;
     }
 
     async getRules(): Promise<Rule[]> {
-        const dbResponse = await this.rulesDB.find({ selector: {} })
+        const dbResponse = await this.rulesDB.find({ selector: {} });
         const rulesDocs: RuleObj[] = dbResponse.docs.filter(
             d => d.daysOfWeek
-        )
-        return rulesDocs.map(r => new Rule(r))
+        );
+        return rulesDocs.map(r => new Rule(r));
     }
 
     updateRuleById(ruleId: string, ruleObj: RuleObj) {
-        return this.updateOrCreateDoc(this.rulesDB, ruleObj, ruleId)
+        return this.updateOrCreateDoc(this.rulesDB, ruleObj, ruleId);
     }
 
     async removeRule(ruleObj) {
-        await this.rulesDB.remove(ruleObj)
-        this.emit('rule_removed', ruleObj)
-        return
+        await this.rulesDB.remove(ruleObj);
+        this.emit('rule_removed', ruleObj);
+        return;
     }
     async createRule(rule: RuleObj, ): Promise<Rule> {
-        const newRule = await this.rulesDB.post(rule)
-        this.emit('new_rule', newRule)
-        return this.getRuleById(newRule.id)
+        const newRule = await this.rulesDB.post(rule);
+        this.emit('new_rule', newRule);
+        return this.getRuleById(newRule.id);
     }
 
     /**
@@ -59,7 +62,7 @@ class Storage extends EventEmitter {
      * returns the active usage for a given rule
      */
     getActiveUsage(ruleId: string): number {
-        return quotaUsage[0].activeUsage
+        return quotaUsage[0].activeUsage;
     }
 
     /**
@@ -67,137 +70,166 @@ class Storage extends EventEmitter {
      * returns the visibility usage for a given rule
      */
     getVisibilityUsage(ruleId: string): number {
-        return quotaUsage[0].activeUsage
+        return quotaUsage[0].activeUsage;
     }
-
-
 
 
     createUsage(usage: QuotaUsage, update?: boolean): Promise<any> {
-        return this.quotaUsageDB.put(usage)
+        return this.quotaUsageDB.put(usage);
     }
-
-
 
 
     getYTRules(): Rule[] {
-        return rules.map(r => new Rule(r))
+        return rules.map(r => new Rule(r));
     }
 
     closeOpenVisit(visit: Visit) {
-        return this.updateOrCreateDoc(this.visitsDB, { leftTime: new Date() }, visit._id)
+        const dbVisit = this.visits.find(v => v._id === visit._id);
+        dbVisit.leftTime = new Date();
+        return dbVisit;
     }
 
-    async getOpenVisit(tabId) {
-        const dbResponse = await this.visitsDB.find({
-            selector: {
-                tabId: tabId,
-                leftTime: { $exists: false }
-            }
-        })
-        return dbResponse.docs[0]
+    getOpenVisit(tabId: number) {
+        try {
+            const dbVisit = this.visits.find(v => {
+                return v.tabId === tabId && !v.leftTime
+            });
+
+            return dbVisit
+        } catch (error) {
+            console.error('Error getting visit ' + String(tabId), error);
+        }
     }
     createVisit(visit: Visit) {
-
-        return this.visitsDB.post(visit)
+        this.visits.push(visit)
+        return visit;
     }
 
-    async updateOrCreateDoc(db, fieldsToUpdate: object, _id?: string): Promise<any> {
-        let newDoc
-        if (!_id) {
-            newDoc = await db.post(fieldsToUpdate)
-            return db.get(newDoc._id || newDoc.id)
-        }
-        const doc = await db.get(_id)
-        if (!doc) {
-            newDoc = await db.post(fieldsToUpdate)
-            return db.get(newDoc._id || newDoc.id)
+    // eslint-disable-next-line @typescript-eslint/require-await
+    async updateVisit(visit: Visit) {
+        console.log('%cstorage.ts line:107 update visit', 'color: #007acc;', visit);
+        // return this.visitsDB.put(visit)
+    }
+
+
+    async updateOrCreateDoc<Model>(db:PouchDB.Database<Model>,
+                                   fieldsToUpdate: Model ,
+        _id?: string): Promise<Model> {
+        try {
+            if (!_id) {
+                const resp = await db.post(fieldsToUpdate);
+                return db.get(resp.id);
+            }
+            const doc = await db.get(_id);
+            if (!doc) {
+                const resp = await db.post(fieldsToUpdate);
+                return db.get(resp.id);
+            }
+
+            const updatedDoc = await db.put({
+                ...doc,
+                ...fieldsToUpdate,
+            });
+            return db.get(updatedDoc.id);
+        } catch (error) {
+
+            console.error('Error updateOrCreateDoc', error)
         }
 
-        const updatedDoc = await db.put({
-            ...doc,
-            ...fieldsToUpdate,
-        })
-        return db.get(updatedDoc._id || updatedDoc.id)
+
     }
 
     async getMatchingRules(tab: chrome.tabs.Tab): Promise<Rule[]> {
 
-        const rules = await this.getRules()
 
+        const allRules = await this.getRules();
+        console.log('%cstorage.ts line:143 got all rules', 'color: #007acc;', tab, allRules);
         if (this.ytVideoURLRegex.test(tab.url)) {
-            const visit = await this.getOpenVisit(tab.id)
-            console.log('got open visit ', visit)
-            return rules.filter(rule => ruleMatcher.matchTab(rule.ruleObj.matcher, tab, visit.ytDetails.snippet))
+            const visit = this.getOpenVisit(tab.id);
+            console.log('got open visit ', visit);
+            return allRules.filter(rule => ruleMatcher.matchTab(rule.ruleObj.matcher,
+                                                                tab, visit.ytDetails.snippet));
         }
-        return rules.filter(rule => ruleMatcher.matchURL(rule.ruleObj.matcher, tab))
+        return allRules.filter(rule => ruleMatcher.matchURL(rule.ruleObj.matcher, tab));
 
     }
 
-    async incrementOrAddUsage(ruleId: string): Promise<QuotaUsage> {
-        const result = await this.quotaUsageDB.find({ selector: { ruleId, day: new Date().getDate() } })
 
-        const usage = result.docs[0]
+    /**
+     *
+     * @param ruleId {string}
+     * @param interval {number}
+     *
+     * Get a rule and interval and check if counting for today exists if so increment it if not create a new usage
+     */
+    async incrementOrAddUsage(ruleId: string, interval:number): Promise<QuotaUsage> {
+        const usage = await this.getQuotaUsage(ruleId)
+
+
+        usage.activeUsage = usage.activeUsage + interval;
+        usage.visibilityUsage = usage.visibilityUsage + interval;
+        await this.quotaUsageDB.put(usage);
+        return usage;
+    }
+
+
+    async getQuotaUsage(ruleId: string) {
+
+        const result = await this.quotaUsageDB.find({
+            selector: { ruleId },
+        });
+
+        const usage = result.docs[0];
+        const today = moment().format('DD-MM-YYYY')
         if (!usage) {
             // create usage
             const newUsage = {
                 ruleId,
-                day: new Date().getDate(),
+                day: today,
                 activeUsage: 0,
                 visibilityUsage: 0,
-            }
-            const response = await this.quotaUsageDB.post(newUsage)
-            return this.quotaUsageDB.get(response.id)
+            };
+            console.log('create new usage', result)
+
+            const response = await this.quotaUsageDB.post(newUsage);
+            return this.quotaUsageDB.get(response.id);
         }
-        if (usage.day !== new Date().getDate()) {
-            // update usage 
-            usage.day = new Date().getDate();
-            usage.activeUsage = usage.activeUsage + 0.1
-            usage.visibilityUsage = usage.visibilityUsage + 0.1
-            await this.quotaUsageDB.put(usage)
-            return usage
-        }
-
-        console.log('inremnet quota ', usage)
-        usage.activeUsage = usage.activeUsage + 0.1
-        usage.visibilityUsage = usage.visibilityUsage + 0.1
-        await this.quotaUsageDB.put(usage)
-        return usage
-    }
-
-
-
-    async getQuotaUsage(ruleId) {
-        const result = await this.quotaUsageDB.find({ selector: { ruleId, day: new Date().getDate() } })
-
-        const usage = result.docs[0]
-        if (!usage) {
-            // create usage
-            const newUsage = {
-                ruleId,
-                day: new Date().getDate(),
-                activeUsage: 0,
-                visibilityUsage: 0,
-            }
-            const response = await this.quotaUsageDB.post(newUsage)
-            return this.quotaUsageDB.get(response.id)
+        if (usage.day !== today && moment().hour() >= this.QUOTA_RENEWAL_HOUR) {
+            // update usage
+            usage.day = today;
+            usage.activeUsage =  0;
+            usage.visibilityUsage = 0;
+            await this.quotaUsageDB.put(usage);
+            return usage;
         }
         return usage
     }
 
 
-
-    async init() {
-        await this.rulesDB.createIndex({ index: { fields: ['matcher.type'] } })
-        await this.quotaUsageDB.createIndex({ index: { fields: ['ruleId'] } })
+    async init(scope?) {
+        await this.rulesDB.createIndex({ index: { fields: ['matcher.type'] } });
+        await this.quotaUsageDB.createIndex({ index: { fields: ['ruleId'] } });
         await this.visitsDB.createIndex({
             index: { fields: ['tabId', 'leftTime', 'visitTime'] },
-        })
+        });
 
-        window.rulesDB = this.rulesDB
-        window.visitsDB = this.visitsDB
-        window.quotaUsageDB = this.quotaUsageDB
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        window.rulesDB = this.rulesDB;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        window.visitsDB = this.visitsDB;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        window.quotaUsageDB = this.quotaUsageDB;
+
+        if (scope === 'popup') {
+            chrome.runtime.sendMessage({ message: 'getVisits' },  (response)=> {
+                console.log('Got response ', response)
+                this.visits = response.visits
+             });
+        }
     }
 }
 
-export default new Storage()
+
+const storage = new Storage();
+(window).storage = storage;
+export default storage

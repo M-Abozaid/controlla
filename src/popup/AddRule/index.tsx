@@ -22,17 +22,17 @@ import { getActiveTab, extractHostname, escapeRegExp } from '../Services'
 import moment from 'moment'
 //
 interface AddRule {
-  onRuleAdded: Function
-  onHide: Function
+  onRuleAdded: () => void
+  onHide: ()=> void
 }
 
 const AddRule = ({ onRuleAdded, onHide }) => {
   useEffect(() => {
     async function getActiveTabAsync() {
-      const activeTab = await getActiveTab()
-      const activeTabUrl = extractHostname(activeTab.url)
-      setActiveTabUrl(activeTabUrl)
-      setMatcherValue(escapeRegExp(activeTabUrl))
+      const [activeTab] = await getActiveTab()
+      const firstActiveTabUrl = extractHostname(activeTab.url)
+      setActiveTabUrl(firstActiveTabUrl)
+      setMatcherValue(escapeRegExp(firstActiveTabUrl))
     }
 
     getActiveTabAsync()
@@ -120,22 +120,26 @@ const AddRule = ({ onRuleAdded, onHide }) => {
     e.preventDefault()
     let daysCount = 0
 
-    const startTimeParsed = parseInt(start.substring(0, 2))
-    const endTimeParsed = parseInt(end.substring(0, 2))
+    const startTimeParsed = parseInt(start.substring(0, 2), 10)
+    const endTimeParsed = parseInt(end.substring(0, 2), 10)
 
     Object.keys(daysOfWeek).map(day => !daysOfWeek[day] && daysCount++)
 
     if (daysCount === 7) {
-      !showOverlay && setShowOverlay(true)
+      if(!showOverlay) {
+         setShowOverlay(true)
+        }
       setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
     } else if (startTimeParsed > endTimeParsed) {
-      !showOverlay && setShowOverlay(true)
+      if(!showOverlay) {
+        setShowOverlay(true)
+       }
       setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
     } else {
       setSubmittingFrom(true)
 
       const convDaysOfWeek = Object.keys(daysOfWeek).map(day => {
-        if (daysOfWeek[day]) return parseInt(day)
+        if (daysOfWeek[day]) return parseInt(day, 10)
       })
 
       const convMatcherValue =
@@ -151,8 +155,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
         daysOfWeek: convDaysOfWeek,
         startTime: start,
         endTime: end,
-        activeQuota: parseInt(activeQuota),
-        visibilityQuota: parseInt(visibilityQuota),
+        activeQuota: parseInt(activeQuota, 10) * 60000,
+        visibilityQuota: parseInt(visibilityQuota, 10) * 60000,
       })
 
       onHide()
@@ -258,18 +262,18 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               className='week__button-group'
               aria-label='button-group'
             >
-              {Object.keys(daysOfWeek).map((number, idx) => (
+              {Object.keys(daysOfWeek).map((num, idx) => (
                 <Button
                   key={idx}
-                  variant={daysOfWeek[number] ? 'primary' : 'light'}
+                  variant={daysOfWeek[num] ? 'primary' : 'light'}
                   onClick={() =>
                     setDaysOfWeek({
                       ...daysOfWeek,
-                      [number]: !daysOfWeek[number],
+                      [num]: !daysOfWeek[num],
                     })
                   }
                 >
-                  {moment(parseInt(number), 'd').format('dd')}
+                  {moment(parseInt(num, 10), 'd').format('dd')}
                 </Button>
               ))}
 
