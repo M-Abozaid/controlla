@@ -84,6 +84,7 @@ class Tracker {
                     await keeper.controlTab(tab, false)
                 } else {
 
+                    console.log('status loading openvisit status', openVisit.status)
                     // if openvisit and openvisit is loading do nothing;
                     if (openVisit && openVisit.status === 'loading') {
                         console.log('Do nothing')
@@ -96,9 +97,16 @@ class Tracker {
                         await storage.closeOpenVisit(openVisit);
                         openVisit.leftTime = new Date();
                         saveVisit(openVisit);
-                        // console.log('Cretea nwe ', newVisit)
-                        // storage.createVisit(newVisit);
-                        // await keeper.controlTab(tab, false)
+                        console.log('Cretea nwe ', newVisit)
+                        storage.createVisit(newVisit);
+                        if (tab.url.includes('youtube.com/watch?v=')) {
+                            // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
+                            const vidId = tab.url.match(/watch\?v=(.{11})/)[1];
+                            const ytDetails = await getYTVideos([vidId]);
+                            [newVisit.ytDetails] = ytDetails.items;
+                            newVisit.ytVideoId = vidId;
+                        }
+                        await keeper.controlTab(tab, false)
                     }
                 }
 
@@ -106,7 +114,7 @@ class Tracker {
 
 
 
-            } else if (changeInfo.title || changeInfo.audible || changeInfo.status === 'complete') {
+            } else if (changeInfo.title || Object.prototype.hasOwnProperty.call(changeInfo, 'audible') || changeInfo.status === 'complete') {
 
 
                 if (openVisit) {
@@ -129,7 +137,7 @@ class Tracker {
                     if (changeInfo.status === 'complete') {
                         console.log('complete visit', openVisit.url , openVisit.status)
                         openVisit.status = 'complete'
-                        openVisit.audible = tab.audible;
+
                         try {
                             chrome.tabs.sendMessage(
                                 tabId,

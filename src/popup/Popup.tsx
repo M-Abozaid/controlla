@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Popup.scss'
 import Header from './Header'
 import TabsPanel from './TabsPanel'
@@ -6,9 +6,12 @@ import TabsPanel from './TabsPanel'
 import storage from '../common/storage'
 
 const Popup = () => {
+  const [hasStorageInit, setHasStorageInit] = useState(false)
+
   useEffect(() => {
     async function initStorage() {
       await storage.init('popup')
+      setHasStorageInit(true)
       console.log('storage initialized')
     }
     initStorage()
@@ -18,7 +21,9 @@ const Popup = () => {
     <div className='popupContainer'>
       <Header />
       <div className='tabs-panel'>
-        <TabsPanel />
+        {
+          hasStorageInit && <TabsPanel />
+        }
       </div>
     </div>
   )

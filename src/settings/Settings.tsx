@@ -16,7 +16,7 @@ const Settings = () => {
 
   return (
     <div className='SettingsContainer'>
-        <TabsPanel showAllRules={true} ></TabsPanel>
+        {/* <TabsPanel showAllRules={true} ></TabsPanel> */}
 
     </div>
   )

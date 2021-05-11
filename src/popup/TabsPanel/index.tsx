@@ -18,7 +18,7 @@ const TabsPanel = ({showAllRules}: TabsPanelProps) => {
         }else{
 
             const [activeTab] = await getActiveTab();
-            console.log('Active tab', activeTab)
+            console.log('Active tab', activeTab, Date.now())
             rules = await storage.getMatchingRules(activeTab);
         }
 

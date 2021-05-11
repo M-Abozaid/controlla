@@ -4,11 +4,12 @@ import storage from '../common/storage';
 import chromePromise  from 'chrome-promise';
 import ruleMatcher from '../common/ruleMatcher';
 import Rule from 'common/Rule';
-import { match } from 'pouchdb-find';
+
 
 
 const ytVideoURLRegex = /youtube.com\/watch\?v=/;
 const TICK_LENGTH = 1000;
+const VISIT_ACTIVE_THRESHOLD = 60*1000;
 export class Keeper {
 
     private incrementQuota(rules: Rule[]) {
@@ -24,13 +25,23 @@ export class Keeper {
 
         const effectiveRules = rules.filter(r => r.isEffectiveNow());
 
+        if (!effectiveRules.length) return;
+
         let matchingRules = [];
+
+        const visit: Visit = storage.getOpenVisit(tab.id);
+
+        if (!visit) {
+            console.warn('No visit ', tab)
+            return
+        };
+
+        if (!this.isVisitActive(visit)) return;
 
         // if this is a youtube tab
         if (ytVideoURLRegex.test(tab.url)) {
 
-            const visit: Visit = storage.getOpenVisit(tab.id);
-            console.log('Visit ', visit)
+            // console.log('Visit ', visit)
             if (!visit || !visit.ytDetails) {
                 return;
             }
@@ -43,6 +54,8 @@ export class Keeper {
             );
 
         }
+
+        if (!matchingRules.length) return;
 
         if(shouldIncrementQuota){
             // update Quota
@@ -173,6 +186,32 @@ export class Keeper {
 
         return !disallowed;
 
+    }
+
+    isVisitActive(visit: Visit): boolean {
+        const activeThresholdAgo = new Date(Date.now()- VISIT_ACTIVE_THRESHOLD)
+        // check if audio is playing
+        if (visit.audibleState?.length &&
+            visit.audibleState[visit.audibleState.length - 1].audible) {
+                return true
+            }
+        // check last visibility
+        if (visit.visibility.length &&
+            visit.visibility[visit.visibility.length - 1].focus &&
+            visit.visibility[visit.visibility.length - 1].time > activeThresholdAgo) {
+                return true
+        }
+
+        if (visit.click.length &&
+             visit.click[visit.click.length - 1].time > activeThresholdAgo) {
+                return true
+        }
+
+        if (visit.visitTime > activeThresholdAgo) {
+            return true;
+        }
+        // check last click
+        return false;
     }
 
 }

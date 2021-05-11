@@ -1,7 +1,7 @@
 
 /* eslint-disable */ 
 const path = require('path');
-
+console.log('WEBPACK ', __dirname)
 module.exports = {
     entry: {
         popup: path.join(__dirname, 'src/popup/index.tsx'),
@@ -10,7 +10,7 @@ module.exports = {
         content: path.join(__dirname, 'src/content/content.ts'),
     },
     output: {
-        path: path.join(__dirname, 'dist/js'),
+        path:  path.join(__dirname,'dist/js'),
         filename: '[name].js',
     },
     module: {

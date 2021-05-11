@@ -181,6 +181,15 @@ async function checkYoutube() {
                             allowVid(el);
                         } else {
                             badVideos.push(el);
+                            el.find('a').toArray().forEach(a=>jQuery(a).attr('href','javascript:void(0)'));
+                            el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
+                            el.hover(() => {
+                                setTimeout(() => {
+                                    el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
+                                    el.find('video').toArray().forEach(a=>jQuery(a).attr('src','')); 
+                               },2) 
+                            })
+                            el.find('yt-formatted-string').toArray().forEach(a=>jQuery(a).html(''));
                         }
 
                         // if (k === chunkArr.length - 1) {
@@ -287,6 +296,9 @@ function coverVideo(el) {
         el.css('position', 'relative');
     }
 
+    // el.find('a').toArray().forEach(a=>jQuery(a).attr('href','javascript:void(0)'));
+    // el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
+    // el.find('yt-formatted-string').toArray().forEach(a=>jQuery(a).html(''));
     el.append(`<div class="tracker-video-cover" style="
   width: 100%;
   height: 100%;

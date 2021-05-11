@@ -19,6 +19,7 @@ class Storage extends EventEmitter {
     ytVideoURLRegex = /youtube.com\/watch\?v=/;
     public visits = []
     private QUOTA_RENEWAL_HOUR = 17;
+    public rulesCached:Rule[] = [];
     constructor() {
         super();
 
@@ -35,15 +36,19 @@ class Storage extends EventEmitter {
     }
 
     async getRules(): Promise<Rule[]> {
+        if (this.rulesCached.length) return this.rulesCached;
         const dbResponse = await this.rulesDB.find({ selector: {} });
         const rulesDocs: RuleObj[] = dbResponse.docs.filter(
             d => d.daysOfWeek
         );
-        return rulesDocs.map(r => new Rule(r));
+        this.rulesCached = rulesDocs.map(r => new Rule(r));
+        return this.rulesCached
     }
 
-    updateRuleById(ruleId: string, ruleObj: RuleObj) {
-        return this.updateOrCreateDoc(this.rulesDB, ruleObj, ruleId);
+    async updateRuleById(ruleId: string, ruleObj: RuleObj) {
+        await this.updateOrCreateDoc(this.rulesDB, ruleObj, ruleId);
+        await this.getRules();
+        return this.rulesDB.get(ruleId);
     }
 
     async removeRule(ruleObj) {
@@ -54,6 +59,8 @@ class Storage extends EventEmitter {
     async createRule(rule: RuleObj, ): Promise<Rule> {
         const newRule = await this.rulesDB.post(rule);
         this.emit('new_rule', newRule);
+        await this.getQuotaUsage(newRule.id);
+        await this.getRules();
         return this.getRuleById(newRule.id);
     }
 
@@ -143,12 +150,12 @@ class Storage extends EventEmitter {
 
 
         const allRules = await this.getRules();
-        console.log('%cstorage.ts line:143 got all rules', 'color: #007acc;', tab, allRules);
+        console.log('%cstorage.ts line:143 got all rules', 'color: #007acc;', tab.id, this.visits.map(v=>v.tabId), Date.now());
         if (this.ytVideoURLRegex.test(tab.url)) {
             const visit = this.getOpenVisit(tab.id);
             console.log('got open visit ', visit);
             return allRules.filter(rule => ruleMatcher.matchTab(rule.ruleObj.matcher,
-                                                                tab, visit.ytDetails.snippet));
+                                                                tab, visit?.ytDetails.snippet));
         }
         return allRules.filter(rule => ruleMatcher.matchURL(rule.ruleObj.matcher, tab));
 
@@ -181,11 +188,13 @@ class Storage extends EventEmitter {
 
         const usage = result.docs[0];
         const today = moment().format('DD-MM-YYYY')
+        const yesterday = moment().subtract(1, 'days').format('DD-MM-YYYY');
+        const hour = moment().hour();
         if (!usage) {
             // create usage
             const newUsage = {
                 ruleId,
-                day: today,
+                day:hour < this.QUOTA_RENEWAL_HOUR ? yesterday : today,
                 activeUsage: 0,
                 visibilityUsage: 0,
             };
@@ -194,7 +203,7 @@ class Storage extends EventEmitter {
             const response = await this.quotaUsageDB.post(newUsage);
             return this.quotaUsageDB.get(response.id);
         }
-        if (usage.day !== today && moment().hour() >= this.QUOTA_RENEWAL_HOUR) {
+        if (usage.day !== today && hour >= this.QUOTA_RENEWAL_HOUR) {
             // update usage
             usage.day = today;
             usage.activeUsage =  0;
@@ -207,6 +216,7 @@ class Storage extends EventEmitter {
 
 
     async init(scope?) {
+        console.log('initialize storage ', Date.now())
         await this.rulesDB.createIndex({ index: { fields: ['matcher.type'] } });
         await this.quotaUsageDB.createIndex({ index: { fields: ['ruleId'] } });
         await this.visitsDB.createIndex({
@@ -221,10 +231,15 @@ class Storage extends EventEmitter {
         window.quotaUsageDB = this.quotaUsageDB;
 
         if (scope === 'popup') {
-            chrome.runtime.sendMessage({ message: 'getVisits' },  (response)=> {
-                console.log('Got response ', response)
-                this.visits = response.visits
-             });
+            return new Promise<void>((resolve, reject) => {
+                chrome.runtime.sendMessage({ message: 'getVisits' },  (response)=> {
+                    console.log('Got response ', response)
+                    this.visits = response.visits
+                    console.log('initialize storage ', Date.now())
+
+                    resolve()
+                 });
+            })
         }
     }
 }
