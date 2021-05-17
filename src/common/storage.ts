@@ -1,3 +1,4 @@
+import { PauseControlUsage } from './../types/index';
 import { Visit } from '../types';
 import { RuleObj, QuotaUsage } from '../types/index';
 import Rule from './Rule';
@@ -7,6 +8,7 @@ import pounchDBFind from 'pouchdb-find';
 import ruleMatcher from './ruleMatcher';
 import { EventEmitter } from 'events';
 import moment from 'moment'
+import settings from './settings';
 declare let window;
 PounchDB.plugin(pounchDBFind);
 
@@ -18,8 +20,7 @@ class Storage extends EventEmitter {
     visitsDB = new PounchDB<Visit>('visits');
     ytVideoURLRegex = /youtube.com\/watch\?v=/;
     public visits = []
-    private QUOTA_RENEWAL_HOUR = 17;
-    public rulesCached:Rule[] = [];
+
     constructor() {
         super();
 
@@ -36,13 +37,12 @@ class Storage extends EventEmitter {
     }
 
     async getRules(): Promise<Rule[]> {
-        if (this.rulesCached.length) return this.rulesCached;
+
         const dbResponse = await this.rulesDB.find({ selector: {} });
         const rulesDocs: RuleObj[] = dbResponse.docs.filter(
             d => d.daysOfWeek
         );
-        this.rulesCached = rulesDocs.map(r => new Rule(r));
-        return this.rulesCached
+        return rulesDocs.map(r => new Rule(r));
     }
 
     async updateRuleById(ruleId: string, ruleObj: RuleObj) {
@@ -187,14 +187,14 @@ class Storage extends EventEmitter {
         });
 
         const usage = result.docs[0];
-        const today = moment().format('DD-MM-YYYY')
-        const yesterday = moment().subtract(1, 'days').format('DD-MM-YYYY');
-        const hour = moment().hour();
+
+        const usageDay = this.__getDailyQuotaDay(usage && usage.day);
+
         if (!usage) {
             // create usage
             const newUsage = {
                 ruleId,
-                day:hour < this.QUOTA_RENEWAL_HOUR ? yesterday : today,
+                day:usageDay,
                 activeUsage: 0,
                 visibilityUsage: 0,
             };
@@ -202,19 +202,72 @@ class Storage extends EventEmitter {
 
             const response = await this.quotaUsageDB.post(newUsage);
             return this.quotaUsageDB.get(response.id);
-        }
-        if (usage.day !== today && hour >= this.QUOTA_RENEWAL_HOUR) {
+        } else if (usageDay !== usage.day) {
+
             // update usage
-            usage.day = today;
+            usage.day = usageDay;
             usage.activeUsage =  0;
             usage.visibilityUsage = 0;
             await this.quotaUsageDB.put(usage);
             return usage;
+
         }
+
         return usage
     }
 
 
+
+    pauseControl() {
+        localStorage.setItem('isControlPaused', 'true')
+    }
+
+    resumeControl() {
+        localStorage.setItem('isControlPaused', 'false')
+    }
+
+    incrementPauseUsage(increment: number) {
+        const pauseControlUsage = this.getOrCreatePauseUsage()
+        pauseControlUsage.usage = pauseControlUsage.usage + increment;
+
+        localStorage.setItem('pauseControlUsage', JSON.stringify(pauseControlUsage))
+    }
+
+    getOrCreatePauseUsage():PauseControlUsage {
+
+
+        const pauseControlUsage = localStorage.pauseControlUsage && JSON.parse(localStorage.pauseControlUsage)
+
+        if (pauseControlUsage && this.__getDailyQuotaDay(pauseControlUsage.day) === pauseControlUsage.day) {
+            return pauseControlUsage
+        } {
+            const initialPauseControlUsage = {
+                day:this.__getDailyQuotaDay(),
+                usage:0
+            }
+
+            localStorage.setItem('pauseControlUsage', JSON.stringify(initialPauseControlUsage))
+           return  initialPauseControlUsage;
+        }
+    }
+    isControlPaused() {
+        return localStorage.isControlPaused === 'true'
+    }
+
+    __getDailyQuotaDay(usageDay?):string {
+        const today = moment().format('DD-MM-YYYY')
+        const yesterday = moment().subtract(1, 'days').format('DD-MM-YYYY');
+        const hour = moment().hour();
+
+        if (!usageDay) {
+            return hour < settings.quotaRenewalHour ? yesterday : today
+        }
+        if (usageDay !== today && hour >= settings.quotaRenewalHour) {
+            return today
+        }
+
+        return usageDay;
+    }
     async init(scope?) {
         console.log('initialize storage ', Date.now())
         await this.rulesDB.createIndex({ index: { fields: ['matcher.type'] } });
@@ -242,7 +295,11 @@ class Storage extends EventEmitter {
             })
         }
     }
+
+
+
 }
+
 
 
 const storage = new Storage();

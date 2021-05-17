@@ -1,11 +1,17 @@
+
+.header__container{
+
+  top: 0;
+  width: 100%;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+}
 .header__main {
   color: #fff;
   padding: 10px;
   font-size: 1.5rem;
 
-  top: 0;
-  width: 100%;
-  position: fixed;
   // background-color: #007bff; // 24292e 007bff
 
   display: flex;
@@ -28,8 +34,8 @@
 }
 
 .header__button {
+  all: unset;
   color: #fff;
-  cursor: pointer;
   margin: auto 8px;
   transition: all 0.3s;
   display: inline-block;
@@ -45,4 +51,11 @@
   svg {
     font-size: 120%;
   }
+
+}
+
+.control__usage__progress-bar{
+  height: 4px;
+  display: inline-block;
+  width: 100%;
 }

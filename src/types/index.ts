@@ -97,6 +97,11 @@ export enum YTCategories {
     'Trailers' = 44,
 }
 
+
+export interface PauseControlUsage{
+    day: string;
+    usage: number;
+}
 // // loop on categories
 // for (const key in YTCategories) {
 //     // console.log('cateogory title ', key)

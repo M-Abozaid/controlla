@@ -4,18 +4,21 @@ import storage from '../common/storage';
 import chromePromise  from 'chrome-promise';
 import ruleMatcher from '../common/ruleMatcher';
 import Rule from 'common/Rule';
+import settings from '../common/settings';
 
 
 
 const ytVideoURLRegex = /youtube.com\/watch\?v=/;
-const TICK_LENGTH = 1000;
-const VISIT_ACTIVE_THRESHOLD = 60*1000;
+
+
 export class Keeper {
+
+    controlIsPaused = false;
 
     private incrementQuota(rules: Rule[]) {
         return Promise.all(rules.map(rule => {
 
-            return storage.incrementOrAddUsage(rule._id, TICK_LENGTH);
+            return storage.incrementOrAddUsage(rule._id, settings.tickDuration);
         }));
     }
 
@@ -57,7 +60,19 @@ export class Keeper {
 
         if (!matchingRules.length) return;
 
-        if(shouldIncrementQuota){
+        // check if keeping is paused
+        if (storage.isControlPaused()) {
+            if (this.isPauseAllowed()) {
+                storage.incrementPauseUsage(settings.tickDuration)
+                return;
+            } else {
+                console.log('control quota is over')
+                storage.resumeControl()
+            }
+        }
+
+        if (shouldIncrementQuota) {
+
             // update Quota
             await this.incrementQuota(matchingRules);
         }
@@ -111,8 +126,9 @@ export class Keeper {
             chromePromise.tabs.query({ active: true }).then(async activeTabs=>{
                 for (const tab of activeTabs) {
                     try {
-
-                        await this.controlTab(tab);
+                        if (tab.url.indexOf('http') === 0) {
+                            await this.controlTab(tab);
+                       }
                     } catch (error) {
                         console.error(error);
                     }
@@ -189,7 +205,7 @@ export class Keeper {
     }
 
     isVisitActive(visit: Visit): boolean {
-        const activeThresholdAgo = new Date(Date.now()- VISIT_ACTIVE_THRESHOLD)
+        const activeThresholdAgo = new Date(Date.now()- settings.visitActiveThreshold)
         // check if audio is playing
         if (visit.audibleState?.length &&
             visit.audibleState[visit.audibleState.length - 1].audible) {
@@ -212,6 +228,17 @@ export class Keeper {
         }
         // check last click
         return false;
+    }
+
+
+    pauseControlUsage(): void{
+        storage.pauseControl()
+    }
+
+    isPauseAllowed(): boolean{
+
+        const pauseUsage = storage.getOrCreatePauseUsage()
+        return pauseUsage.usage < settings.pauseQuota
     }
 
 }

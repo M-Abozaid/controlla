@@ -45,7 +45,7 @@ class Tracker {
 
                     if (openVisit.url.includes('youtube.com/watch?v=')) {
                         const openVisitVideoID = openVisit.url.match(/watch\?v=(.{11})/)[1];
-                        if (vidId === openVisitVideoID) {
+                        if (vidId === openVisitVideoID && changeInfo.status === 'loading' && changeInfo.url && changeInfo.url.indexOf('http') === 0) {
                             console.log('same video ')
                             return
                         }
@@ -114,9 +114,9 @@ class Tracker {
 
 
 
-            } else if (changeInfo.title || Object.prototype.hasOwnProperty.call(changeInfo, 'audible') || changeInfo.status === 'complete') {
+            } else if (changeInfo.title || 'audible' in changeInfo || changeInfo.status === 'complete') {
 
-
+                console.log('change info 2')
                 if (openVisit) {
 
                     if (changeInfo.title) {
@@ -127,7 +127,8 @@ class Tracker {
                         openVisit.audible = true;
                     }
 
-                    if (Object.prototype.hasOwnProperty.call(changeInfo, 'audible')) {
+                    if ('audible' in changeInfo ) {
+                        console.log('audible state changed ', openVisit)
                         openVisit.audibleState.push({
                             time: new Date(),
                             audible: changeInfo.audible,

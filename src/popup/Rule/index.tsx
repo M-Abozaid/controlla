@@ -20,6 +20,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
     const { activeUsage } = rule.usage;
     const { activeQuota, startTime, endTime, daysOfWeek } = rule.ruleObj;
 
+    console.log('rule object ', rule.ruleObj)
     const quotaPercentage = Math.round((activeUsage / activeQuota) * 100);
 
     const restQuota = activeQuota - activeUsage;
@@ -92,7 +93,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
                 <TimerIcon />
                 <span>Start: {startTime}</span>
                 <span>End: {endTime}</span>
-                <span>Quota: {activeQuota} m</span>
+                <span>Quota: {moment().startOf('day').add(activeQuota,'ms').format('HH:mm')} </span>
             </div>
 
             <div className='rule__days-week'>
