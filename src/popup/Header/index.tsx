@@ -12,9 +12,7 @@ import settings from '../../common/settings'
 const Header = () => {
   const [showAddRuleModal, toggleAddRuleModal] = useState(false)
 
-  const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const [toggleColor, setToggleColor] = useState(true)
 
   const [isControlPaused, setIsControlPaused] = useState(storage.isControlPaused())
   const [isControlPauseAllowed, setIsControlPauseAllowed] = useState(true)
@@ -22,7 +20,6 @@ const Header = () => {
   const [pauseUsagePercent, setPauseUsagePercent] = useState(0)
   const toggleIsControlPaused = (evt?): void => {
     if (!isControlPauseAllowed) return;
-    console.log('toggle control', storage.isControlPaused())
     if(storage.isControlPaused()){
       setIsControlPaused(false)
       storage.resumeControl()
@@ -33,7 +30,6 @@ const Header = () => {
   }
   const checkControlPausedUsage = ()=>{
     const controlUsage = storage.getOrCreatePauseUsage();
-    console.log('ispause allowed ', controlUsage, isControlPauseAllowed)
     if (controlUsage.usage >= settings.pauseQuota && isControlPauseAllowed) {
       setIsControlPauseAllowed(false)
     } else if(!isControlPauseAllowed) {
@@ -88,18 +84,7 @@ const Header = () => {
             </Tooltip>
           </div>
 
-          {/* <Drawer
-            anchor='bottom'
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-          >
-            <span>Header Color</span>
-            <Switch
-              checked={toggleColor}
-              color={toggleColor ? 'primary' : 'secondary'}
-              onChange={() => setToggleColor(!toggleColor)}
-            />
-          </Drawer> */}
+
         </div>
         </div>
       <ProgressBar

@@ -8,7 +8,6 @@ const TICK_LENGTH = 1000;
 function run() {
 
     try {
-
         void tracker.run();
         void storage.init();
         setInterval(keeper.run, TICK_LENGTH);

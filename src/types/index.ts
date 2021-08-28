@@ -13,7 +13,8 @@ export interface Matcher {
 export interface RuleObj {
     _id?: string;
     _rev?: string;
-    matcher: Matcher;
+    name?: string;
+    matchers: Matcher[];
     startTime: string;
     endTime: string;
     daysOfWeek: number[];

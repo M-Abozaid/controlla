@@ -37,7 +37,7 @@ const SelectYTCat: React.FC<SelectYTCatProps> = ({ setMatcherValue }) => {
     setAnchorEl(null)
   }
 
-  const [choosenCategory, setChoosenCategory] = useState('')
+  const [category, setCategory] = useState('')
 
   return (
     <div className={classes.root}>
@@ -50,7 +50,7 @@ const SelectYTCat: React.FC<SelectYTCatProps> = ({ setMatcherValue }) => {
           style={{ paddingLeft: '0px' }}
         >
           <ListItemText
-            primary={choosenCategory || 'Select Youtube category'}
+            primary={category || 'Select Youtube category'}
           />
         </ListItem>
       </List>
@@ -73,7 +73,7 @@ const SelectYTCat: React.FC<SelectYTCatProps> = ({ setMatcherValue }) => {
               value={YTCategories[cat]}
               onClick={(e: any) => {
                 setMatcherValue(e.target.value)
-                setChoosenCategory(cat)
+                setCategory(cat)
                 setAnchorEl(null)
               }}
             >

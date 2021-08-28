@@ -11,7 +11,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import Close from '@material-ui/icons/Close';
 import Rule from '../../common/Rule';
 import moment from 'moment';
-
+import {onlyUnique} from '../../common/utils'
 interface RuleProps {
     rule: Rule;
 }
@@ -51,7 +51,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
                     </Tooltip>
                 </div>
 
-                <div className='rule__type'>{rule.ruleObj.matcher.type}</div>
+                <div className='rule__type'>{rule.ruleObj.matchers.map(m=>m.type).filter(onlyUnique).join(' ')}</div>
                 <div className='rule__tools'>
                     <Tooltip
                         TransitionComponent={Zoom}
@@ -76,7 +76,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
                     </Tooltip>
                 </div>
             </div>
-            <h4 className='rule__title'>{getRuleTitle(rule.ruleObj.matcher)}</h4>
+            <h4 className='rule__title'>{rule.ruleObj.matchers.map(matcher=>getRuleTitle(matcher)).join(' ')}</h4>
 
             <div>
                 <ProgressBar

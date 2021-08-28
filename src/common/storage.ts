@@ -39,9 +39,7 @@ class Storage extends EventEmitter {
     async getRules(): Promise<Rule[]> {
 
         const dbResponse = await this.rulesDB.find({ selector: {} });
-        const rulesDocs: RuleObj[] = dbResponse.docs.filter(
-            d => d.daysOfWeek
-        );
+        const rulesDocs: RuleObj[] = dbResponse.docs;
         return rulesDocs.map(r => new Rule(r));
     }
 
@@ -56,7 +54,7 @@ class Storage extends EventEmitter {
         this.emit('rule_removed', ruleObj);
         return;
     }
-    async createRule(rule: RuleObj, ): Promise<Rule> {
+    async createRule(rule: RuleObj,): Promise<Rule> {
         const newRule = await this.rulesDB.post(rule);
         this.emit('new_rule', newRule);
         await this.getQuotaUsage(newRule.id);
@@ -114,13 +112,13 @@ class Storage extends EventEmitter {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     async updateVisit(visit: Visit) {
-        console.log('%cstorage.ts line:107 update visit', 'color: #007acc;', visit);
+        // console.log('%cstorage.ts line:107 update visit', 'color: #007acc;', visit);
         // return this.visitsDB.put(visit)
     }
 
 
-    async updateOrCreateDoc<Model>(db:PouchDB.Database<Model>,
-                                   fieldsToUpdate: Model ,
+    async updateOrCreateDoc<Model>(db: PouchDB.Database<Model>,
+        fieldsToUpdate: Model,
         _id?: string): Promise<Model> {
         try {
             if (!_id) {
@@ -148,16 +146,11 @@ class Storage extends EventEmitter {
 
     async getMatchingRules(tab: chrome.tabs.Tab): Promise<Rule[]> {
 
-
         const allRules = await this.getRules();
-        console.log('%cstorage.ts line:143 got all rules', 'color: #007acc;', tab.id, this.visits.map(v=>v.tabId), Date.now());
-        if (this.ytVideoURLRegex.test(tab.url)) {
-            const visit = this.getOpenVisit(tab.id);
-            console.log('got open visit ', visit);
-            return allRules.filter(rule => ruleMatcher.matchTab(rule.ruleObj.matcher,
-                                                                tab, visit?.ytDetails.snippet));
-        }
-        return allRules.filter(rule => ruleMatcher.matchURL(rule.ruleObj.matcher, tab));
+
+        const visit = this.getOpenVisit(tab.id);
+
+        return allRules.filter(rule => rule.doesMatch(tab, visit));
 
     }
 
@@ -169,7 +162,7 @@ class Storage extends EventEmitter {
      *
      * Get a rule and interval and check if counting for today exists if so increment it if not create a new usage
      */
-    async incrementOrAddUsage(ruleId: string, interval:number): Promise<QuotaUsage> {
+    async incrementOrAddUsage(ruleId: string, interval: number): Promise<QuotaUsage> {
         const usage = await this.getQuotaUsage(ruleId)
 
 
@@ -194,7 +187,7 @@ class Storage extends EventEmitter {
             // create usage
             const newUsage = {
                 ruleId,
-                day:usageDay,
+                day: usageDay,
                 activeUsage: 0,
                 visibilityUsage: 0,
             };
@@ -206,7 +199,7 @@ class Storage extends EventEmitter {
 
             // update usage
             usage.day = usageDay;
-            usage.activeUsage =  0;
+            usage.activeUsage = 0;
             usage.visibilityUsage = 0;
             await this.quotaUsageDB.put(usage);
             return usage;
@@ -233,7 +226,7 @@ class Storage extends EventEmitter {
         localStorage.setItem('pauseControlUsage', JSON.stringify(pauseControlUsage))
     }
 
-    getOrCreatePauseUsage():PauseControlUsage {
+    getOrCreatePauseUsage(): PauseControlUsage {
 
 
         const pauseControlUsage = localStorage.pauseControlUsage && JSON.parse(localStorage.pauseControlUsage)
@@ -242,19 +235,19 @@ class Storage extends EventEmitter {
             return pauseControlUsage
         } {
             const initialPauseControlUsage = {
-                day:this.__getDailyQuotaDay(),
-                usage:0
+                day: this.__getDailyQuotaDay(),
+                usage: 0
             }
 
             localStorage.setItem('pauseControlUsage', JSON.stringify(initialPauseControlUsage))
-           return  initialPauseControlUsage;
+            return initialPauseControlUsage;
         }
     }
     isControlPaused() {
         return localStorage.isControlPaused === 'true'
     }
 
-    __getDailyQuotaDay(usageDay?):string {
+    __getDailyQuotaDay(usageDay?): string {
         const today = moment().format('DD-MM-YYYY')
         const yesterday = moment().subtract(1, 'days').format('DD-MM-YYYY');
         const hour = moment().hour();
@@ -262,8 +255,12 @@ class Storage extends EventEmitter {
         if (!usageDay) {
             return hour < settings.quotaRenewalHour ? yesterday : today
         }
-        if (usageDay !== today && hour >= settings.quotaRenewalHour) {
-            return today
+        if (usageDay !== today) {
+            if (hour >= settings.quotaRenewalHour) {
+                return today
+            } else {
+                return yesterday
+            }
         }
 
         return usageDay;
@@ -285,13 +282,13 @@ class Storage extends EventEmitter {
 
         if (scope === 'popup') {
             return new Promise<void>((resolve, reject) => {
-                chrome.runtime.sendMessage({ message: 'getVisits' },  (response)=> {
+                chrome.runtime.sendMessage({ message: 'getVisits' }, (response) => {
                     console.log('Got response ', response)
                     this.visits = response.visits
                     console.log('initialize storage ', Date.now())
 
                     resolve()
-                 });
+                });
             })
         }
     }

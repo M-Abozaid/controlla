@@ -1,25 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './styles.scss'
-import { MatcherType, YTCategories } from '../../types'
 import storage from '../../common/storage'
 
 import TimeRangeSlider from 'react-time-range-slider'
-import MenuItem from '@material-ui/core/MenuItem'
-import Select from '@material-ui/core/Select'
 
-import SelectYTCat from './SelectYTCat'
 
 import {
-  Modal,
   Button,
   Form,
   Spinner,
   ButtonGroup,
   Overlay,
   Tooltip,
+  Modal
 } from 'react-bootstrap'
 import { getActiveTab, extractHostname, escapeRegExp } from '../Services'
 import moment from 'moment'
+import MatcherForm from '../matcherForm'
+import { Matcher, MatcherType } from '../../types'
+import { Add } from '@material-ui/icons'
 //
 interface AddRule {
   onRuleAdded: () => void
@@ -32,7 +31,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
       const [activeTab] = await getActiveTab()
       const firstActiveTabUrl = extractHostname(activeTab.url)
       setActiveTabUrl(firstActiveTabUrl)
-      setMatcherValue(escapeRegExp(firstActiveTabUrl))
+      console.log('Set matchers ', firstActiveTabUrl)
+      setMatchers([{type:MatcherType.URL, value:new RegExp(escapeRegExp(firstActiveTabUrl))}])
     }
 
     getActiveTabAsync()
@@ -42,25 +42,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   const [activeTabUrl, setActiveTabUrl] = useState('')
   const escapedActiveTab = escapeRegExp(activeTabUrl)
 
-  // matcher type and handler
-  const [matcherType, setmatcherType] = React.useState(MatcherType.URL)
-  const handleMatcherChange = event => {
-    const newMatcher = event.target.value
-    setmatcherType(newMatcher)
-    if (newMatcher === MatcherType.URL) {
-      setShowYTCategory(false)
-      setMatcherValue(escapedActiveTab)
-    } else if (newMatcher === MatcherType.YT_CATEGORY) setShowYTCategory(true)
-    else {
-      setShowYTCategory(false)
-      setMatcherValue('')
-    }
-  }
+  const [matchers, setMatchers] = useState([] as Matcher[])
 
-  // matcher value and show yt category
-  const [matcherValue, setMatcherValue] = useState('')
-
-  const [showYTCategory, setShowYTCategory] = useState(false)
 
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
@@ -111,6 +94,15 @@ const AddRule = ({ onRuleAdded, onHide }) => {
     }
   }
 
+  const updateMatcher = (update, i) => {
+    console.log('update matcher ', update, i)
+    matchers[i] = { ...matchers[i], ...update }
+    setMatchers([...matchers])
+  }
+
+  const addMatcher = () => {
+    setMatchers([...matchers, {type:MatcherType.URL, value: new RegExp(escapedActiveTab)}])
+  }
   // form validation
   const addButtonTarget = useRef(null)
   const [showOverlay, setShowOverlay] = useState(false)
@@ -142,16 +134,11 @@ const AddRule = ({ onRuleAdded, onHide }) => {
         if (daysOfWeek[day]) return parseInt(day, 10)
       })
 
-      const convMatcherValue =
-        matcherType === MatcherType.URL
-          ? new RegExp(matcherValue)
-          : matcherValue
 
+
+      console.log('create rule ', matchers)
       await storage.createRule({
-        matcher: {
-          type: matcherType,
-          value: convMatcherValue,
-        },
+        matchers,
         daysOfWeek: convDaysOfWeek,
         startTime: start,
         endTime: end,
@@ -167,6 +154,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
       setTimeRange({ ...timeRangeInitial })
     }
   }
+
 
   return (
     <>
@@ -186,36 +174,12 @@ const AddRule = ({ onRuleAdded, onHide }) => {
             className='add-rule__form'
             onSubmit={async e => await handleFormSubmitting(e)}
           >
-            <div className='matcher-type__main'>
-              <span>Matcher Type</span>
-              <Select
-                className='matcher-type__select'
-                labelId='select-label'
-                value={matcherType}
-                onChange={handleMatcherChange}
-              >
-                {Object.keys(MatcherType).map(matcher => (
-                  <MenuItem key={matcher} value={matcher}>
-                    {matcher}
-                  </MenuItem>
-                ))}
-              </Select>
-            </div>
 
-            {showYTCategory ? (
-              <SelectYTCat setMatcherValue={setMatcherValue} />
-            ) : (
-              <Form.Control
-                className='macher-type__input'
-                type='text'
-                required
-                placeholder='Matcher Value'
-                name='urlRegex'
-                value={matcherValue}
-                onChange={(e: any) => setMatcherValue(e.target.value)}
-              />
+            {matchers.map((matcher, i) =>
+              <MatcherForm key={i} matcher={matcher} onMatcherUpdated={(update)=> updateMatcher(update, i)} ></MatcherForm>
             )}
 
+            <Add onClick={() => addMatcher()} />
             <div className='start-end__time'>
               <span>{timeRange.start}</span>
               <span>{timeRange.end}</span>
@@ -316,6 +280,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               </Tooltip>
             </Overlay>
           </Form>
+
+
         </Modal.Body>
       </Modal>
     </>

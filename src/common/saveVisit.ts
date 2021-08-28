@@ -1,3 +1,4 @@
+import settings from "./settings";
 
 
 const saveVisit = async (visit) => {
@@ -7,7 +8,7 @@ const saveVisit = async (visit) => {
     visit.leftTime = new Date();
     try {
 
-        const rawResponse = await fetch('http://localhost:36168/data', {
+        const rawResponse = await fetch(`${settings.apiUrl}/data`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

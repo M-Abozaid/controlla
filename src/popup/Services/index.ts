@@ -20,7 +20,7 @@ export const getRuleTitle = (matcher: Matcher) => {
   if (matcher.type === MatcherType.YT_CATEGORY) {
     return YTCategories[matcher.value as string]
   }
-  return `${matcher.value as string}`.match(/[^\\\/\^\$]/gi)
+  return `${matcher.value as string}`.match(/[^\\\/\^\$]/gi).join('')
 
 }
 

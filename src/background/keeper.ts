@@ -41,35 +41,15 @@ export class Keeper {
 
         if (!this.isVisitActive(visit)) return;
 
-        // if this is a youtube tab
-        if (ytVideoURLRegex.test(tab.url)) {
 
-            // console.log('Visit ', visit)
-            if (!visit || !visit.ytDetails) {
-                return;
-            }
-            matchingRules = effectiveRules.filter(
-                r => ruleMatcher.matchTab(r.ruleObj.matcher, tab, visit.ytDetails.snippet),
-            );
-        } else {
-            matchingRules = effectiveRules.filter(
-                r => ruleMatcher.matchURL(r.ruleObj.matcher, tab),
-            );
+        matchingRules = effectiveRules.filter(
+            rule=>rule.doesMatch(tab, visit) ,
+        );
 
-        }
 
         if (!matchingRules.length) return;
 
-        // check if keeping is paused
-        if (storage.isControlPaused()) {
-            if (this.isPauseAllowed()) {
-                storage.incrementPauseUsage(settings.tickDuration)
-                return;
-            } else {
-                console.log('control quota is over')
-                storage.resumeControl()
-            }
-        }
+
 
         if (shouldIncrementQuota) {
 
@@ -81,6 +61,16 @@ export class Keeper {
         const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules);
 
         if (tabExpired) {
+            // check if keeping is paused
+            if (storage.isControlPaused()) {
+                if (this.isPauseAllowed()) {
+                    storage.incrementPauseUsage(settings.tickDuration)
+                    return;
+                } else {
+                    console.log('control quota is over')
+                    storage.resumeControl()
+                }
+            }
             this.hideTab(tab).then(() => {
                 try {
                     console.log('Tab expired ', matchingRules)
@@ -196,7 +186,7 @@ export class Keeper {
         const YTRules = await storage.getRules();
 
         const matchingRules = YTRules.filter(rule =>
-            (rule.isEffectiveNow() && ruleMatcher.matchVideoSnippet(rule.ruleObj.matcher, video)));
+            (rule.isEffectiveNow() && rule.ruleObj.matchers.some(matcher=> ruleMatcher.matchVideoSnippet(matcher, video))));
 
         const [disallowed] = await this.quotaCheck(matchingRules);
 

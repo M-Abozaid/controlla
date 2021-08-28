@@ -8,16 +8,12 @@ import { v4 as uuidv4 } from 'uuid';
 class Tracker {
 
     private async handleTabRemoved(tabId) {
-        console.log('%ctracker.ts line:10 object', 'color: #007acc;');
         try {
             const openVisit = storage.getOpenVisit(tabId);
-            console.log('%ctracker.ts line:13 object', 'color: #007acc;', );
             if (openVisit) {
                 await storage.closeOpenVisit(openVisit);
                 openVisit.leftTime = new Date();
-                console.log('%ctracker.ts line:17 object', 'color: #007acc;',);
                 await saveVisit(openVisit);
-                console.log('%ctracker.ts line:19 object', 'color: #007acc;');
             }
         } catch (error) {
             console.error(error);
@@ -25,7 +21,7 @@ class Tracker {
     }
     run(): void {
 
-        chrome.tabs.onRemoved.addListener(async (tabId)=>{
+        chrome.tabs.onRemoved.addListener(async (tabId) => {
             await this.handleTabRemoved(tabId);
         });
 
@@ -34,7 +30,7 @@ class Tracker {
             //   return v.tabId === tabId && v.leftTime === undefined;
             // });
             // console.log("CHANGE ", changeInfo.status)
-            console.log('%ctracker.ts line:36 changeInfo', 'color: #007acc;', changeInfo.status, changeInfo.url ,changeInfo);
+            // console.log('%ctracker.ts line:36 changeInfo', 'color: #007acc;', changeInfo.status, changeInfo.url, changeInfo);
             // a new visit // refreshes are not taken into account
             const openVisit = storage.getOpenVisit(tabId);
             if (openVisit) {
@@ -127,7 +123,7 @@ class Tracker {
                         openVisit.audible = true;
                     }
 
-                    if ('audible' in changeInfo ) {
+                    if ('audible' in changeInfo) {
                         console.log('audible state changed ', openVisit)
                         openVisit.audibleState.push({
                             time: new Date(),
@@ -136,7 +132,7 @@ class Tracker {
                     }
 
                     if (changeInfo.status === 'complete') {
-                        console.log('complete visit', openVisit.url , openVisit.status)
+
                         openVisit.status = 'complete'
 
                         try {
@@ -194,45 +190,43 @@ class Tracker {
                 const openVisit = storage.getOpenVisit(sender.tab.id)
 
 
-                    // console.log("got event ", request, openVisit);
-                    if (openVisit && (request.hidden !== undefined)) {
-                        openVisit.visibility.push({
-                            time: new Date(),
-                            hidden: request.hidden,
-                        });
-                    }
-
-                    if (openVisit && request.focus !== undefined) {
-                        openVisit.visibility.push({
-                            time: new Date(),
-                            focus: request.focus,
-                        });
-                    }
-
-                    if (openVisit && request.message === 'keypress') {
-                        openVisit.keypress.push({
-                            time: new Date(),
-                        });
-                    }
-                    if (openVisit && request.message === 'click') {
-                        openVisit.click.push({
-                            time: new Date(),
-                        });
-                    }
-
-                    try {
-
-                        storage.updateVisit(openVisit).then(r => {
-                            console.log('Visit updated ')
-                        })
-                    } catch (error) {
-                        console.error(error);
-                    }
-
-
-                    sendResponse({
-                        farewell: 'goodbye',
+                // console.log("got event ", request, openVisit);
+                if (openVisit && (request.hidden !== undefined)) {
+                    openVisit.visibility.push({
+                        time: new Date(),
+                        hidden: request.hidden,
                     });
+                }
+
+                if (openVisit && request.focus !== undefined) {
+                    openVisit.visibility.push({
+                        time: new Date(),
+                        focus: request.focus,
+                    });
+                }
+
+                if (openVisit && request.message === 'keypress') {
+                    openVisit.keypress.push({
+                        time: new Date(),
+                    });
+                }
+                if (openVisit && request.message === 'click') {
+                    openVisit.click.push({
+                        time: new Date(),
+                    });
+                }
+
+                try {
+
+                    storage.updateVisit(openVisit).then()
+                } catch (error) {
+                    console.error(error);
+                }
+
+
+                sendResponse({
+                    farewell: 'goodbye',
+                });
 
             }
 
@@ -242,6 +236,6 @@ class Tracker {
     }
 
 }
-
+// some test coding
 const tracker = new Tracker();
 export default tracker;
