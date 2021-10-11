@@ -3,14 +3,14 @@ declare let window;
 
 
 
-class Settings{
+class Settings {
 
 
   defaultSettings = {
-    apiUrl:'http://localhost:36168',
+    apiUrl: 'http://localhost:36168',
     tickDuration: 1000,
     visitActiveThreshold: 60 * 1000,
-    pauseQuota: 10 * 60 * 1000,
+    pauseQuota: 2 * 60 * 1000,
     quotaRenewalHour: 17
   }
   _settings;
@@ -43,7 +43,7 @@ class Settings{
   }
 
 
-  get pauseQuota(){
+  get pauseQuota() {
     return this._settings.pauseQuota
   }
 

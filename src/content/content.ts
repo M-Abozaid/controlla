@@ -3,7 +3,7 @@ import getYTVideos from '../common/getYTVideos';
 
 import jQuery from 'jquery';
 // declare var jQuery
-let bodyHidden 
+let bodyHidden
 
 
 const keywordSearch = []
@@ -71,14 +71,14 @@ jQuery(window).blur(function () {
 
 jQuery(document).ready(() => {
     // console.log('document loaded ');
- 
+
     if (window.location.href.includes('youtube.com')) {
         jQuery('body').css('display', 'none')
         bodyHidden = true;
     }
 
     document.body.addEventListener('click', function () {
-        
+
         // console.log('click ');
         chrome.runtime.sendMessage({ message: 'click' }, function (response) { });
     });
@@ -112,14 +112,15 @@ async function checkYoutube() {
         jQuery('ytd-miniplayer').remove();
     }
     if (window.location.href.includes('youtube.com')) {
-        if(bodyHidden){
+        if (bodyHidden) {
             jQuery('body').css('display', 'block')
-           bodyHidden = false
-       }
+            bodyHidden = false
+        }
         const videos = jQuery(
             'ytd-compact-autoplay-renderer,ytd-rich-item-renderer,ytd-compact-video-renderer,ytd-grid-video-renderer,ytd-video-renderer,#movie_player > div.html5-endscreen.ytp-player-content.videowall-endscreen.ytp-show-tiles > div > a',
         ).toArray();
 
+        console.log('videos', videos);
         let chunkArr;
         for (let i = 0, j = videos.length; i < j; i += 50) {
             chunkArr = videos.slice(i, i + 50);
@@ -157,7 +158,7 @@ async function checkYoutube() {
 
             const ytVideos = await getYTVideos(ids.join(','));
 
-          
+
             // console.log('got videos ', ytVideos);
 
             for (const v of chunkArr) {
@@ -181,15 +182,15 @@ async function checkYoutube() {
                             allowVid(el);
                         } else {
                             badVideos.push(el);
-                            el.find('a').toArray().forEach(a=>jQuery(a).attr('href','javascript:void(0)'));
-                            el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
+                            el.find('a').toArray().forEach(a => jQuery(a).attr('href', 'javascript:void(0)'));
+                            el.find('img').toArray().forEach(a => jQuery(a).attr('src', ''));
                             el.hover(() => {
                                 setTimeout(() => {
-                                    el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
-                                    el.find('video').toArray().forEach(a=>jQuery(a).attr('src','')); 
-                               },2) 
+                                    el.find('img').toArray().forEach(a => jQuery(a).attr('src', ''));
+                                    el.find('video').toArray().forEach(a => jQuery(a).attr('src', ''));
+                                }, 2)
                             })
-                            el.find('yt-formatted-string').toArray().forEach(a=>jQuery(a).html(''));
+                            el.find('yt-formatted-string').toArray().forEach(a => jQuery(a).html(''));
                         }
 
                         // if (k === chunkArr.length - 1) {
@@ -201,7 +202,7 @@ async function checkYoutube() {
                 }
             }
 
-            
+
         }
     }
 }
