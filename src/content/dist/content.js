@@ -39,6 +39,7 @@ exports.__esModule = true;
 /* eslint-disable  */
 var getYTVideos_1 = require("../common/getYTVideos");
 var jquery_1 = require("jquery");
+var index_1 = require("../types/index");
 // declare var jQuery
 var bodyHidden;
 var keywordSearch = [];
@@ -84,7 +85,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         sendResponse({ msg: 'got it' });
         return;
     }
-    console.log('return true ');
+    //   console.log('return true ')
     return true;
 });
 jquery_1["default"](window).focus(function () {
@@ -126,7 +127,7 @@ jquery_1["default"](document).ready(function () {
 // observer.observe(target, config)
 function checkYoutube() {
     return __awaiter(this, void 0, void 0, function () {
-        var videos, chunkArr, i, j, ids, ytVideos, _loop_1, _i, chunkArr_1, v;
+        var videos, chunkArr, i, j, ids, ytVideos, _loop_1, _i, chunkArr_1, v, match, videoId, videoDetails, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -139,7 +140,6 @@ function checkYoutube() {
                         bodyHidden = false;
                     }
                     videos = jquery_1["default"]('ytd-compact-autoplay-renderer,ytd-rich-item-renderer,ytd-compact-video-renderer,ytd-grid-video-renderer,ytd-video-renderer,#movie_player > div.html5-endscreen.ytp-player-content.videowall-endscreen.ytp-show-tiles > div > a').toArray();
-                    console.log('videos', videos);
                     chunkArr = void 0;
                     i = 0, j = videos.length;
                     _a.label = 1;
@@ -174,7 +174,9 @@ function checkYoutube() {
                     if (!ids.length) {
                         return [3 /*break*/, 3];
                     }
-                    return [4 /*yield*/, getYTVideos_1["default"](ids.join(','))];
+                    return [4 /*yield*/, getYTVideos_1["default"](ids.join(','))
+                        // console.log('got videos ', ytVideos);
+                    ];
                 case 2:
                     ytVideos = _a.sent();
                     _loop_1 = function (v) {
@@ -193,15 +195,25 @@ function checkYoutube() {
                                 }
                                 else {
                                     badVideos.push(el_1);
-                                    el_1.find('a').toArray().forEach(function (a) { return jquery_1["default"](a).attr('href', 'javascript:void(0)'); });
-                                    el_1.find('img').toArray().forEach(function (a) { return jquery_1["default"](a).attr('src', ''); });
+                                    el_1.find('a')
+                                        .toArray()
+                                        .forEach(function (a) { return jquery_1["default"](a).attr('href', 'javascript:void(0)'); });
+                                    el_1.find('img')
+                                        .toArray()
+                                        .forEach(function (a) { return jquery_1["default"](a).attr('src', ''); });
                                     el_1.hover(function () {
                                         setTimeout(function () {
-                                            el_1.find('img').toArray().forEach(function (a) { return jquery_1["default"](a).attr('src', ''); });
-                                            el_1.find('video').toArray().forEach(function (a) { return jquery_1["default"](a).attr('src', ''); });
+                                            el_1.find('img')
+                                                .toArray()
+                                                .forEach(function (a) { return jquery_1["default"](a).attr('src', ''); });
+                                            el_1.find('video')
+                                                .toArray()
+                                                .forEach(function (a) { return jquery_1["default"](a).attr('src', ''); });
                                         }, 2);
                                     });
-                                    el_1.find('yt-formatted-string').toArray().forEach(function (a) { return jquery_1["default"](a).html(''); });
+                                    el_1.find('yt-formatted-string')
+                                        .toArray()
+                                        .forEach(function (a) { return jquery_1["default"](a).html(''); });
                                 }
                                 // if (k === chunkArr.length - 1) {
                                 //   replaceBadVideos();
@@ -209,7 +221,7 @@ function checkYoutube() {
                             });
                         }
                         catch (error) {
-                            console.error('errrrrrrrrrrrrrrrrrrrrr checking ', error);
+                            console.error('error checking youtube video', error);
                         }
                     };
                     // console.log('got videos ', ytVideos);
@@ -221,7 +233,26 @@ function checkYoutube() {
                 case 3:
                     i += 50;
                     return [3 /*break*/, 1];
-                case 4: return [2 /*return*/];
+                case 4:
+                    if (!window.location.href.includes('youtube.com/watch?')) return [3 /*break*/, 10];
+                    _a.label = 5;
+                case 5:
+                    _a.trys.push([5, 9, , 10]);
+                    match = window.location.href.match(/watch\?v=(.{11})/);
+                    videoId = match && match[1];
+                    if (!(videoId && !jquery_1["default"].find("#tracker-video-info-" + videoId)[0])) return [3 /*break*/, 8];
+                    return [4 /*yield*/, getYTVideos_1["default"]([videoId])];
+                case 6: return [4 /*yield*/, (_a.sent()).items];
+                case 7:
+                    videoDetails = (_a.sent())[0];
+                    addVideoInfo(videoDetails);
+                    _a.label = 8;
+                case 8: return [3 /*break*/, 10];
+                case 9:
+                    error_1 = _a.sent();
+                    console.log('error adding video details ', error_1);
+                    return [3 /*break*/, 10];
+                case 10: return [2 /*return*/];
             }
         });
     });
@@ -338,6 +369,16 @@ function coverVideo(el) {
     // el.find('yt-formatted-string').toArray().forEach(a=>jQuery(a).html(''));
     el.append("<div class=\"tracker-video-cover\" style=\"\n  width: 100%;\n  height: 100%;\n  position: absolute;\n  background-color: var(--yt-spec-general-background-a);\n  z-index: 1000;\n  top: 0; \"></div>");
 }
+function addVideoInfo(details) {
+    var _a;
+    //   console.log('add video info ', YTCategories, details.snippet)
+    if (jquery_1["default"].find("#tracker-video-info-" + details.id)[0])
+        return;
+    jquery_1["default"]('#description > yt-formatted-string').append("\n    <table id=\"tracker-video-info-" + details.id + "\">\n    <tr>\n      <th>Category</th>\n      <th>Tags</th>\n      <th>Published At</th>\n    </tr>\n    <tr>\n      <td>" + Object.keys(index_1.YTCategories).filter(function (key) { return index_1.YTCategories[key].toString() === details.snippet.categoryId; })[0] + "</td>\n      <td style=\"max-width:250px;\">" + ((_a = details.snippet.tags) === null || _a === void 0 ? void 0 : _a.join(', ')) + "</td>\n      <td>" + details.snippet.publishedAt + "</td>\n    </tr>\n\n  </table>\n    ");
+    // .insertAfter(
+    // jQuery('.content.style-scope.ytd-video-secondary-info-renderer')[0])
+}
+;
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -350,6 +391,9 @@ function coverVideo(el) {
                 return [4 /*yield*/, checkYoutube()];
             case 3:
                 _a.sent();
+                window.addEventListener('locationchange', function () {
+                    console.log('location changed!', window.location.href);
+                });
                 setInterval(function () {
                     checkYoutube();
                 }, 2000);

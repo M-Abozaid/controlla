@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './styles.scss'
-import storage from '../../common/storage'
+import storage from '../common/storage'
 
 import TimeRangeSlider from 'react-time-range-slider'
-
 
 import {
   Button,
@@ -12,27 +11,32 @@ import {
   ButtonGroup,
   Overlay,
   Tooltip,
-  Modal
+  Modal,
 } from 'react-bootstrap'
-import { getActiveTab, extractHostname, escapeRegExp } from '../Services'
+import { getActiveTab, extractHostname, escapeRegExp } from '../popup/Services'
 import moment from 'moment'
-import MatcherForm from '../matcherForm'
-import { Matcher, MatcherType } from '../../types'
+import MatcherForm from './matcherForm'
+import { Matcher, MatcherType } from '../types'
 import { Add } from '@material-ui/icons'
+import { Grid } from '@material-ui/core'
 //
 interface AddRule {
   onRuleAdded: () => void
-  onHide: ()=> void
 }
 
-const AddRule = ({ onRuleAdded, onHide }) => {
+const AddRule = ({ onRuleAdded }) => {
   useEffect(() => {
     async function getActiveTabAsync() {
       const [activeTab] = await getActiveTab()
       const firstActiveTabUrl = extractHostname(activeTab.url)
       setActiveTabUrl(firstActiveTabUrl)
       console.log('Set matchers ', firstActiveTabUrl)
-      setMatchers([{type:MatcherType.URL, value:new RegExp(escapeRegExp(firstActiveTabUrl))}])
+      setMatchers([
+        {
+          type: MatcherType.URL,
+          value: new RegExp(escapeRegExp(firstActiveTabUrl)),
+        },
+      ])
     }
 
     getActiveTabAsync()
@@ -43,7 +47,6 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   const escapedActiveTab = escapeRegExp(activeTabUrl)
 
   const [matchers, setMatchers] = useState([] as Matcher[])
-
 
   // submitting the from
   const [submittingFrom, setSubmittingFrom] = useState(false)
@@ -62,6 +65,7 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   const handleQuotaChange = e =>
     setQuotaTime({ ...quotaTime, [e.target.name]: e.target.value })
 
+  const [priority, setPriority] = useState(1)
   // days of the week
   const initialDaysOfWeek = {
     0: false,
@@ -101,7 +105,10 @@ const AddRule = ({ onRuleAdded, onHide }) => {
   }
 
   const addMatcher = () => {
-    setMatchers([...matchers, {type:MatcherType.URL, value: new RegExp(escapedActiveTab)}])
+    setMatchers([
+      ...matchers,
+      { type: MatcherType.URL, value: new RegExp(escapedActiveTab) },
+    ])
   }
   // form validation
   const addButtonTarget = useRef(null)
@@ -118,14 +125,14 @@ const AddRule = ({ onRuleAdded, onHide }) => {
     Object.keys(daysOfWeek).map(day => !daysOfWeek[day] && daysCount++)
 
     if (daysCount === 7) {
-      if(!showOverlay) {
-         setShowOverlay(true)
-        }
+      if (!showOverlay) {
+        setShowOverlay(true)
+      }
       setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
     } else if (startTimeParsed > endTimeParsed) {
-      if(!showOverlay) {
+      if (!showOverlay) {
         setShowOverlay(true)
-       }
+      }
       setTimeout(() => !showOverlay && setShowOverlay(false), 2000)
     } else {
       setSubmittingFrom(true)
@@ -133,8 +140,6 @@ const AddRule = ({ onRuleAdded, onHide }) => {
       const convDaysOfWeek = Object.keys(daysOfWeek).map(day => {
         if (daysOfWeek[day]) return parseInt(day, 10)
       })
-
-
 
       console.log('create rule ', matchers)
       await storage.createRule({
@@ -144,9 +149,9 @@ const AddRule = ({ onRuleAdded, onHide }) => {
         endTime: end,
         activeQuota: parseInt(activeQuota, 10) * 60000,
         visibilityQuota: parseInt(visibilityQuota, 10) * 60000,
+        priority,
       })
 
-      onHide()
       onRuleAdded()
       setSubmittingFrom(false)
       setQuotaTime(quotaTimeInitial)
@@ -155,29 +160,35 @@ const AddRule = ({ onRuleAdded, onHide }) => {
     }
   }
 
-
   return (
     <>
-      <Modal
-        size='lg'
-        show
-        centered
-        onHide={onHide}
-        aria-labelledby='contained-modal-title-vcenter'
-      >
-        <Modal.Header className='modal__header' closeButton>
-          <Modal.Title id='contained-modal-title-vcenter'>Add Rule</Modal.Title>
-        </Modal.Header>
+      <Grid container direction='row' spacing={2}>
+        <Grid item xs={12}>
+          <h2>Add Rule.</h2>
 
-        <Modal.Body>
           <Form
             className='add-rule__form'
             onSubmit={async e => await handleFormSubmitting(e)}
           >
-
-            {matchers.map((matcher, i) =>
-              <MatcherForm key={i} matcher={matcher} onMatcherUpdated={(update)=> updateMatcher(update, i)} ></MatcherForm>
-            )}
+            <Grid>
+              <Form.Control
+                required
+                min='1'
+                type='number'
+                placeholder='Priority'
+                name='priority'
+                value={priority.toString()}
+                // eslint-disable-next-line radix
+                onChange={e => setPriority(parseInt(e.target.value))}
+              />
+            </Grid>
+            {matchers.map((matcher, i) => (
+              <MatcherForm
+                key={i}
+                matcher={matcher}
+                onMatcherUpdated={update => updateMatcher(update, i)}
+              ></MatcherForm>
+            ))}
 
             <Add onClick={() => addMatcher()} />
             <div className='start-end__time'>
@@ -280,10 +291,8 @@ const AddRule = ({ onRuleAdded, onHide }) => {
               </Tooltip>
             </Overlay>
           </Form>
-
-
-        </Modal.Body>
-      </Modal>
+        </Grid>
+      </Grid>
     </>
   )
 }

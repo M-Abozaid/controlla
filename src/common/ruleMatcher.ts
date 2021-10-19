@@ -1,8 +1,6 @@
 import { Matcher, MatcherType } from '../types'
 
 class RuleMatcher {
-
-
   matchVideoTitle(matcher: Matcher, title: string): boolean {
     if (matcher.type !== MatcherType.YT_TITLE) return false
 
@@ -10,13 +8,13 @@ class RuleMatcher {
       return matcher.value.test(title)
     }
 
-
     return title.toLowerCase().includes(matcher.value.toLowerCase())
   }
 
   matchVideoCategory(matcher: Matcher, categoryId: string): boolean {
     if (matcher.type !== MatcherType.YT_CATEGORY) return false
-    return String(matcher.value) === categoryId
+
+    return matcher.value.includes(categoryId)
   }
 
   matchChannel(matcher: Matcher, channel) {
@@ -29,12 +27,16 @@ class RuleMatcher {
     return channel.toLowerCase().trim() === matcher.value.toLowerCase().trim()
   }
 
-  matchURL(matcher: Matcher, { url }: chrome.tabs.Tab) {
+  matchYtTAGS(matcher: Matcher, tags: string[]): boolean {
+    if (matcher.type !== MatcherType.YT_TAGS) return false
+    if (!tags) return false
+    return tags.some(tag => matcher.value.includes(tag))
+  }
 
+  matchURL(matcher: Matcher, { url }: chrome.tabs.Tab) {
     if (matcher.type !== MatcherType.URL) return false
 
     if (matcher.value instanceof RegExp) {
-
       return matcher.value.test(url)
     }
 
@@ -43,13 +45,13 @@ class RuleMatcher {
 
   matchVideoSnippet(
     matcher: Matcher,
-    { categoryId, channelTitle, title }: gapi.client.youtube.VideoSnippet
+    { categoryId, channelTitle, title, tags }: gapi.client.youtube.VideoSnippet
   ): boolean {
-
     return (
       this.matchVideoTitle(matcher, title) ||
       this.matchChannel(matcher, channelTitle) ||
-      this.matchVideoCategory(matcher, categoryId)
+      this.matchVideoCategory(matcher, categoryId) ||
+      this.matchYtTAGS(matcher, tags)
     )
   }
   matchTab(
@@ -63,11 +65,14 @@ class RuleMatcher {
       case MatcherType.YT_CATEGORY:
       case MatcherType.YT_TITLE:
       case MatcherType.YT_CHANNEL:
+      case MatcherType.YT_TAGS:
         return this.matchVideoSnippet(matcher, snippet)
       default:
         break
     }
   }
 }
+const ruleMatcher = new RuleMatcher()
+;(window as any).ruleMatcher = ruleMatcher
 
-export default new RuleMatcher()
+export default ruleMatcher

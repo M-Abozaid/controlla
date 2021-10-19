@@ -1,93 +1,92 @@
 /* eslint-disable  */
-import getYTVideos from '../common/getYTVideos';
+import getYTVideos from '../common/getYTVideos'
 
-import jQuery from 'jquery';
+import jQuery from 'jquery'
+import { YTCategories } from '../types/index'
 // declare var jQuery
 let bodyHidden
 
-
 const keywordSearch = []
-let goodVideos = [];
-const badVideos = [];
+let goodVideos = []
+const badVideos = []
 // Adapted slightly from Sam Dutton
 // Set name of hidden property and visibility change event
 // since some browsers only offer vendor-prefixed support
 // let hidden;
 // let state;
-let visibilityChange;
+let visibilityChange
 if (typeof document.hidden !== 'undefined') {
-    // hidden = 'hidden';
-    visibilityChange = 'visibilitychange';
-    // state = 'visibilityState';
+  // hidden = 'hidden';
+  visibilityChange = 'visibilitychange'
+  // state = 'visibilityState';
 }
 
 // Add a listener that constantly changes the title
 document.addEventListener(
-    visibilityChange,
-    () => {
-        // document.title = document[state]
-        chrome.runtime.sendMessage({ hidden: document.hidden });
-    },
-    false,
-);
+  visibilityChange,
+  () => {
+    // document.title = document[state]
+    chrome.runtime.sendMessage({ hidden: document.hidden })
+  },
+  false
+)
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    // console.log(sender, ' sent >>>> ', request);
+  // console.log(sender, ' sent >>>> ', request);
 
-    if (request.newVisit) {
-        sendResponse({ msg: 'got it' });
-        return;
-    }
-    if (request.hidden) {
-        sleep(10).then(() => {
-            sendResponse({
-                hidden: document.hidden,
-                focus: document.hasFocus(),
-                href: location.href,
-            });
-            // console.log('sending res ', {
-            //     hidden: document.hidden,
-            //     focus: document.hasFocus(),
-            //     href: location.href,
-            // });
-        });
-    } else {
-        sendResponse({ msg: 'got it' });
-        return;
-    }
-    console.log('return true ');
-    return true;
-});
+  if (request.newVisit) {
+    sendResponse({ msg: 'got it' })
+    return
+  }
+  if (request.hidden) {
+    sleep(10).then(() => {
+      sendResponse({
+        hidden: document.hidden,
+        focus: document.hasFocus(),
+        href: location.href,
+      })
+      // console.log('sending res ', {
+      //     hidden: document.hidden,
+      //     focus: document.hasFocus(),
+      //     href: location.href,
+      // });
+    })
+  } else {
+    sendResponse({ msg: 'got it' })
+    return
+  }
+  //   console.log('return true ')
+  return true
+})
 
-jQuery(window).focus(function () {
-    // do something
-    chrome.runtime.sendMessage({ focus: true }, function (response) { });
-});
+jQuery(window).focus(function() {
+  // do something
+  chrome.runtime.sendMessage({ focus: true }, function(response) {})
+})
 
-jQuery(window).blur(function () {
-    // do something
-    chrome.runtime.sendMessage({ focus: false }, function (response) { });
-});
+jQuery(window).blur(function() {
+  // do something
+  chrome.runtime.sendMessage({ focus: false }, function(response) {})
+})
 
 jQuery(document).ready(() => {
-    // console.log('document loaded ');
+  // console.log('document loaded ');
 
-    if (window.location.href.includes('youtube.com')) {
-        jQuery('body').css('display', 'none')
-        bodyHidden = true;
-    }
+  if (window.location.href.includes('youtube.com')) {
+    jQuery('body').css('display', 'none')
+    bodyHidden = true
+  }
 
-    document.body.addEventListener('click', function () {
+  document.body.addEventListener('click', function() {
+    // console.log('click ');
+    chrome.runtime.sendMessage({ message: 'click' }, function(response) {})
+  })
 
-        // console.log('click ');
-        chrome.runtime.sendMessage({ message: 'click' }, function (response) { });
-    });
-
-    document.body.addEventListener('keypress', function () {
-        // console.log('key press ');
-        chrome.runtime.sendMessage({ message: 'keypress' }, function (response) { });
-    });
-});
+  document.body.addEventListener('keypress', function() {
+    // console.log('key press ');
+    chrome.runtime.sendMessage({ message: 'keypress' }, function(response) {})
+  })
+})
 
 // // select the target node
 // var target = document.querySelector('title')
@@ -108,237 +107,296 @@ jQuery(document).ready(() => {
 // // pass in the target node, as well as the observer options
 // observer.observe(target, config)
 async function checkYoutube() {
-    if (jQuery('ytd-miniplayer')) {
-        jQuery('ytd-miniplayer').remove();
+  if (jQuery('ytd-miniplayer')) {
+    jQuery('ytd-miniplayer').remove()
+  }
+  if (window.location.href.includes('youtube.com')) {
+    if (bodyHidden) {
+      jQuery('body').css('display', 'block')
+      bodyHidden = false
     }
-    if (window.location.href.includes('youtube.com')) {
-        if (bodyHidden) {
-            jQuery('body').css('display', 'block')
-            bodyHidden = false
+    const videos = jQuery(
+      'ytd-compact-autoplay-renderer,ytd-rich-item-renderer,ytd-compact-video-renderer,ytd-grid-video-renderer,ytd-video-renderer,#movie_player > div.html5-endscreen.ytp-player-content.videowall-endscreen.ytp-show-tiles > div > a'
+    ).toArray()
+
+    // console.log('videos', videos)
+    let chunkArr
+    for (let i = 0, j = videos.length; i < j; i += 50) {
+      chunkArr = videos.slice(i, i + 50)
+      chunkArr = chunkArr.filter(v => {
+        const el = jQuery(v)
+        const id = getId(el)
+
+        if (!id) {
+          // console.log('video with no id ', id, el);
+          return
         }
-        const videos = jQuery(
-            'ytd-compact-autoplay-renderer,ytd-rich-item-renderer,ytd-compact-video-renderer,ytd-grid-video-renderer,ytd-video-renderer,#movie_player > div.html5-endscreen.ytp-player-content.videowall-endscreen.ytp-show-tiles > div > a',
-        ).toArray();
+        if (el.attr('tr-allowed')) {
+          return false
+        }
+        if (el.attr('tr-video-id') === id) {
+          return false
+        }
+        el.attr('tr-video-id', id)
+        coverVideo(el)
+        return true
+      })
 
-        console.log('videos', videos);
-        let chunkArr;
-        for (let i = 0, j = videos.length; i < j; i += 50) {
-            chunkArr = videos.slice(i, i + 50);
-            chunkArr = chunkArr.filter(v => {
-                const el = jQuery(v);
-                const id = getId(el);
+      const ids = chunkArr
+        .map(v => {
+          const el = jQuery(v)
+          const id = getId(el)
+          el.videoId = id
+          return id
+        })
+        .filter(id => id)
 
-                if (!id) {
-                    // console.log('video with no id ', id, el);
-                    return;
-                }
-                if (el.attr('tr-allowed')) {
-                    return false;
-                }
-                if (el.attr('tr-video-id') === id) {
-                    return false;
-                }
-                el.attr('tr-video-id', id);
-                coverVideo(el);
-                return true;
-            });
+      if (!ids.length) {
+        continue
+      }
 
-            const ids = chunkArr
-                .map(v => {
-                    const el = jQuery(v);
-                    const id = getId(el);
-                    el.videoId = id;
-                    return id;
+      const ytVideos = await getYTVideos(ids.join(','))
+
+      // console.log('got videos ', ytVideos);
+
+      for (const v of chunkArr) {
+        try {
+          // const v = chunkArr[k];
+          const el = jQuery(v)
+          const id = getId(el)
+
+          if (!id) {
+            // console.log('no id ', el, v);
+            continue
+          }
+          const ytVideo = ytVideos.items.find(v => v.id === id)
+
+          chrome.runtime.sendMessage(
+            { msg: 'checkVideo', snippet: ytVideo.snippet },
+            function(response) {
+              // console.log('got response ------------------', response)
+              if (response.allowVid) {
+                allowVid(el)
+              } else {
+                badVideos.push(el)
+                el.find('a')
+                  .toArray()
+                  .forEach(a => jQuery(a).attr('href', 'javascript:void(0)'))
+                el.find('img')
+                  .toArray()
+                  .forEach(a => jQuery(a).attr('src', ''))
+                el.hover(() => {
+                  setTimeout(() => {
+                    el.find('img')
+                      .toArray()
+                      .forEach(a => jQuery(a).attr('src', ''))
+                    el.find('video')
+                      .toArray()
+                      .forEach(a => jQuery(a).attr('src', ''))
+                  }, 2)
                 })
-                .filter(id => id);
+                el.find('yt-formatted-string')
+                  .toArray()
+                  .forEach(a => jQuery(a).html(''))
+              }
 
-            if (!ids.length) {
-                continue;
+              // if (k === chunkArr.length - 1) {
+              //   replaceBadVideos();
+              // }
             }
-
-            const ytVideos = await getYTVideos(ids.join(','));
-
-
-            // console.log('got videos ', ytVideos);
-
-            for (const v of chunkArr) {
-
-                try {
-                    // const v = chunkArr[k];
-                    const el = jQuery(v);
-                    const id = getId(el);
-
-                    if (!id) {
-                        // console.log('no id ', el, v);
-                        continue;
-                    }
-                    const ytVideo = ytVideos.items.find(v => v.id === id);
-
-                    chrome.runtime.sendMessage({ msg: 'checkVideo', snippet: ytVideo.snippet }, function (
-                        response,
-                    ) {
-                        // console.log('got response ------------------', response)
-                        if (response.allowVid) {
-                            allowVid(el);
-                        } else {
-                            badVideos.push(el);
-                            el.find('a').toArray().forEach(a => jQuery(a).attr('href', 'javascript:void(0)'));
-                            el.find('img').toArray().forEach(a => jQuery(a).attr('src', ''));
-                            el.hover(() => {
-                                setTimeout(() => {
-                                    el.find('img').toArray().forEach(a => jQuery(a).attr('src', ''));
-                                    el.find('video').toArray().forEach(a => jQuery(a).attr('src', ''));
-                                }, 2)
-                            })
-                            el.find('yt-formatted-string').toArray().forEach(a => jQuery(a).html(''));
-                        }
-
-                        // if (k === chunkArr.length - 1) {
-                        //   replaceBadVideos();
-                        // }
-                    });
-                } catch (error) {
-                    console.error('errrrrrrrrrrrrrrrrrrrrr checking ', error);
-                }
-            }
-
-
+          )
+        } catch (error) {
+          console.error('error checking youtube video', error)
         }
+      }
     }
+  }
+
+  if (window.location.href.includes('youtube.com/watch?')) {
+    try {
+      const match = window.location.href.match(/watch\?v=(.{11})/)
+      const videoId = match && match[1]
+
+      if (videoId && !jQuery.find(`#tracker-video-info-${videoId}`)[0]) {
+        const [videoDetails] = await (await getYTVideos([videoId])).items
+        addVideoInfo(videoDetails)
+      }
+    } catch (error) {
+      console.log('error adding video details ', error)
+    }
+  }
 }
 
 async function replaceBadVideos() {
-    // console.log('replace bad vids', badVideos);
-    await getGoodVideos();
+  // console.log('replace bad vids', badVideos);
+  await getGoodVideos()
 
-    while (badVideos.length) {
-        const goodVid = goodVideos.shift();
-        if (!goodVid) await getGoodVideos();
-        const el = badVideos.shift();
+  while (badVideos.length) {
+    const goodVid = goodVideos.shift()
+    if (!goodVid) await getGoodVideos()
+    const el = badVideos.shift()
 
-        chrome.runtime.sendMessage({ msg: 'checkVideo', snippet: goodVid.snippet }, async function (
-            response,
-        ) {
-            if (response.allowVid) {
-                if (el) {
-                    // console.log('replace vid ', el, goodVid);
-                    el.click(() => {
-                        location.href = `https://www.youtube.com/watch?v=${goodVid.id.videoId}`;
-                    });
-                    el.attr('tr-allowed', 'true');
-                    allowVid(el);
-                    if (el.prop('tagName') !== 'A') {
-                        el.css('position', 'relative');
-                    }
+    chrome.runtime.sendMessage(
+      { msg: 'checkVideo', snippet: goodVid.snippet },
+      async function(response) {
+        if (response.allowVid) {
+          if (el) {
+            // console.log('replace vid ', el, goodVid);
+            el.click(() => {
+              location.href = `https://www.youtube.com/watch?v=${goodVid.id.videoId}`
+            })
+            el.attr('tr-allowed', 'true')
+            allowVid(el)
+            if (el.prop('tagName') !== 'A') {
+              el.css('position', 'relative')
+            }
 
-                    el.append(`<a href=${`https://www.youtube.com/watch?v=${goodVid.id.videoId}`} style="
+            el.append(`<a href=${`https://www.youtube.com/watch?v=${goodVid.id.videoId}`} style="
             width: 100%;
             height: 100%;
             position: absolute;
             z-index: 100;
             display: block;
-            top: 0; "></a>`);
+            top: 0; "></a>`)
 
-                    el.find('a')
-                        .toArray()
-                        .forEach(a => {
-                            const link = jQuery(a);
-                            if (link.attr('href')) {
-                                link.removeAttr('src').attr(
-                                    'href',
-                                    link
-                                        .attr('href')
-                                        .replace(/watch\?v=(.{11})/, `watch?v=${goodVid.id.videoId}`)
-                                        .replace(/channel\/(.{24})/, `channel/${goodVid.snippet.channelId}`),
-                                );
-                            }
-                        });
-
-                    el.find('yt-img-shadow')
-                        .toArray()
-                        .forEach(img => {
-                            jQuery(img).html(
-                                `<img id="tr-img" class="style-scope yt-img-shadow" alt="" width="9999" src=${goodVid.snippet.thumbnails.high.url}>`,
-                            );
-                        });
-                    el.find('#video-title').text(goodVid.snippet.title);
-                    el.find('#text.ytd-channel-name ').text(goodVid.snippet.channelTitle);
-                    el.find('#metadata-line').text(goodVid.snippet.channelTitle);
-
-                    el.find('#mouseover-overlay').remove();
-                    el.find('#hover-overlays').remove();
+            el.find('a')
+              .toArray()
+              .forEach(a => {
+                const link = jQuery(a)
+                if (link.attr('href')) {
+                  link.removeAttr('src').attr(
+                    'href',
+                    link
+                      .attr('href')
+                      .replace(
+                        /watch\?v=(.{11})/,
+                        `watch?v=${goodVid.id.videoId}`
+                      )
+                      .replace(
+                        /channel\/(.{24})/,
+                        `channel/${goodVid.snippet.channelId}`
+                      )
+                  )
                 }
-            } else {
-                await getGoodVideos();
-                badVideos.push(el);
-            }
-        });
-    }
+              })
 
-    // el.append(`<div class="tracker-video-cover"></div>`)
+            el.find('yt-img-shadow')
+              .toArray()
+              .forEach(img => {
+                jQuery(img).html(
+                  `<img id="tr-img" class="style-scope yt-img-shadow" alt="" width="9999" src=${goodVid.snippet.thumbnails.high.url}>`
+                )
+              })
+            el.find('#video-title').text(goodVid.snippet.title)
+            el.find('#text.ytd-channel-name ').text(
+              goodVid.snippet.channelTitle
+            )
+            el.find('#metadata-line').text(goodVid.snippet.channelTitle)
+
+            el.find('#mouseover-overlay').remove()
+            el.find('#hover-overlays').remove()
+          }
+        } else {
+          await getGoodVideos()
+          badVideos.push(el)
+        }
+      }
+    )
+  }
+
+  // el.append(`<div class="tracker-video-cover"></div>`)
 }
 
 function getId(el) {
-    let url;
+  let url
 
-    if (el.prop('tagName') === 'A') {
-        url = el.attr('href');
-    } else {
-        url = el.find('#thumbnail') && el.find('#thumbnail').attr('href');
-    }
+  if (el.prop('tagName') === 'A') {
+    url = el.attr('href')
+  } else {
+    url = el.find('#thumbnail') && el.find('#thumbnail').attr('href')
+  }
 
-    const match = url && url.match(/watch\?v=(.{11})/);
-    return match && match[1];
+  const match = url && url.match(/watch\?v=(.{11})/)
+  return match && match[1]
 }
 
 function coverVideo(el) {
-    if (el.find('.tracker-video-cover')[0]) return;
-    if (el.prop('tagName') !== 'A') {
-        el.css('position', 'relative');
-    }
+  if (el.find('.tracker-video-cover')[0]) return
+  if (el.prop('tagName') !== 'A') {
+    el.css('position', 'relative')
+  }
 
-    // el.find('a').toArray().forEach(a=>jQuery(a).attr('href','javascript:void(0)'));
-    // el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
-    // el.find('yt-formatted-string').toArray().forEach(a=>jQuery(a).html(''));
-    el.append(`<div class="tracker-video-cover" style="
+  // el.find('a').toArray().forEach(a=>jQuery(a).attr('href','javascript:void(0)'));
+  // el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
+  // el.find('yt-formatted-string').toArray().forEach(a=>jQuery(a).html(''));
+  el.append(`<div class="tracker-video-cover" style="
   width: 100%;
   height: 100%;
   position: absolute;
   background-color: var(--yt-spec-general-background-a);
   z-index: 1000;
-  top: 0; "></div>`);
+  top: 0; "></div>`)
 }
 
-(async () => {
-    await checkYoutube();
-    await sleep(1000);
-    await checkYoutube();
+function addVideoInfo(details: gapi.client.youtube.Video) {
+  //   console.log('add video info ', YTCategories, details.snippet)
+  if (jQuery.find(`#tracker-video-info-${details.id}`)[0]) return
+  jQuery('#description > yt-formatted-string').append(`
+    <table id="tracker-video-info-${details.id}">
+    <tr>
+      <th>Category</th>
+      <th>Tags</th>
+      <th>Published At</th>
+    </tr>
+    <tr>
+      <td>${
+        Object.keys(YTCategories).filter(
+          key => YTCategories[key].toString() === details.snippet.categoryId
+        )[0]
+      }</td>
+      <td style="max-width:250px;">${details.snippet.tags?.join(', ')}</td>
+      <td>${details.snippet.publishedAt}</td>
+    </tr>
 
-    setInterval(() => {
-        checkYoutube();
-    }, 2000);
-})();
+  </table>
+    `)
+  // .insertAfter(
+  // jQuery('.content.style-scope.ytd-video-secondary-info-renderer')[0])
+}
+;(async () => {
+  await checkYoutube()
+  await sleep(1000)
+  await checkYoutube()
+  window.addEventListener('locationchange', function() {
+    console.log('location changed!', window.location.href)
+  })
+
+  setInterval(() => {
+    checkYoutube()
+  }, 2000)
+})()
 
 function allowVid(el) {
-    if (!el) return;
-    el.find('div.tracker-video-cover').remove();
+  if (!el) return
+  el.find('div.tracker-video-cover').remove()
 }
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 async function getGoodVideos() {
-    // get videos
-    if (badVideos.length > goodVideos.length) {
-        const keyword = keywordSearch[Math.floor(Math.random() * keywordSearch.length)];
-        const videos = await fetch(
-            `http://localhost:36168/videos/search?q=${keyword}&count=${badVideos.length -
-            goodVideos.length}`,
-        );
-        const videosJSON = await videos.json();
+  // get videos
+  if (badVideos.length > goodVideos.length) {
+    const keyword =
+      keywordSearch[Math.floor(Math.random() * keywordSearch.length)]
+    const videos = await fetch(
+      `http://localhost:36168/videos/search?q=${keyword}&count=${badVideos.length -
+        goodVideos.length}`
+    )
+    const videosJSON = await videos.json()
 
-        console.log('got good vids ', videosJSON);
-        goodVideos = goodVideos.concat(videosJSON);
-    }
+    console.log('got good vids ', videosJSON)
+    goodVideos = goodVideos.concat(videosJSON)
+  }
 }
