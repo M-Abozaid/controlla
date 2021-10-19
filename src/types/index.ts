@@ -104,9 +104,5 @@ export interface PauseControlUsage {
   day: string
   usage: number
 }
-// // loop on categories
-// for (const key in YTCategories) {
-//     // console.log('cateogory title ', key)
-//     // console.log('cateogry id ', YTCategories[key])
-//     // use category id for matcher.value
-// }
+
+export const test = 'TEST1'
