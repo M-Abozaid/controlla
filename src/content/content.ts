@@ -341,8 +341,9 @@ function coverVideo(el) {
 function addVideoInfo(details: gapi.client.youtube.Video) {
   //   console.log('add video info ', YTCategories, details.snippet)
   if (jQuery.find(`#tracker-video-info-${details.id}`)[0]) return
+  jQuery('.tk-video-info').remove()
   jQuery('#description > yt-formatted-string').append(`
-    <table id="tracker-video-info-${details.id}">
+    <table id="tracker-video-info-${details.id}" class="tk-video-info">
     <tr>
       <th>Category</th>
       <th>Tags</th>

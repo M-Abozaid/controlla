@@ -24,10 +24,8 @@ class Tracker {
 
     chrome.tabs.onUpdated.addListener(
       async (tabId, { status, url, title, audible } = {}, tab) => {
-        await this.lock.acquireAsync()
         try {
-          //   console.log('TAB CHANGE ', status, url, tab.url)
-
+          await this.lock.acquireAsync()
           const openVisit = storage.getOpenVisit(tabId)
 
           // if loading and url
@@ -45,10 +43,9 @@ class Tracker {
 
               // else url is different from openVisit close openVisit
               await storage.closeOpenVisit(openVisit)
+
               // create new
-
-              const visit = await storage.createVisitFromTab(tab)
-
+              await storage.createVisitFromTab(tab)
               await keeper.controlTab(tab, false)
             }
           }

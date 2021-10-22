@@ -105,4 +105,4 @@ export interface PauseControlUsage {
   usage: number
 }
 
-export const test = 'TEST1'
+export const test = 'TEST2'

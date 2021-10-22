@@ -5,8 +5,6 @@ import ruleMatcher from '../common/ruleMatcher'
 import Rule from 'common/Rule'
 import settings from '../common/settings'
 
-const ytVideoURLRegex = /youtube.com\/watch\?v=/
-
 export class Keeper {
   controlIsPaused = false
 
@@ -60,29 +58,25 @@ export class Keeper {
 
     const [tabExpired, visibilityExpired] = await this.quotaCheck(matchingRules)
 
-    if ((tabExpired || visibilityExpired) && storage.isControlPaused()) {
-      if (shouldIncrementQuota) {
-        storage.incrementPauseUsage(settings.tickDuration)
+    if (tabExpired || visibilityExpired) {
+      if (storage.isControlPaused()) {
+        if (shouldIncrementQuota) {
+          storage.incrementPauseUsage(settings.tickDuration)
+        }
+        return
       }
-      return
-    }
 
-    if (tabExpired) {
-      // check if keeping is paused
-      this.hideTab(tab)
-        .then(() => {
-          try {
-            console.log('Tab expired ', matchingRules)
-            this.removeTab(tab)
-          } catch (error) {
-            console.error('Error Removing tab', error)
-          }
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    } else if (visibilityExpired && tab.active) {
-      this.hideTab(tab)
+      if (tab.active) {
+        try {
+          await this.hideTab(tab)
+        } catch (error) {
+          console.error('Error Hiding tab', error)
+        }
+      }
+
+      if (tabExpired) {
+        this.removeTab(tab)
+      }
     }
   }
 
@@ -231,6 +225,7 @@ export class Keeper {
       return true
     }
 
+    // check last click
     if (
       visit.click.length &&
       visit.click[visit.click.length - 1].time > activeThresholdAgo
@@ -241,7 +236,6 @@ export class Keeper {
     if (visit.visitTime > activeThresholdAgo) {
       return true
     }
-    // check last click
     return false
   }
 
