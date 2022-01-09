@@ -1,50 +1,49 @@
 {
-    "manifest_version": 2,
-    "name": "Controlla",
-    "description": "contol your time and be more productive",
-    "version": "1.0.0",
-    "browser_action": {
-        "default_icon": "icon128.png",
-        "default_popup": "popup.html"
-    },
-    "background": {
-        "scripts": [
-            "js/background.js"
-        ],
-        "persistent": true
-    },
-    "icons": {
-        "128": "icon128.png"
-    },
-    "permissions": [
-        "declarativeContent",
-        "storage",
-        "background",
-        "geolocation",
-        "history",
-        "webNavigation",
-        "webRequest",
-        "activeTab",
-        "tabs",
-        "<all_urls>",
-        "alarms",
-        "contextMenus",
-        "privacy",
-        "unlimitedStorage",
-        "webRequestBlocking",
-        "http://*/*",
-        "https://*/*",
-        "notifications"
-    ],
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "all_frames": false,
-            "css": [],
-            "js": ["js/content.js"],
-            "run_at": "document_start"
-        }
-    ],
-    "content_security_policy": "script-src 'self' 'unsafe-eval';    connect-src *; object-src 'self'",
-    "manifest_version": 2
+  "manifest_version": 2,
+  "name": "Controlla",
+  "description": "contol your time and be more productive",
+  "version": "1.0.0",
+  "browser_action": {
+    "default_icon": "icon128.png",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["js/background.js"],
+    "persistent": true
+  },
+  "icons": {
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "declarativeContent",
+    "storage",
+    "background",
+    "geolocation",
+    "history",
+    "webNavigation",
+    "webRequest",
+    "activeTab",
+    "tabs",
+    "<all_urls>",
+    "alarms",
+    "contextMenus",
+    "privacy",
+    "unlimitedStorage",
+    "webRequestBlocking",
+    "http://*/*",
+    "https://*/*",
+    "notifications",
+    "chrome://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": false,
+      "css": [],
+      "js": ["js/content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval';    connect-src *; object-src 'self'",
+  "manifest_version": 2
 }

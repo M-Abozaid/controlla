@@ -34,7 +34,7 @@ const AddRule = ({ onRuleAdded }) => {
       setMatchers([
         {
           type: MatcherType.URL,
-          value: new RegExp(escapeRegExp(firstActiveTabUrl)),
+          value: firstActiveTabUrl,
         },
       ])
     }

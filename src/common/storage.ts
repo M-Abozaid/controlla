@@ -2,7 +2,6 @@ import { PauseControlUsage } from './../types/index'
 import { Visit } from '../types'
 import { RuleObj, QuotaUsage } from '../types/index'
 import Rule from './Rule'
-import { rules, quotaUsage } from './data'
 import PounchDB from 'pouchdb'
 import pounchDBFind from 'pouchdb-find'
 import ruleMatcher from './ruleMatcher'
@@ -63,28 +62,8 @@ class Storage extends EventEmitter {
     return this.getRuleById(newRule.id)
   }
 
-  /**
-   * @param ruleId
-   * returns the active usage for a given rule
-   */
-  getActiveUsage(ruleId: string): number {
-    return quotaUsage[0].activeUsage
-  }
-
-  /**
-   * @param ruleId string
-   * returns the visibility usage for a given rule
-   */
-  getVisibilityUsage(ruleId: string): number {
-    return quotaUsage[0].activeUsage
-  }
-
   createUsage(usage: QuotaUsage, update?: boolean): Promise<any> {
     return this.quotaUsageDB.put(usage)
-  }
-
-  getYTRules(): Rule[] {
-    return rules.map(r => new Rule(r))
   }
 
   async closeOpenVisit(visit: Visit) {

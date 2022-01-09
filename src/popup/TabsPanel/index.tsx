@@ -1,86 +1,109 @@
-import React, { useState, useEffect } from 'react';
-import './styles.scss';
-import { Tabs, Tab, Spinner } from 'react-bootstrap';
-import RuleComponent from '../Rule';
+import React, { useState, useEffect } from 'react'
+import './styles.scss'
+import { Tabs, Tab, Spinner, Button } from 'react-bootstrap'
+import RuleComponent from '../Rule'
 
-import storage from '../../common/storage';
-import { getActiveTab } from '../Services';
+import storage from '../../common/storage'
+import { getActiveTab } from '../Services'
 
 interface TabsPanelProps {
-    showAllRules?: boolean
+  showAllRules?: boolean
 }
-const TabsPanel = ({showAllRules}: TabsPanelProps) => {
-    async function getRules() {
-        let rules = []
-        if(showAllRules){
-            rules = await storage.getRules()
-
-        }else{
-
-            const [activeTab] = await getActiveTab();
-            console.log('Active tab', activeTab, Date.now())
-            rules = await storage.getMatchingRules(activeTab);
-        }
-
-        await Promise.all(rules.map(r => r.getUsage()));
-        console.log('matched rules from tabs', rules);
-
-        setMatchedRules(rules);
-        setLoading(false);
+const TabsPanel = ({ showAllRules }: TabsPanelProps) => {
+  async function getRules() {
+    let rules = []
+    if (showAllRules) {
+      rules = await storage.getRules()
+    } else {
+      const [activeTab] = await getActiveTab()
+      console.log('Active tab', activeTab, Date.now())
+      rules = await storage.getMatchingRules(activeTab)
     }
 
-    useEffect(() => {
-        getRules();
-        storage.on('new_rule', getRules);
-        storage.on('rule_removed', getRules);
-        const intervalId = setInterval(getRules, 6000);
-        return () => clearInterval(intervalId);
-    }, []);
+    await Promise.all(rules.map(r => r.getUsage()))
+    console.log('matched rules from tabs', rules)
 
-    const [loading, setLoading] = useState(true);
+    setMatchedRules(rules)
+    setLoading(false)
+  }
 
-    const [tabKey, setTabKey] = useState('rules');
+  useEffect(() => {
+    getRules()
+    storage.on('new_rule', getRules)
+    storage.on('rule_removed', getRules)
+    const intervalId = setInterval(getRules, 6000)
+    return () => clearInterval(intervalId)
+  }, [])
 
-    const [matchedRules, setMatchedRules] = useState([]);
+  const [loading, setLoading] = useState(true)
 
-    if (loading) {
-        return (
-            <Spinner
-                className='tabs-panel__spinner'
-                animation='grow'
-                variant='primary'
-            />
-        );
-    }
+  const [tabKey, setTabKey] = useState('rules')
 
-    if (!matchedRules.length) {
-        return (
-            <div className='tabs-panel__main'>
-                <p>No Rules.. horray</p>
-            </div>
-        );
-    }
+  const [matchedRules, setMatchedRules] = useState([])
 
+  if (loading) {
     return (
-        <Tabs
-            className='tabs-panel__main'
-            id='contolled-tabs'
-            activeKey={tabKey}
-            onSelect={(k: React.SetStateAction<string>) => setTabKey(k)}
-        >
-            <Tab eventKey='rules' title='Rules &#9997;'>
-                <div>
-                    {matchedRules.map((rule, idx) => (
-                        <RuleComponent key={idx} rule={rule} />
-                    ))}
-                </div>
-            </Tab>
+      <Spinner
+        className='tabs-panel__spinner'
+        animation='grow'
+        variant='primary'
+      />
+    )
+  }
 
-            <Tab eventKey='stats' title='Stats &#9783;'>
-                <div>Stats</div>
-            </Tab>
-        </Tabs>
-    );
-};
+  if (!matchedRules.length) {
+    return (
+      <div className='tabs-panel__main'>
+        <p>No Rules.. horray</p>
+      </div>
+    )
+  }
 
-export default TabsPanel;
+  const downloadString = (text, fileType, fileName) => {
+    const blob = new Blob([text], { type: fileType })
+
+    const a = document.createElement('a')
+    a.download = fileName
+    a.href = URL.createObjectURL(blob)
+    a.dataset.downloadurl = [fileType, a.download, a.href].join(':')
+    a.style.display = 'none'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(function() {
+      URL.revokeObjectURL(a.href)
+    }, 1500)
+  }
+
+  const exportRules = () => {
+    downloadString(
+      JSON.stringify(matchedRules),
+      'application/json',
+      'rules.json'
+    )
+  }
+
+  return (
+    <Tabs
+      className='tabs-panel__main'
+      id='contolled-tabs'
+      activeKey={tabKey}
+      onSelect={(k: React.SetStateAction<string>) => setTabKey(k)}
+    >
+      <Tab eventKey='rules' title='Rules &#9997;'>
+        <Button onClick={exportRules}>Export JSON</Button>
+        <div>
+          {matchedRules.map((rule, idx) => (
+            <RuleComponent key={idx} rule={rule} />
+          ))}
+        </div>
+      </Tab>
+
+      <Tab eventKey='stats' title='Stats &#9783;'>
+        <div>Stats</div>
+      </Tab>
+    </Tabs>
+  )
+}
+
+export default TabsPanel

@@ -1,19 +1,15 @@
-/* eslint-disable  */
 import getYTVideos from '../common/getYTVideos'
 
-import jQuery from 'jquery'
+import $ from 'jquery'
 import { YTCategories } from '../types/index'
-// declare var jQuery
+// declare var $
 let bodyHidden
 
 const keywordSearch = []
-let goodVideos = []
+let goodVideos: gapi.client.youtube.Video[] = []
 const badVideos = []
-// Adapted slightly from Sam Dutton
-// Set name of hidden property and visibility change event
-// since some browsers only offer vendor-prefixed support
-// let hidden;
-// let state;
+;(window as any).badVideos = badVideos
+
 let visibilityChange
 if (typeof document.hidden !== 'undefined') {
   // hidden = 'hidden';
@@ -45,11 +41,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         focus: document.hasFocus(),
         href: location.href,
       })
-      // console.log('sending res ', {
-      //     hidden: document.hidden,
-      //     focus: document.hasFocus(),
-      //     href: location.href,
-      // });
     })
   } else {
     sendResponse({ msg: 'got it' })
@@ -59,32 +50,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true
 })
 
-jQuery(window).focus(function() {
+$(window).focus(function() {
   // do something
-  chrome.runtime.sendMessage({ focus: true }, function(response) {})
+  chrome.runtime.sendMessage({ focus: true })
 })
 
-jQuery(window).blur(function() {
+$(window).blur(function() {
   // do something
-  chrome.runtime.sendMessage({ focus: false }, function(response) {})
+  chrome.runtime.sendMessage({ focus: false })
 })
 
-jQuery(document).ready(() => {
-  // console.log('document loaded ');
-
-  if (window.location.href.includes('youtube.com')) {
-    jQuery('body').css('display', 'none')
-    bodyHidden = true
-  }
-
+$(document).ready(() => {
   document.body.addEventListener('click', function() {
     // console.log('click ');
-    chrome.runtime.sendMessage({ message: 'click' }, function(response) {})
+    chrome.runtime.sendMessage({ message: 'click' })
   })
 
   document.body.addEventListener('keypress', function() {
     // console.log('key press ');
-    chrome.runtime.sendMessage({ message: 'keypress' }, function(response) {})
+    chrome.runtime.sendMessage({ message: 'keypress' })
   })
 })
 
@@ -107,15 +91,15 @@ jQuery(document).ready(() => {
 // // pass in the target node, as well as the observer options
 // observer.observe(target, config)
 async function checkYoutube() {
-  if (jQuery('ytd-miniplayer')) {
-    jQuery('ytd-miniplayer').remove()
+  if ($('ytd-miniplayer')) {
+    $('ytd-miniplayer').remove()
   }
   if (window.location.href.includes('youtube.com')) {
     if (bodyHidden) {
-      jQuery('body').css('display', 'block')
+      $('body').css('display', 'block')
       bodyHidden = false
     }
-    const videos = jQuery(
+    const videos = $(
       'ytd-compact-autoplay-renderer,ytd-rich-item-renderer,ytd-compact-video-renderer,ytd-grid-video-renderer,ytd-video-renderer,#movie_player > div.html5-endscreen.ytp-player-content.videowall-endscreen.ytp-show-tiles > div > a'
     ).toArray()
 
@@ -124,7 +108,7 @@ async function checkYoutube() {
     for (let i = 0, j = videos.length; i < j; i += 50) {
       chunkArr = videos.slice(i, i + 50)
       chunkArr = chunkArr.filter(v => {
-        const el = jQuery(v)
+        const el = $(v)
         const id = getId(el)
 
         if (!id) {
@@ -137,6 +121,9 @@ async function checkYoutube() {
         if (el.attr('tr-video-id') === id) {
           return false
         }
+        if (el.attr('tr-video-id')) {
+          el.off('mouseenter mouseleave')
+        }
         el.attr('tr-video-id', id)
         coverVideo(el)
         return true
@@ -144,7 +131,7 @@ async function checkYoutube() {
 
       const ids = chunkArr
         .map(v => {
-          const el = jQuery(v)
+          const el = $(v)
           const id = getId(el)
           el.videoId = id
           return id
@@ -157,47 +144,45 @@ async function checkYoutube() {
 
       const ytVideos = await getYTVideos(ids.join(','))
 
-      // console.log('got videos ', ytVideos);
-
       for (const v of chunkArr) {
         try {
           // const v = chunkArr[k];
-          const el = jQuery(v)
-          const id = getId(el)
+          const el = $(v)
+          const id = el.attr('tr-video-id')
 
           if (!id) {
             // console.log('no id ', el, v);
             continue
           }
-          const ytVideo = ytVideos.items.find(v => v.id === id)
+          const ytVideo = ytVideos.items.find(vid => vid.id === id)
 
           chrome.runtime.sendMessage(
             { msg: 'checkVideo', snippet: ytVideo.snippet },
             function(response) {
-              // console.log('got response ------------------', response)
               if (response.allowVid) {
                 allowVid(el)
               } else {
                 badVideos.push(el)
+
                 el.find('a')
                   .toArray()
-                  .forEach(a => jQuery(a).attr('href', 'javascript:void(0)'))
+                  .forEach(a => $(a).attr('href', 'javascript:void(0)'))
                 el.find('img')
                   .toArray()
-                  .forEach(a => jQuery(a).attr('src', ''))
+                  .forEach(a => $(a).attr('src', ''))
+                // el.find('yt-formatted-string')
+                //   .toArray()
+                //   .forEach(a => $(a).text('..'))
                 el.hover(() => {
                   setTimeout(() => {
                     el.find('img')
                       .toArray()
-                      .forEach(a => jQuery(a).attr('src', ''))
+                      .forEach(a => $(a).attr('src', ''))
                     el.find('video')
                       .toArray()
-                      .forEach(a => jQuery(a).attr('src', ''))
+                      .forEach(a => $(a).attr('src', ''))
                   }, 2)
                 })
-                el.find('yt-formatted-string')
-                  .toArray()
-                  .forEach(a => jQuery(a).html(''))
               }
 
               // if (k === chunkArr.length - 1) {
@@ -214,11 +199,11 @@ async function checkYoutube() {
 
   if (window.location.href.includes('youtube.com/watch?')) {
     try {
-      const match = window.location.href.match(/watch\?v=(.{11})/)
+      const match = /watch\?v=(.{11})/.exec(window.location.href)
       const videoId = match && match[1]
 
-      if (videoId && !jQuery.find(`#tracker-video-info-${videoId}`)[0]) {
-        const [videoDetails] = await (await getYTVideos([videoId])).items
+      if (videoId && !$.find(`#tracker-video-info-${videoId}`)[0]) {
+        const [videoDetails] = (await getYTVideos([videoId])).items
         addVideoInfo(videoDetails)
       }
     } catch (error) {
@@ -227,85 +212,88 @@ async function checkYoutube() {
   }
 }
 
-async function replaceBadVideos() {
-  // console.log('replace bad vids', badVideos);
-  await getGoodVideos()
+/**
+ *
 
-  while (badVideos.length) {
-    const goodVid = goodVideos.shift()
-    if (!goodVid) await getGoodVideos()
-    const el = badVideos.shift()
 
-    chrome.runtime.sendMessage(
-      { msg: 'checkVideo', snippet: goodVid.snippet },
-      async function(response) {
-        if (response.allowVid) {
-          if (el) {
-            // console.log('replace vid ', el, goodVid);
-            el.click(() => {
-              location.href = `https://www.youtube.com/watch?v=${goodVid.id.videoId}`
-            })
-            el.attr('tr-allowed', 'true')
-            allowVid(el)
-            if (el.prop('tagName') !== 'A') {
-              el.css('position', 'relative')
-            }
+ async function replaceBadVideos() {
+   // console.log('replace bad vids', badVideos);
+   await getGoodVideos()
 
-            el.append(`<a href=${`https://www.youtube.com/watch?v=${goodVid.id.videoId}`} style="
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            z-index: 100;
-            display: block;
-            top: 0; "></a>`)
+   while (badVideos.length) {
+     const goodVid = goodVideos.shift()
+     if (!goodVid) await getGoodVideos()
+     const el = badVideos.shift()
 
-            el.find('a')
-              .toArray()
-              .forEach(a => {
-                const link = jQuery(a)
-                if (link.attr('href')) {
-                  link.removeAttr('src').attr(
-                    'href',
-                    link
-                      .attr('href')
-                      .replace(
-                        /watch\?v=(.{11})/,
-                        `watch?v=${goodVid.id.videoId}`
-                      )
-                      .replace(
-                        /channel\/(.{24})/,
-                        `channel/${goodVid.snippet.channelId}`
-                      )
-                  )
-                }
-              })
+     chrome.runtime.sendMessage(
+       { msg: 'checkVideo', snippet: goodVid.snippet },
+       async function(response) {
+         if (response.allowVid) {
+           if (el) {
+             // console.log('replace vid ', el, goodVid);
+             el.click(() => {
+               location.href = `https://www.youtube.com/watch?v=${goodVid.id}`
+             })
+             el.attr('tr-allowed', 'true')
+             allowVid(el)
+             if (el.prop('tagName') !== 'A') {
+               el.css('position', 'relative')
+             }
 
-            el.find('yt-img-shadow')
-              .toArray()
-              .forEach(img => {
-                jQuery(img).html(
-                  `<img id="tr-img" class="style-scope yt-img-shadow" alt="" width="9999" src=${goodVid.snippet.thumbnails.high.url}>`
-                )
-              })
-            el.find('#video-title').text(goodVid.snippet.title)
-            el.find('#text.ytd-channel-name ').text(
-              goodVid.snippet.channelTitle
-            )
-            el.find('#metadata-line').text(goodVid.snippet.channelTitle)
+             el.append(`<a href=${`https://www.youtube.com/watch?v=${goodVid.id}`} style="
+             width: 100%;
+             height: 100%;
+             position: absolute;
+             z-index: 100;
+             display: block;
+             top: 0; "></a>`)
 
-            el.find('#mouseover-overlay').remove()
-            el.find('#hover-overlays').remove()
-          }
-        } else {
-          await getGoodVideos()
-          badVideos.push(el)
-        }
-      }
-    )
-  }
+             el.find('a')
+               .toArray()
+               .forEach(a => {
+                 const link = $(a)
+                 if (link.attr('href')) {
+                   link.removeAttr('src').attr(
+                     'href',
+                     link
+                       .attr('href')
+                       .replace(/watch\?v=(.{11})/, `watch?v=${goodVid.id}`)
+                       .replace(
+                         /channel\/(.{24})/,
+                         `channel/${goodVid.snippet.channelId}`
+                       )
+                   )
+                 }
+               })
 
-  // el.append(`<div class="tracker-video-cover"></div>`)
-}
+             el.find('yt-img-shadow')
+               .toArray()
+               .forEach(img => {
+                 $(img).html(
+                   `<img id="tr-img" class="style-scope yt-img-shadow" alt="" width="9999" src=${goodVid.snippet.thumbnails.high.url}>`
+                 )
+               })
+             el.find('#video-title').text(goodVid.snippet.title)
+             el.find('#text.ytd-channel-name ').text(
+               goodVid.snippet.channelTitle
+             )
+             el.find('#metadata-line').text(goodVid.snippet.channelTitle)
+
+             el.find('#mouseover-overlay').remove()
+             el.find('#hover-overlays').remove()
+           }
+         } else {
+           await getGoodVideos()
+           badVideos.push(el)
+         }
+       }
+     )
+   }
+
+   // el.append(`<div class="tracker-video-cover"></div>`)
+ }
+
+ */
 
 function getId(el) {
   let url
@@ -316,7 +304,9 @@ function getId(el) {
     url = el.find('#thumbnail') && el.find('#thumbnail').attr('href')
   }
 
+  if (!url) return ''
   const match = url && url.match(/watch\?v=(.{11})/)
+  if (!match || !match[1]) return ''
   return match && match[1]
 }
 
@@ -326,9 +316,6 @@ function coverVideo(el) {
     el.css('position', 'relative')
   }
 
-  // el.find('a').toArray().forEach(a=>jQuery(a).attr('href','javascript:void(0)'));
-  // el.find('img').toArray().forEach(a=>jQuery(a).attr('src',''));
-  // el.find('yt-formatted-string').toArray().forEach(a=>jQuery(a).html(''));
   el.append(`<div class="tracker-video-cover" style="
   width: 100%;
   height: 100%;
@@ -340,9 +327,9 @@ function coverVideo(el) {
 
 function addVideoInfo(details: gapi.client.youtube.Video) {
   //   console.log('add video info ', YTCategories, details.snippet)
-  if (jQuery.find(`#tracker-video-info-${details.id}`)[0]) return
-  jQuery('.tk-video-info').remove()
-  jQuery('#description > yt-formatted-string').append(`
+  if ($.find(`#tracker-video-info-${details.id}`)[0]) return
+  $('.tk-video-info').remove()
+  $('#description > yt-formatted-string').append(`
     <table id="tracker-video-info-${details.id}" class="tk-video-info">
     <tr>
       <th>Category</th>
@@ -362,15 +349,12 @@ function addVideoInfo(details: gapi.client.youtube.Video) {
   </table>
     `)
   // .insertAfter(
-  // jQuery('.content.style-scope.ytd-video-secondary-info-renderer')[0])
+  // $('.content.style-scope.ytd-video-secondary-info-renderer')[0])
 }
 ;(async () => {
   await checkYoutube()
   await sleep(1000)
   await checkYoutube()
-  window.addEventListener('locationchange', function() {
-    console.log('location changed!', window.location.href)
-  })
 
   setInterval(() => {
     checkYoutube()
@@ -392,7 +376,7 @@ async function getGoodVideos() {
     const keyword =
       keywordSearch[Math.floor(Math.random() * keywordSearch.length)]
     const videos = await fetch(
-      `http://localhost:36168/videos/search?q=${keyword}&count=${badVideos.length -
+      `http://localhost:36168/videos/search?q=${keyword as string}&count=${badVideos.length -
         goodVideos.length}`
     )
     const videosJSON = await videos.json()
