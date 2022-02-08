@@ -57,7 +57,7 @@ class Storage extends EventEmitter {
   async createRule(rule: RuleObj): Promise<Rule> {
     const newRule = await this.rulesDB.post(rule)
     this.emit('new_rule', newRule)
-    await this.getQuotaUsage(newRule.id)
+    await this.getOrCreateQuotaUsage(newRule.id)
     await this.getRules()
     return this.getRuleById(newRule.id)
   }
@@ -141,7 +141,7 @@ class Storage extends EventEmitter {
     ruleId: string,
     interval: number
   ): Promise<QuotaUsage> {
-    const usage = await this.getQuotaUsage(ruleId)
+    const usage = await this.getOrCreateQuotaUsage(ruleId)
 
     usage.activeUsage = usage.activeUsage + interval
     usage.visibilityUsage = usage.visibilityUsage + interval
@@ -149,7 +149,7 @@ class Storage extends EventEmitter {
     return usage
   }
 
-  async getQuotaUsage(ruleId: string) {
+  async getOrCreateQuotaUsage(ruleId: string) {
     const result = await this.quotaUsageDB.find({
       selector: { ruleId },
     })

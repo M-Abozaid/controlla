@@ -4,8 +4,8 @@ class RuleMatcher {
   matchVideoTitle(matcher: Matcher, title: string): boolean {
     if (matcher.type !== MatcherType.YT_TITLE) return false
 
-    if (matcher.value instanceof RegExp) {
-      return matcher.value.test(title)
+    if (matcher.isRegex) {
+      return this.matchRegex(matcher.value, title)
     }
 
     return title.toLowerCase().includes(matcher.value.toLowerCase())
@@ -20,8 +20,8 @@ class RuleMatcher {
   matchChannel(matcher: Matcher, channel) {
     if (matcher.type !== MatcherType.YT_CHANNEL) return false
 
-    if (matcher.value instanceof RegExp) {
-      return matcher.value.test(channel)
+    if (matcher.isRegex) {
+      return this.matchRegex(matcher.value, channel)
     }
 
     return channel.toLowerCase().trim() === matcher.value.toLowerCase().trim()
@@ -36,11 +36,11 @@ class RuleMatcher {
   matchURL(matcher: Matcher, { url }: chrome.tabs.Tab) {
     if (matcher.type !== MatcherType.URL) return false
 
-    if (matcher.value instanceof RegExp) {
-      return matcher.value.test(url)
+    if (matcher.isRegex) {
+      return this.matchRegex(matcher.value, url)
     }
 
-    return url.includes(matcher.value)
+    return url.includes(matcher.value.toString())
   }
 
   matchVideoSnippet(
@@ -70,6 +70,15 @@ class RuleMatcher {
       default:
         break
     }
+  }
+  matchRegex(matcherValue, value) {
+    const regex = new RegExp(
+      matcherValue
+        .toString()
+        .replace(/\/$/, '')
+        .replace(/^\//, '')
+    )
+    return regex.test(value)
   }
 }
 const ruleMatcher = new RuleMatcher()

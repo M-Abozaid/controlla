@@ -1,14 +1,11 @@
-import { Matcher, MatcherType, YTCategories } from './../../types/index';
+import { Matcher, MatcherType, YTCategories } from './../../types/index'
 import chromep from 'chrome-promise'
 
 export function getActiveTab(): Promise<chrome.tabs.Tab[]> {
-  return chromep.tabs
-    .query({
-      currentWindow: true,
-      active: true,
-    })
-
-
+  return chromep.tabs.query({
+    currentWindow: true,
+    active: true,
+  })
 }
 
 /*
@@ -16,12 +13,19 @@ export function getActiveTab(): Promise<chrome.tabs.Tab[]> {
 @output: the title of the rule as a string
 */
 export const getRuleTitle = (matcher: Matcher) => {
-
+  if (matcher.type === MatcherType.YT_TAGS) {
+    return (matcher.value as string[]).join(', ')
+  }
   if (matcher.type === MatcherType.YT_CATEGORY) {
-    return YTCategories[matcher.value as string]
+    if (matcher.value.length === Object.keys(YTCategories).length) {
+      return 'All categories'
+    }
+
+    return Object.keys(YTCategories)
+      .filter(key => matcher.value.includes(YTCategories[key]))
+      .join(', ')
   }
   return `${matcher.value as string}`.match(/[^\\\/\^\$]/gi).join('')
-
 }
 
 /*
@@ -32,7 +36,7 @@ export const mapDayNumber = (index: number): string =>
   ['S', 'M', 'T', 'W', 'T', 'F', 'S'][index]
 
 // get host name url
-export function extractHostname(url:string) {
+export function extractHostname(url: string) {
   let hostname
   // find & remove protocol (http, ftp, etc.) and get hostname
 

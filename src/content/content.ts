@@ -2,8 +2,6 @@ import getYTVideos from '../common/getYTVideos'
 
 import $ from 'jquery'
 import { YTCategories } from '../types/index'
-// declare var $
-let bodyHidden
 
 const keywordSearch = []
 let goodVideos: gapi.client.youtube.Video[] = []
@@ -91,14 +89,10 @@ $(document).ready(() => {
 // // pass in the target node, as well as the observer options
 // observer.observe(target, config)
 async function checkYoutube() {
-  if ($('ytd-miniplayer')) {
-    $('ytd-miniplayer').remove()
-  }
+  // if ($('ytd-miniplayer')) {
+  //   $('ytd-miniplayer').remove()
+  // }
   if (window.location.href.includes('youtube.com')) {
-    if (bodyHidden) {
-      $('body').css('display', 'block')
-      bodyHidden = false
-    }
     const videos = $(
       'ytd-compact-autoplay-renderer,ytd-rich-item-renderer,ytd-compact-video-renderer,ytd-grid-video-renderer,ytd-video-renderer,#movie_player > div.html5-endscreen.ytp-player-content.videowall-endscreen.ytp-show-tiles > div > a'
     ).toArray()
@@ -352,13 +346,10 @@ function addVideoInfo(details: gapi.client.youtube.Video) {
   // $('.content.style-scope.ytd-video-secondary-info-renderer')[0])
 }
 ;(async () => {
-  await checkYoutube()
-  await sleep(1000)
-  await checkYoutube()
-
-  setInterval(() => {
-    checkYoutube()
-  }, 2000)
+  // await checkYoutube()
+  // setInterval(() => {
+  //   checkYoutube()
+  // }, 2000)
 })()
 
 function allowVid(el) {

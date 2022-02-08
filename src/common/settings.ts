@@ -7,6 +7,7 @@ class Settings {
     visitActiveThreshold: 60 * 1000,
     pauseQuota: 0,
     quotaRenewalHour: 17,
+    disabled: false,
   }
   _settings
 
@@ -53,6 +54,10 @@ class Settings {
 
   get apiUrl(): string {
     return this._settings.apiUrl
+  }
+
+  get disabled(): string {
+    return this._settings.disabled
   }
 }
 

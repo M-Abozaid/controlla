@@ -9,6 +9,7 @@ export enum MatcherType {
 export interface Matcher {
   type: MatcherType
   value: any
+  isRegex?: boolean
 }
 
 export interface RuleObj {

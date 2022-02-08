@@ -87,9 +87,9 @@ export class Keeper {
     await Promise.all(
       rules.map(async rule => {
         if (tabRemoved) return
-        const usage = await storage.getQuotaUsage(rule._id)
+        const usage = await storage.getOrCreateQuotaUsage(rule._id)
         if (tabRemoved) return
-        if (this.compareActiveQuota(usage, rule)) {
+        if (this.isQuotaExceeded(usage, rule)) {
           result[0] = true
           tabRemoved = true
         }
@@ -126,7 +126,7 @@ export class Keeper {
     }
   }
 
-  compareActiveQuota(
+  isQuotaExceeded(
     { activeUsage }: QuotaUsage,
     { ruleObj: { activeQuota } }: Rule
   ): boolean {
@@ -141,6 +141,7 @@ export class Keeper {
   }
 
   removeTab(tab: chrome.tabs.Tab) {
+    if (settings.disabled) return
     chrome.tabs.get(tab.id, tabFound => {
       if (chrome.runtime.lastError) {
         console.log(chrome.runtime.lastError.message)
@@ -161,6 +162,8 @@ export class Keeper {
   }
 
   async hideTab(tab: chrome.tabs.Tab): Promise<any> {
+    if (settings.disabled) return
+
     try {
       const [newTab] = await chromePromise.tabs.query({
         url: 'chrome://newtab/',

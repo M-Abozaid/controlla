@@ -6,6 +6,7 @@ import Select from '@material-ui/core/Select'
 import { Matcher, MatcherType } from '../../types'
 import SelectYTCat from '../SelectYTCat'
 import ChipInput from 'material-ui-chip-input'
+import { Button, Grid } from '@material-ui/core'
 export interface Props {
   matcher: Matcher
   onMatcherUpdated: (matcher: Matcher) => void
@@ -15,6 +16,12 @@ const MatcherForm = ({ matcher, onMatcherUpdated }) => {
   console.log('matcher ', matcher)
   const [type, setMatcherType] = React.useState(matcher.type || MatcherType.URL)
   const [value, setMatcherValue] = useState(matcher.value)
+
+  const [isRegex, setIsRegex] = useState(
+    !matcher.value && type === MatcherType.URL
+      ? true
+      : typeof matcher.value !== 'string'
+  )
 
   const handleMatcherTypeChange = event => {
     const newMatcherType = event.target?.value
@@ -27,14 +34,16 @@ const MatcherForm = ({ matcher, onMatcherUpdated }) => {
 
   const handleValueChange = newValue => {
     console.log('matcher value changed ', newValue)
-    if (type === MatcherType.URL) {
-      setMatcherValue(new RegExp(newValue))
-    } else {
-      setMatcherValue(newValue)
-    }
-    onMatcherUpdated({ type, value: newValue })
+
+    setMatcherValue(newValue)
+
+    onMatcherUpdated({ type, value: newValue, isRegex })
   }
 
+  const toggleIsRegex = () => {
+    onMatcherUpdated({ type, value, isRegex: !isRegex })
+    setIsRegex(!isRegex)
+  }
   const getMatcherInput = () => {
     switch (type) {
       case MatcherType.YT_CATEGORY:
@@ -77,7 +86,20 @@ const MatcherForm = ({ matcher, onMatcherUpdated }) => {
           ))}
         </Select>
       </div>
-      {getMatcherInput()}
+      <Grid container>
+        <Grid item xs={8}>
+          {' '}
+          {getMatcherInput()}
+        </Grid>
+        <Grid item xs={4}>
+          <Button
+            onClick={toggleIsRegex}
+            style={{ color: isRegex ? 'blue' : 'gray' }}
+          >
+            *
+          </Button>
+        </Grid>
+      </Grid>
     </div>
   )
 }

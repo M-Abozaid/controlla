@@ -1,7 +1,7 @@
 import storage from './storage'
 import { RuleObj, QuotaUsage, Visit, MatcherType } from '../types/index'
 import moment from 'moment'
-import ruleMatcher from '../common/ruleMatcher';
+import ruleMatcher from '../common/ruleMatcher'
 
 class Rule {
   ruleObj: RuleObj
@@ -9,11 +9,7 @@ class Rule {
   usage: QuotaUsage
   constructor(ruleObj?: RuleObj) {
     this.ruleObj = ruleObj
-    this.ruleObj.matchers.forEach(matcher => {
-      if (matcher.type === MatcherType.URL) {
-        matcher.value = new RegExp(matcher.value.toString().replace(/\/$/,'').replace(/^\//,''))
-      }
-    })
+
     this._id = this.ruleObj._id
   }
 
@@ -51,12 +47,12 @@ class Rule {
       ...this.ruleObj,
       ...fieldsToUpdate,
     })
-    this.ruleObj = newObj;
+    this.ruleObj = newObj
     return this.ruleObj
   }
 
   async getUsage(): Promise<QuotaUsage> {
-    this.usage = await storage.getQuotaUsage(this._id)
+    this.usage = await storage.getOrCreateQuotaUsage(this._id)
     return this.usage
   }
 
@@ -66,10 +62,14 @@ class Rule {
 
   doesMatch(tab: chrome.tabs.Tab, visit?: Visit): boolean {
     if (visit && visit.ytDetails) {
-      return this.ruleObj.matchers.some(matcher=>ruleMatcher.matchTab(matcher, tab, visit.ytDetails.snippet))
+      return this.ruleObj.matchers.some(matcher =>
+        ruleMatcher.matchTab(matcher, tab, visit.ytDetails.snippet)
+      )
     }
 
-    return this.ruleObj.matchers.some(matcher => ruleMatcher.matchURL(matcher, tab));
+    return this.ruleObj.matchers.some(matcher =>
+      ruleMatcher.matchURL(matcher, tab)
+    )
   }
 }
 
