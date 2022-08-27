@@ -4,7 +4,6 @@ import chromePromise from 'chrome-promise'
 import ruleMatcher from '../common/ruleMatcher'
 import Rule from 'common/Rule'
 import settings from '../common/settings'
-
 export class Keeper {
   controlIsPaused = false
 
@@ -68,6 +67,13 @@ export class Keeper {
 
       if (tab.active) {
         try {
+          const lastVisibility = visit.visibility[visit.visibility.length - 1]
+          if (
+            lastVisibility &&
+            Date.now() - new Date(lastVisibility.time).getTime() < 4000
+          ) {
+            return
+          }
           await this.hideTab(tab)
         } catch (error) {
           console.error('Error Hiding tab', error)
@@ -163,8 +169,11 @@ export class Keeper {
 
   async hideTab(tab: chrome.tabs.Tab): Promise<any> {
     if (settings.disabled) return
-
     try {
+      const refreshedTab = await chromePromise.tabs.get(tab.id)
+      if (!refreshedTab || !refreshedTab.active) {
+        return
+      }
       const [newTab] = await chromePromise.tabs.query({
         url: 'chrome://newtab/',
         windowId: tab.windowId,

@@ -55,6 +55,20 @@ class Storage extends EventEmitter {
     return
   }
   async createRule(rule: RuleObj): Promise<Rule> {
+    if (rule._rev) {
+      delete rule._rev
+    }
+    if (rule._id) {
+      try {
+        const exists = await this.rulesDB.get(rule._id)
+        if (exists) {
+          await this.updateRuleById(rule._id, rule)
+          return this.getRuleById(rule._id)
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
     const newRule = await this.rulesDB.post(rule)
     this.emit('new_rule', newRule)
     await this.getOrCreateQuotaUsage(newRule.id)
@@ -149,6 +163,13 @@ class Storage extends EventEmitter {
     return usage
   }
 
+  async maxOutUsage(rule: Rule): Promise<any> {
+    const usage = await this.getOrCreateQuotaUsage(rule._id)
+    usage.activeUsage = rule.ruleObj.activeQuota
+    usage.visibilityUsage = rule.ruleObj.visibilityQuota
+    await this.quotaUsageDB.put(usage)
+    return usage
+  }
   async getOrCreateQuotaUsage(ruleId: string) {
     const result = await this.quotaUsageDB.find({
       selector: { ruleId },

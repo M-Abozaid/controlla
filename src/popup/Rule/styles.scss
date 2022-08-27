@@ -20,8 +20,7 @@
 
 .rule__progress {
   &-bar {
-    width: 85%;
-    display: inline-block;
+    flex: 3;
   }
 
   &-time {
@@ -38,7 +37,22 @@
     background-color: #007bff;
   }
 }
+.rule-usage {
+  display: flex;
+}
+.rule__progress-button {
+  top: -4px;
+  position: relative;
 
+  padding: 3px;
+  font-size: 60%;
+  color: white;
+  font-weight: bold;
+
+  margin-left: 8px;
+  border-radius: 5px;
+  background-color: #007bff;
+}
 .rule__time-day {
   text-align: center;
   position: relative;

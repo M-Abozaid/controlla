@@ -4,6 +4,7 @@ export enum MatcherType {
   'YT_CHANNEL' = 'YT_CHANNEL',
   'YT_CATEGORY' = 'YT_CATEGORY',
   'YT_TAGS' = 'YT_TAGS',
+  'ADULT' = 'ADULT',
 }
 
 export interface Matcher {

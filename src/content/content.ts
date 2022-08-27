@@ -98,6 +98,7 @@ async function checkYoutube() {
     ).toArray()
 
     // console.log('videos', videos)
+
     let chunkArr
     for (let i = 0, j = videos.length; i < j; i += 50) {
       chunkArr = videos.slice(i, i + 50)
@@ -323,7 +324,7 @@ function addVideoInfo(details: gapi.client.youtube.Video) {
   //   console.log('add video info ', YTCategories, details.snippet)
   if ($.find(`#tracker-video-info-${details.id}`)[0]) return
   $('.tk-video-info').remove()
-  $('#description > yt-formatted-string').append(`
+  $('#description-inline-expander > yt-formatted-string').append(`
     <table id="tracker-video-info-${details.id}" class="tk-video-info">
     <tr>
       <th>Category</th>
@@ -346,10 +347,10 @@ function addVideoInfo(details: gapi.client.youtube.Video) {
   // $('.content.style-scope.ytd-video-secondary-info-renderer')[0])
 }
 ;(async () => {
-  // await checkYoutube()
-  // setInterval(() => {
-  //   checkYoutube()
-  // }, 2000)
+  await checkYoutube()
+  setInterval(() => {
+    checkYoutube()
+  }, 2000)
 })()
 
 function allowVid(el) {

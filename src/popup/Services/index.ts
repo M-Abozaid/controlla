@@ -25,7 +25,7 @@ export const getRuleTitle = (matcher: Matcher) => {
       .filter(key => matcher.value.includes(YTCategories[key]))
       .join(', ')
   }
-  return `${matcher.value as string}`.match(/[^\\\/\^\$]/gi).join('')
+  return `${matcher.value as string}`
 }
 
 /*

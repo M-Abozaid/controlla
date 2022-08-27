@@ -68,7 +68,7 @@ class Rule {
     }
 
     return this.ruleObj.matchers.some(matcher =>
-      ruleMatcher.matchURL(matcher, tab)
+      ruleMatcher.matchTab(matcher, tab)
     )
   }
 }

@@ -60,7 +60,6 @@ class Tracker {
             }
 
             if (audible !== undefined) {
-              console.log('audible state changed ', openVisit)
               openVisit.audibleState.push({
                 time: new Date(),
                 audible,

@@ -1,5 +1,5 @@
 import { Matcher, MatcherType } from '../types'
-
+import adultSites from './adult'
 class RuleMatcher {
   matchVideoTitle(matcher: Matcher, title: string): boolean {
     if (matcher.type !== MatcherType.YT_TITLE) return false
@@ -59,26 +59,41 @@ class RuleMatcher {
     tab: chrome.tabs.Tab,
     snippet?: gapi.client.youtube.VideoSnippet
   ): boolean {
+    console.log('matcher type ', matcher.type)
+    if (snippet) {
+      switch (matcher.type) {
+        case MatcherType.YT_CATEGORY:
+        case MatcherType.YT_TITLE:
+        case MatcherType.YT_CHANNEL:
+        case MatcherType.YT_TAGS:
+          return this.matchVideoSnippet(matcher, snippet)
+      }
+    }
     switch (matcher.type) {
       case MatcherType.URL:
         return this.matchURL(matcher, tab)
-      case MatcherType.YT_CATEGORY:
-      case MatcherType.YT_TITLE:
-      case MatcherType.YT_CHANNEL:
-      case MatcherType.YT_TAGS:
-        return this.matchVideoSnippet(matcher, snippet)
+      case MatcherType.ADULT:
+        return this.matchAdult(matcher, tab)
       default:
         break
     }
   }
   matchRegex(matcherValue, value) {
-    const regex = new RegExp(
-      matcherValue
-        .toString()
-        .replace(/\/$/, '')
-        .replace(/^\//, '')
-    )
+    const regex = new RegExp(matcherValue)
     return regex.test(value)
+  }
+
+  matchAdult(matcher, { url }: chrome.tabs.Tab) {
+    console.log(
+      'match adult ',
+      url,
+      adultSites.some(pSite => {
+        return url.includes(pSite)
+      })
+    )
+    return adultSites.some(pSite => {
+      return url.includes(pSite)
+    })
   }
 }
 const ruleMatcher = new RuleMatcher()

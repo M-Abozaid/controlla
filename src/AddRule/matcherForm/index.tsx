@@ -91,14 +91,16 @@ const MatcherForm = ({ matcher, onMatcherUpdated }) => {
           {' '}
           {getMatcherInput()}
         </Grid>
-        <Grid item xs={4}>
-          <Button
-            onClick={toggleIsRegex}
-            style={{ color: isRegex ? 'blue' : 'gray' }}
-          >
-            *
-          </Button>
-        </Grid>
+        {matcher.type === MatcherType.URL && (
+          <Grid item xs={4}>
+            <Button
+              onClick={toggleIsRegex}
+              style={{ color: isRegex ? 'blue' : 'gray' }}
+            >
+              *
+            </Button>
+          </Grid>
+        )}
       </Grid>
     </div>
   )

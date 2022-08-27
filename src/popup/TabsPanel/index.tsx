@@ -5,13 +5,14 @@ import RuleComponent from '../Rule'
 
 import storage from '../../common/storage'
 import { getActiveTab } from '../Services'
+import Rule from '../../common/Rule'
 
 interface TabsPanelProps {
   showAllRules?: boolean
 }
 const TabsPanel = ({ showAllRules }: TabsPanelProps) => {
   async function getRules() {
-    let rules = []
+    let rules: Rule[] = []
     if (showAllRules) {
       rules = await storage.getRules()
     } else {
@@ -39,7 +40,7 @@ const TabsPanel = ({ showAllRules }: TabsPanelProps) => {
 
   const [tabKey, setTabKey] = useState('rules')
 
-  const [matchedRules, setMatchedRules] = useState([])
+  const [matchedRules, setMatchedRules] = useState<Rule[]>([])
 
   if (loading) {
     return (
@@ -48,14 +49,6 @@ const TabsPanel = ({ showAllRules }: TabsPanelProps) => {
         animation='grow'
         variant='primary'
       />
-    )
-  }
-
-  if (!matchedRules.length) {
-    return (
-      <div className='tabs-panel__main'>
-        <p>No Rules.. horray</p>
-      </div>
     )
   }
 
@@ -75,14 +68,35 @@ const TabsPanel = ({ showAllRules }: TabsPanelProps) => {
     }, 1500)
   }
 
-  const exportRules = () => {
+  const exportRules = async () => {
+    const rules = await storage.getRules()
+
     downloadString(
-      JSON.stringify(matchedRules),
+      JSON.stringify(rules.map(r => r.ruleObj)),
       'application/json',
       'rules.json'
     )
   }
 
+  const importRules = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = async e => {
+      if (
+        e.target &&
+        (e.target as HTMLInputElement).files &&
+        (e.target as any).files[0]
+      ) {
+        const file = (e.target as any).files[0]
+        const text = await file.text()
+        const rules = JSON.parse(text)
+        console.log('rules', rules)
+        await Promise.all(rules.map(rule => storage.createRule(rule)))
+      }
+    }
+    input.click()
+  }
   return (
     <Tabs
       className='tabs-panel__main'
@@ -92,6 +106,13 @@ const TabsPanel = ({ showAllRules }: TabsPanelProps) => {
     >
       <Tab eventKey='rules' title='Rules &#9997;'>
         <Button onClick={exportRules}>Export JSON</Button>
+
+        <Button onClick={importRules}>Import JSON</Button>
+        {!matchedRules.length && (
+          <div className='tabs-panel__main'>
+            <p>No Rules.. horray</p>
+          </div>
+        )}
         <div>
           {matchedRules.map((rule, idx) => (
             <RuleComponent key={idx} rule={rule} />

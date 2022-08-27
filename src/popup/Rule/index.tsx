@@ -12,6 +12,7 @@ import Close from '@material-ui/icons/Close'
 import Rule from '../../common/Rule'
 import moment from 'moment'
 import { onlyUnique } from '../../common/utils'
+import storage from '../../common/storage'
 interface RuleProps {
   rule: Rule
 }
@@ -29,6 +30,10 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
 
   const removeRule = async () => {
     await rule.remove()
+  }
+
+  const handleOnMaxOut = async () => {
+    await storage.maxOutUsage(rule)
   }
 
   return (
@@ -86,7 +91,7 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
         {rule.ruleObj.matchers.map(matcher => getRuleTitle(matcher)).join(' ')}
       </h4>
 
-      <div>
+      <div className='rule-usage'>
         <ProgressBar
           className='rule__progress-bar'
           now={quotaPercentage}
@@ -95,6 +100,14 @@ const RuleComponent: React.FC<RuleProps> = ({ rule }) => {
         <span className='rule__progress-time'>
           {`${moment(restQuota).format('mm:ss')}`}
         </span>
+        <Button
+          className='rule__progress-button'
+          size='sm'
+          onClick={handleOnMaxOut}
+        >
+          {' '}
+          max out{' '}
+        </Button>
       </div>
 
       <div className='rule__time-day'>
