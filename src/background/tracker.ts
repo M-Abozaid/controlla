@@ -4,6 +4,7 @@ import { Visit } from 'types'
 import storage from '../common/storage'
 import keeper from './keeper'
 import AwaitLock from 'await-lock'
+import { getVideoIdFromURL } from '../common/utils'
 
 class Tracker {
   lock = new AwaitLock()
@@ -157,17 +158,7 @@ class Tracker {
     })
   }
   isUrlTheSame(firstUrl: string, secondUrl: string): boolean {
-    if (
-      firstUrl.includes('youtube.com/watch?v=') &&
-      secondUrl.includes('youtube.com/watch?v=')
-    ) {
-      return (
-        firstUrl.match(/watch\?v=(.{11})/)[1] ===
-        secondUrl.match(/watch\?v=(.{11})/)[1]
-      )
-    } else {
-      return firstUrl === secondUrl
-    }
+    return getVideoIdFromURL(firstUrl) === getVideoIdFromURL(secondUrl)
   }
 }
 // some test coding

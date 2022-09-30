@@ -59,7 +59,6 @@ class RuleMatcher {
     tab: chrome.tabs.Tab,
     snippet?: gapi.client.youtube.VideoSnippet
   ): boolean {
-    console.log('matcher type ', matcher.type)
     if (snippet) {
       switch (matcher.type) {
         case MatcherType.YT_CATEGORY:

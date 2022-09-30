@@ -81,6 +81,7 @@ export class Keeper {
       }
 
       if (tabExpired) {
+        console.log('Removing tab', tab, 'Because of ', matchingRules)
         this.removeTab(tab)
       }
     }

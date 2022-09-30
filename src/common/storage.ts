@@ -11,6 +11,7 @@ import settings from './settings'
 import getYTVideos from '../common/getYTVideos'
 import { v4 as uuidv4 } from 'uuid'
 import saveVisit from './saveVisit'
+import { getVideoIdFromURL, ytVideoOrShortsRegex } from './utils'
 
 declare let window
 PounchDB.plugin(pounchDBFind)
@@ -20,7 +21,7 @@ class Storage extends EventEmitter {
   rulesDB = new PounchDB<RuleObj>('rules')
   quotaUsageDB = new PounchDB<QuotaUsage>('quotaUsage')
   visitsDB = new PounchDB<Visit>('visits')
-  ytVideoURLRegex = /youtube.com\/watch\?v=/
+
   public visits = []
 
   constructor() {
@@ -293,12 +294,15 @@ class Storage extends EventEmitter {
       _id: uuidv4(),
       status: 'loading',
     }
-    if (tab.url.includes('youtube.com/watch?v=')) {
+    const ytVideoId = getVideoIdFromURL(tab.url)
+    console.log('ytVideoId', ytVideoId)
+    if (ytVideoId) {
       // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
-      const vidId = tab.url.match(/watch\?v=(.{11})/)[1]
-      const ytDetails = await getYTVideos([vidId])
+
+      const ytDetails = await getYTVideos([ytVideoId])
+      console.debug('ytDetails', ytDetails)
       ;[newVisit.ytDetails] = ytDetails.items
-      newVisit.ytVideoId = vidId
+      newVisit.ytVideoId = ytVideoId
     }
     storage.createVisit(newVisit)
     return newVisit

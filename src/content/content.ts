@@ -2,6 +2,7 @@ import getYTVideos from '../common/getYTVideos'
 
 import $ from 'jquery'
 import { YTCategories } from '../types/index'
+import { getVideoIdFromURL } from '../common/utils'
 
 const keywordSearch = []
 let goodVideos: gapi.client.youtube.Video[] = []
@@ -194,8 +195,7 @@ async function checkYoutube() {
 
   if (window.location.href.includes('youtube.com/watch?')) {
     try {
-      const match = /watch\?v=(.{11})/.exec(window.location.href)
-      const videoId = match && match[1]
+      const videoId = getVideoIdFromURL(window.location.href)
 
       if (videoId && !$.find(`#tracker-video-info-${videoId}`)[0]) {
         const [videoDetails] = (await getYTVideos([videoId])).items
@@ -300,9 +300,7 @@ function getId(el) {
   }
 
   if (!url) return ''
-  const match = url && url.match(/watch\?v=(.{11})/)
-  if (!match || !match[1]) return ''
-  return match && match[1]
+  return getVideoIdFromURL(url)
 }
 
 function coverVideo(el) {
