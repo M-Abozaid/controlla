@@ -99,6 +99,7 @@ class Tracker {
       }
     )
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      // console.log('Got message ', request.msg)
       if (request.msg === 'checkVideo') {
         keeper.isYTVideoAllowed(request.snippet).then(allowVid => {
           sendResponse({
